@@ -55,50 +55,6 @@
 
 ---
 
-## 📁 Project Structure
-
-```
-finance-tracker/
-├── frontend/                     # Next.js Application
-│   ├── public/                   # Static assets & PWA
-│   │   ├── manifest.json
-│   │   └── icons/
-│   └── src/
-│       ├── app/                  # Pages (App Router)
-│       │   ├── page.tsx          # Dashboard
-│       │   ├── expenses/         # Expense management
-│       │   ├── analytics/        # Charts & predictions
-│       │   ├── insights/         # AI insights
-│       │   ├── categories/       # Category management
-│       │   ├── login/            # Authentication
-│       │   └── register/
-│       ├── components/
-│       │   ├── layout/           # Sidebar, MobileNav, AppShell
-│       │   └── charts/           # Recharts components
-│       ├── context/              # AuthContext (JWT)
-│       ├── hooks/                # Custom data hooks
-│       ├── services/             # API client
-│       ├── types/                # TypeScript interfaces
-│       └── utils/                # Formatters, constants
-│
-├── backend/                      # FastAPI Application
-│   ├── app/
-│   │   ├── main.py               # App entry point
-│   │   ├── config.py             # Environment config
-│   │   ├── database.py           # SQLAlchemy setup
-│   │   ├── models/               # ORM models
-│   │   ├── schemas/              # Pydantic schemas
-│   │   ├── services/             # Business logic
-│   │   ├── routers/              # API endpoints
-│   │   ├── analysis/             # Pandas aggregation + ML
-│   │   └── ai/                   # Gemini + rule-based insights
-│   ├── requirements.txt
-│   └── .env
-└── .gitignore
-```
-
----
-
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -193,26 +149,3 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 | GET | `/api/insights/` | AI/rule-based insights |
 
 ---
-
-## 🧠 Architecture Principles
-
-This project follows **SOLID**, **DRY**, **KISS**, and **YAGNI** principles:
-
-- **Single Responsibility** — Each service/module has one clear purpose
-- **Open/Closed** — AI providers use Strategy Pattern for extensibility
-- **Dependency Inversion** — FastAPI dependency injection throughout
-- **DRY** — Shared hooks, formatters, and design tokens
-- **KISS** — SQLite for simplicity, direct bcrypt for auth
-- **YAGNI** — Only features that serve the core use case
-
----
-
-## 📄 License
-
-MIT License — feel free to use this project in your portfolio.
-
----
-
-## 👤 Author
-
-Built with ❤️ as a portfolio project showcasing full-stack development skills.
