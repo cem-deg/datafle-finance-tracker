@@ -4,7 +4,8 @@ import { useState, FormEvent } from "react";
 import AppShell from "@/components/layout/AppShell";
 import { useExpenses, useCategories } from "@/hooks/useData";
 import { expenseApi } from "@/services/api";
-import { formatCurrency, formatDate } from "@/utils/formatters";
+import { formatDate } from "@/utils/formatters";
+import { useCurrency } from "@/context/CurrencyContext";
 import { Plus, Trash2, Edit3, X, Search, Filter } from "lucide-react";
 
 export default function ExpensesPage() {
@@ -19,6 +20,7 @@ export default function ExpensesPage() {
 
   const { data, loading, refetch } = useExpenses(params);
   const { categories } = useCategories();
+  const { formatAmount } = useCurrency();
   const catMap = new Map(categories.map((c) => [c.id, c]));
 
   // Form state
@@ -159,7 +161,7 @@ export default function ExpensesPage() {
                   <div className="expense-desc">{exp.description}</div>
                   <div className="expense-meta">{cat?.name || "Other"} · {formatDate(exp.expense_date)}</div>
                 </div>
-                <div className="expense-amount">-{formatCurrency(exp.amount)}</div>
+                <div className="expense-amount">-{formatAmount(exp.amount)}</div>
                 <div className="expense-actions">
                   <button className="btn btn-ghost btn-icon btn-sm" onClick={() => openEdit(exp)} title="Edit">
                     <Edit3 size={15} />

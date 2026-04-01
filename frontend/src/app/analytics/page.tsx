@@ -5,7 +5,7 @@ import { useMonthlyTotals, useCategoryDistribution, useTrends, useCategories, us
 import MonthlyBarChart from "@/components/charts/MonthlyBarChart";
 import CategoryPieChart from "@/components/charts/CategoryPieChart";
 import TrendLineChart from "@/components/charts/TrendLineChart";
-import { formatCurrency } from "@/utils/formatters";
+import { useCurrency } from "@/context/CurrencyContext";
 import { BrainCircuit, TrendingUp, TrendingDown, Target } from "lucide-react";
 
 export default function AnalyticsPage() {
@@ -14,6 +14,7 @@ export default function AnalyticsPage() {
   const { data: trends, loading: tLoading } = useTrends(30);
   const { categories } = useCategories();
   const { prediction, loading: pLoading } = usePrediction();
+  const { formatAmount } = useCurrency();
 
   return (
     <AppShell>
@@ -32,7 +33,7 @@ export default function AnalyticsPage() {
             <div className="skeleton skeleton-heading" />
           ) : prediction?.prediction ? (
             <>
-              <div className="stat-value">{formatCurrency(prediction.prediction)}</div>
+              <div className="stat-value">{formatAmount(prediction.prediction)}</div>
               <div className="stat-label">Predicted next month</div>
               <div className={`stat-change ${prediction.trend === "increasing" ? "negative" : "positive"}`}>
                 {prediction.trend === "increasing" ? <TrendingUp size={14} /> : <TrendingDown size={14} />}

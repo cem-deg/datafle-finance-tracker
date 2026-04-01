@@ -22,14 +22,11 @@ export default function MobileNav() {
     <nav className="mobile-nav" id="mobile-nav">
       <div className="mobile-nav-inner">
         {NAV_ITEMS.map((item) => {
-          const isActive =
-            item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+          const isActive = item.href === "/dashboard"
+            ? pathname === "/dashboard" || pathname === "/"
+            : pathname.startsWith(item.href);
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`mobile-nav-link ${isActive ? "active" : ""}`}
-            >
+            <Link key={item.href} href={item.href} className={`mobile-nav-link ${isActive ? "active" : ""}`}>
               <div className="nav-icon-wrap">{iconMap[item.icon]}</div>
               <span>{item.label}</span>
             </Link>

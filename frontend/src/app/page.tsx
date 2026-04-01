@@ -1,141 +1,152 @@
 "use client";
 
-import AppShell from "@/components/layout/AppShell";
-import { useSummary, useRecentExpenses, useMonthlyTotals, useCategories } from "@/hooks/useData";
-import { formatCurrency, formatPercent } from "@/utils/formatters";
-import MonthlyBarChart from "@/components/charts/MonthlyBarChart";
+import Link from "next/link";
+import Navbar from "@/components/layout/Navbar";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import {
-  DollarSign, TrendingUp, TrendingDown, CreditCard, ArrowUpRight,
-  ArrowDownRight, ShoppingBag, Minus,
+  Wallet, BarChart3, Lightbulb, Tags, Shield, Zap,
+  ArrowRight, TrendingUp, ChevronRight,
 } from "lucide-react";
 
-export default function DashboardPage() {
-  const { summary, loading: summaryLoading } = useSummary();
-  const { expenses: recent, loading: recentLoading } = useRecentExpenses(5);
-  const { data: monthly, loading: monthlyLoading } = useMonthlyTotals(6);
-  const { categories } = useCategories();
+export default function LandingPage() {
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
 
-  const catMap = new Map(categories.map((c) => [c.id, c]));
-  const topCat = summary?.top_category_id ? catMap.get(summary.top_category_id) : null;
+  useEffect(() => {
+    if (!isLoading && user) {
+      router.push("/dashboard");
+    }
+  }, [isLoading, user, router]);
 
-  const changeIsPositive = (summary?.month_change_percent ?? 0) > 0;
+  if (isLoading) return null;
+  if (user) return null;
 
   return (
-    <AppShell>
-      <div className="page-header animate-in">
-        <h1>Dashboard</h1>
-        <p>Your financial overview at a glance</p>
-      </div>
+    <div className="landing-page">
+      <Navbar />
 
-      {/* Stat Cards */}
-      <div className="stat-grid">
-        <div className="stat-card animate-in animate-in-delay-1">
-          <div className="stat-icon" style={{ background: "rgba(124,106,239,0.15)", color: "var(--accent-primary-light)" }}>
-            <DollarSign size={22} />
+      {/* Hero */}
+      <section className="hero-section">
+        <div className="hero-content animate-in">
+          <div className="hero-badge">
+            <Zap size={14} /> Smart Finance Tracking
           </div>
-          {summaryLoading ? (
-            <div className="skeleton skeleton-heading" />
-          ) : (
-            <>
-              <div className="stat-value">{formatCurrency(summary?.total_this_month ?? 0)}</div>
-              <div className="stat-label">Spent this month</div>
-              <div className={`stat-change ${changeIsPositive ? "negative" : "positive"}`}>
-                {changeIsPositive ? <ArrowUpRight size={14} /> : summary?.month_change_percent === 0 ? <Minus size={14} /> : <ArrowDownRight size={14} />}
-                {formatPercent(summary?.month_change_percent ?? 0)}
-              </div>
-            </>
-          )}
-        </div>
-
-        <div className="stat-card animate-in animate-in-delay-2">
-          <div className="stat-icon" style={{ background: "rgba(0,210,211,0.15)", color: "var(--accent-secondary)" }}>
-            <CreditCard size={22} />
+          <h1 className="hero-title">
+            Take Control of Your{" "}
+            <span className="gradient-text">Financial Future</span>
+          </h1>
+          <p className="hero-subtitle">
+            Track expenses, analyze spending patterns, and get AI-powered insights
+            to make smarter financial decisions. All in one beautiful dashboard.
+          </p>
+          <div className="hero-actions">
+            <Link href="/register" className="btn btn-primary">
+              Start for Free <ArrowRight size={18} />
+            </Link>
+            <Link href="/login" className="btn btn-secondary">
+              Sign In <ChevronRight size={18} />
+            </Link>
           </div>
-          {summaryLoading ? (
-            <div className="skeleton skeleton-heading" />
-          ) : (
-            <>
-              <div className="stat-value">{summary?.total_transactions ?? 0}</div>
-              <div className="stat-label">Transactions</div>
-              <div className="stat-change positive" style={{ background: "rgba(0,210,211,0.1)", color: "var(--accent-secondary)" }}>
-                Avg {formatCurrency(summary?.avg_per_transaction ?? 0)}
-              </div>
-            </>
-          )}
-        </div>
-
-        <div className="stat-card animate-in animate-in-delay-3">
-          <div className="stat-icon" style={{ background: "rgba(255,107,107,0.15)", color: "var(--accent-danger)" }}>
-            {changeIsPositive ? <TrendingUp size={22} /> : <TrendingDown size={22} />}
-          </div>
-          {summaryLoading ? (
-            <div className="skeleton skeleton-heading" />
-          ) : (
-            <>
-              <div className="stat-value">{formatCurrency(summary?.highest_expense ?? 0)}</div>
-              <div className="stat-label">Highest expense</div>
-            </>
-          )}
-        </div>
-
-        <div className="stat-card animate-in animate-in-delay-4">
-          <div className="stat-icon" style={{ background: topCat ? `${topCat.color}22` : "rgba(253,203,110,0.15)", color: topCat?.color || "var(--accent-warning)" }}>
-            <ShoppingBag size={22} />
-          </div>
-          {summaryLoading ? (
-            <div className="skeleton skeleton-heading" />
-          ) : (
-            <>
-              <div className="stat-value" style={{ fontSize: "var(--font-xl)" }}>{topCat?.name || "—"}</div>
-              <div className="stat-label">Top category</div>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Charts */}
-      <div className="charts-grid">
-        <div className="animate-in animate-in-delay-2">
-          {monthlyLoading ? (
-            <div className="card"><div className="skeleton" style={{ height: 300 }} /></div>
-          ) : (
-            <MonthlyBarChart data={monthly} />
-          )}
-        </div>
-
-        {/* Recent Transactions */}
-        <div className="card animate-in animate-in-delay-3">
-          <div className="card-header">
-            <h3 className="card-title">Recent Transactions</h3>
-            <a href="/expenses" className="btn btn-ghost btn-sm">View all</a>
-          </div>
-          <div className="expense-list">
-            {recentLoading ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="skeleton" style={{ height: 52, marginBottom: 8 }} />
-              ))
-            ) : recent.length === 0 ? (
-              <div className="empty-state" style={{ padding: "var(--space-xl)" }}>
-                <p>No transactions yet. Add your first expense!</p>
-              </div>
-            ) : (
-              recent.map((exp) => {
-                const cat = catMap.get(exp.category_id);
-                return (
-                  <div key={exp.id} className="expense-item">
-                    <div className="category-dot" style={{ background: cat?.color || "#636e72" }} />
-                    <div className="expense-info">
-                      <div className="expense-desc">{exp.description}</div>
-                      <div className="expense-meta">{cat?.name || "Other"} · {new Date(exp.expense_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</div>
-                    </div>
-                    <div className="expense-amount">-{formatCurrency(exp.amount)}</div>
-                  </div>
-                );
-              })
-            )}
+          <div className="hero-stats">
+            <div className="hero-stat">
+              <div className="stat-number">50+</div>
+              <div className="stat-text">Category Icons</div>
+            </div>
+            <div className="hero-stat">
+              <div className="stat-number">AI</div>
+              <div className="stat-text">Powered Insights</div>
+            </div>
+            <div className="hero-stat">
+              <div className="stat-number">18+</div>
+              <div className="stat-text">Currencies</div>
+            </div>
           </div>
         </div>
-      </div>
-    </AppShell>
+      </section>
+
+      {/* Features */}
+      <section className="features-section" id="features">
+        <div className="section-header animate-in">
+          <h2>Everything You Need</h2>
+          <p>Powerful features to manage your finances effortlessly</p>
+        </div>
+        <div className="features-grid">
+          <div className="feature-card animate-in animate-in-delay-1">
+            <div className="feature-icon" style={{ background: "rgba(124,106,239,0.15)", color: "var(--accent-primary-light)" }}>
+              <Wallet size={24} />
+            </div>
+            <h3>Expense Tracking</h3>
+            <p>Log every transaction with categories, dates, and descriptions. Filter and search through your history instantly.</p>
+          </div>
+          <div className="feature-card animate-in animate-in-delay-2">
+            <div className="feature-icon" style={{ background: "rgba(0,210,211,0.15)", color: "var(--accent-secondary)" }}>
+              <BarChart3 size={24} />
+            </div>
+            <h3>Visual Analytics</h3>
+            <p>Beautiful charts and graphs show your spending patterns. Monthly trends, category breakdowns, and daily insights.</p>
+          </div>
+          <div className="feature-card animate-in animate-in-delay-3">
+            <div className="feature-icon" style={{ background: "rgba(253,203,110,0.15)", color: "var(--accent-warning)" }}>
+              <Lightbulb size={24} />
+            </div>
+            <h3>AI-Powered Insights</h3>
+            <p>Get personalized financial advice powered by Google Gemini AI. Smart alerts when spending spikes or savings opportunities appear.</p>
+          </div>
+          <div className="feature-card animate-in animate-in-delay-4">
+            <div className="feature-icon" style={{ background: "rgba(0,184,148,0.15)", color: "var(--accent-success)" }}>
+              <Tags size={24} />
+            </div>
+            <h3>Custom Categories</h3>
+            <p>Organize with 50+ icons across 12 groups. Create unlimited custom categories with colors that match your style.</p>
+          </div>
+          <div className="feature-card animate-in animate-in-delay-1">
+            <div className="feature-icon" style={{ background: "rgba(255,107,107,0.15)", color: "var(--accent-danger)" }}>
+              <TrendingUp size={24} />
+            </div>
+            <h3>ML Predictions</h3>
+            <p>Machine learning models predict your next month's spending based on historical patterns and trends.</p>
+          </div>
+          <div className="feature-card animate-in animate-in-delay-2">
+            <div className="feature-icon" style={{ background: "rgba(162,155,254,0.15)", color: "var(--accent-primary-light)" }}>
+              <Shield size={24} />
+            </div>
+            <h3>Multi-Currency</h3>
+            <p>Support for 18+ currencies worldwide. Switch between USD, EUR, TRY, GBP, JPY and more with a single click.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* How it Works */}
+      <section className="how-it-works" id="how-it-works">
+        <div className="section-header animate-in">
+          <h2>How It Works</h2>
+          <p>Get started in three simple steps</p>
+        </div>
+        <div className="steps-grid">
+          <div className="step-item animate-in animate-in-delay-1">
+            <div className="step-number">1</div>
+            <h3>Create Account</h3>
+            <p>Sign up for free in seconds. No credit card required.</p>
+          </div>
+          <div className="step-item animate-in animate-in-delay-2">
+            <div className="step-number">2</div>
+            <h3>Track Spending</h3>
+            <p>Add expenses with categories and watch your dashboard come alive.</p>
+          </div>
+          <div className="step-item animate-in animate-in-delay-3">
+            <div className="step-number">3</div>
+            <h3>Get Insights</h3>
+            <p>Receive AI-powered analysis and actionable tips to save money.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="landing-footer">
+        <p>© {new Date().getFullYear()} Datafle. Built with ❤️ for smarter finances.</p>
+      </footer>
+    </div>
   );
 }

@@ -1,12 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
+import { useCurrency, SUPPORTED_CURRENCIES } from "@/context/CurrencyContext";
 import { NAV_ITEMS, APP_NAME } from "@/utils/constants";
 import {
   LayoutDashboard, Wallet, BarChart3, Lightbulb, Tags,
-  LogOut, TrendingUp,
+  LogOut, TrendingUp, Sun, Moon, Settings, ChevronDown,
+  Calendar, Globe, X,
 } from "lucide-react";
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -20,52 +24,130 @@ const iconMap: Record<string, React.ReactNode> = {
 export default function Sidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+  const { currency, setCurrency } = useCurrency();
+  const [profileExpanded, setProfileExpanded] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const initial = user?.name?.charAt(0)?.toUpperCase() || "U";
+  const memberSince = user?.created_at
+    ? new Date(user.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })
+    : "";
 
   return (
-    <aside className="sidebar" id="sidebar">
-      <div className="sidebar-logo">
-        <div className="logo-icon">
-          <TrendingUp size={18} />
+    <>
+      <aside className="sidebar" id="sidebar">
+        <div className="sidebar-logo">
+          <div className="logo-icon"><TrendingUp size={18} /></div>
+          <h1>{APP_NAME}</h1>
         </div>
-        <h1>{APP_NAME}</h1>
-      </div>
 
-      <nav className="sidebar-nav">
-        {NAV_ITEMS.map((item) => {
-          const isActive =
-            item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`sidebar-link ${isActive ? "active" : ""}`}
-            >
-              {iconMap[item.icon]}
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
+        <nav className="sidebar-nav">
+          {NAV_ITEMS.map((item) => {
+            const isActive = item.href === "/dashboard"
+              ? pathname === "/dashboard" || pathname === "/"
+              : pathname.startsWith(item.href);
+            return (
+              <Link key={item.href} href={item.href} className={`sidebar-link ${isActive ? "active" : ""}`}>
+                {iconMap[item.icon]}
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
 
-      <div className="sidebar-footer">
-        <div className="sidebar-user">
-          <div className="avatar">{initial}</div>
-          <div className="user-info">
-            <div className="user-name">{user?.name || "User"}</div>
-            <div className="user-email">{user?.email || ""}</div>
-          </div>
-          <button
-            className="btn-ghost btn-icon"
-            onClick={logout}
-            title="Log out"
-            id="logout-btn"
-          >
-            <LogOut size={18} />
+        {/* Theme Toggle */}
+        <div style={{ padding: "0 var(--space-md)", marginBottom: "var(--space-sm)" }}>
+          <button className="theme-toggle w-full" onClick={toggleTheme} title="Toggle theme" id="theme-toggle-sidebar"
+            style={{ width: "100%", justifyContent: "center", gap: 8, fontSize: "var(--font-xs)", fontWeight: 500 }}>
+            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+            {theme === "dark" ? "Light Mode" : "Dark Mode"}
           </button>
         </div>
-      </div>
-    </aside>
+
+        {/* Profile Section */}
+        <div className="sidebar-footer">
+          <div className="profile-panel">
+            <div className="sidebar-user" onClick={() => setProfileExpanded(!profileExpanded)} style={{ margin: 0, padding: 0 }}>
+              <div className="avatar">{initial}</div>
+              <div className="user-info">
+                <div className="user-name">{user?.name || "User"}</div>
+                <div className="user-email">{user?.email || ""}</div>
+              </div>
+              <ChevronDown size={16} style={{
+                color: "var(--text-tertiary)", transition: "transform 200ms ease",
+                transform: profileExpanded ? "rotate(180deg)" : "rotate(0)"
+              }} />
+            </div>
+
+            {profileExpanded && (
+              <div className="profile-expanded">
+                <div className="profile-detail">
+                  <Calendar size={14} />
+                  <span>Member since {memberSince}</span>
+                </div>
+                <div className="profile-detail">
+                  <Globe size={14} />
+                  <span>{currency.flag} {currency.code}</span>
+                </div>
+                <div style={{ display: "flex", gap: 4, marginTop: "var(--space-sm)" }}>
+                  <button className="btn btn-ghost btn-sm" style={{ flex: 1, fontSize: "var(--font-xs)" }}
+                    onClick={() => setShowSettings(true)}>
+                    <Settings size={14} /> Settings
+                  </button>
+                  <button className="btn btn-ghost btn-sm" style={{ color: "var(--accent-danger)", fontSize: "var(--font-xs)" }}
+                    onClick={logout} id="logout-btn">
+                    <LogOut size={14} /> Logout
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </aside>
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <div className="modal-overlay" onClick={() => setShowSettings(false)} style={{ zIndex: 1000 }}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h2 className="modal-title">Settings</h2>
+              <button className="btn btn-ghost btn-icon" onClick={() => setShowSettings(false)}><X size={20} /></button>
+            </div>
+
+            <div className="settings-section">
+              <h3>Currency</h3>
+              <p style={{ fontSize: "var(--font-xs)", color: "var(--text-secondary)", marginBottom: "var(--space-sm)" }}>
+                Select your preferred currency for displaying amounts
+              </p>
+              <div className="currency-grid">
+                {SUPPORTED_CURRENCIES.map((c) => (
+                  <div key={c.code}
+                    className={`currency-option ${currency.code === c.code ? "selected" : ""}`}
+                    onClick={() => setCurrency(c.code)}>
+                    <span className="currency-flag">{c.flag}</span>
+                    <span>{c.code}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="settings-section">
+              <h3>Theme</h3>
+              <div style={{ display: "flex", gap: "var(--space-sm)" }}>
+                <button className={`btn ${theme === "dark" ? "btn-primary" : "btn-secondary"}`}
+                  onClick={() => { toggleTheme(); }} style={{ flex: 1 }}>
+                  <Moon size={16} /> Dark
+                </button>
+                <button className={`btn ${theme === "light" ? "btn-primary" : "btn-secondary"}`}
+                  onClick={() => { toggleTheme(); }} style={{ flex: 1 }}>
+                  <Sun size={16} /> Light
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
