@@ -26,6 +26,7 @@ class Predictor:
 
         df = pd.DataFrame(expenses, columns=["amount", "expense_date"])
         df["expense_date"] = pd.to_datetime(df["expense_date"])
+        df["amount"] = pd.to_numeric(df["amount"])
         df["month"] = df["expense_date"].dt.to_period("M")
         monthly = df.groupby("month")["amount"].sum().reset_index()
         monthly = monthly.sort_values("month")
@@ -105,6 +106,7 @@ class Predictor:
 
         df = pd.DataFrame(expenses, columns=["amount", "expense_date", "category_id"])
         df["expense_date"] = pd.to_datetime(df["expense_date"])
+        df["amount"] = pd.to_numeric(df["amount"])
         df["month"] = df["expense_date"].dt.to_period("M")
 
         predictions = []

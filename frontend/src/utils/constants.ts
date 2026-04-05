@@ -7,6 +7,8 @@ export const APP_NAME = "Datafle";
 export const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: "layout-dashboard" },
   { label: "Expenses", href: "/expenses", icon: "wallet" },
+  { label: "Income", href: "/income", icon: "banknote" },
+  { label: "Budgets", href: "/budgets", icon: "target" },
   { label: "Analytics", href: "/analytics", icon: "bar-chart-3" },
   { label: "Insights", href: "/insights", icon: "lightbulb" },
   { label: "Categories", href: "/categories", icon: "tags" },

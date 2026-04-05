@@ -2,7 +2,6 @@
  * TypeScript type definitions for the Datafle application.
  */
 
-// ─── User & Auth ────────────────────────────────────────────
 export interface User {
   id: number;
   email: string;
@@ -27,7 +26,6 @@ export interface RegisterData {
   password: string;
 }
 
-// ─── Category ───────────────────────────────────────────────
 export interface Category {
   id: number;
   name: string;
@@ -43,13 +41,13 @@ export interface CategoryCreate {
   color?: string;
 }
 
-// ─── Expense ────────────────────────────────────────────────
 export interface Expense {
   id: number;
   amount: number;
   description: string;
   expense_date: string;
   category_id: number;
+  currency_code: string;
   category: Category;
   created_at: string;
   updated_at: string;
@@ -60,6 +58,7 @@ export interface ExpenseCreate {
   description: string;
   category_id: number;
   expense_date: string;
+  currency_code?: string;
 }
 
 export interface ExpenseUpdate {
@@ -67,6 +66,7 @@ export interface ExpenseUpdate {
   description?: string;
   category_id?: number;
   expense_date?: string;
+  currency_code?: string;
 }
 
 export interface ExpenseList {
@@ -77,20 +77,91 @@ export interface ExpenseList {
   total_pages: number;
 }
 
-// ─── Analytics ──────────────────────────────────────────────
+export interface Income {
+  id: number;
+  amount: number;
+  description: string;
+  income_date: string;
+  source: string;
+  currency_code: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface IncomeCreate {
+  amount: number;
+  description: string;
+  income_date: string;
+  source?: string;
+  currency_code?: string;
+}
+
+export interface IncomeList {
+  items: Income[];
+  total: number;
+  page: number;
+  per_page: number;
+  total_pages: number;
+}
+
+export interface Budget {
+  id: number;
+  amount: number;
+  month_start: string;
+  category_id: number;
+  note?: string | null;
+  created_at: string;
+  updated_at: string;
+  category: Category;
+}
+
+export interface BudgetCreate {
+  amount: number;
+  month_start: string;
+  category_id: number;
+  note?: string;
+}
+
+export interface BudgetOverviewItem {
+  budget_id: number;
+  category_id: number;
+  category_name: string;
+  category_color: string;
+  amount: number;
+  spent: number;
+  remaining: number;
+  usage_percent: number;
+  is_over_budget: boolean;
+  month_start: string;
+  note?: string | null;
+}
+
 export interface DashboardSummary {
   total_this_month: number;
+  total_income_this_month: number;
+  net_balance_this_month: number;
   total_last_month: number;
   month_change_percent: number;
   total_transactions: number;
   avg_per_transaction: number;
   top_category_id: number | null;
   highest_expense: number;
+  total_budget_this_month: number;
+  budget_remaining: number;
+  budget_usage_percent: number;
+  over_budget_categories_count: number;
 }
 
 export interface MonthlyTotal {
   month: string;
   total: number;
+}
+
+export interface CashflowPoint {
+  month: string;
+  income: number;
+  expenses: number;
+  net: number;
 }
 
 export interface CategoryDistribution {
@@ -114,7 +185,6 @@ export interface Prediction {
   message: string;
 }
 
-// ─── Insights ───────────────────────────────────────────────
 export interface InsightResponse {
   mode: string;
   provider: string;

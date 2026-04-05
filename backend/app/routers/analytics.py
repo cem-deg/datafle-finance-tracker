@@ -34,6 +34,16 @@ def monthly_totals(
     return Aggregator.monthly_totals(db, current_user.id, months)
 
 
+@router.get("/cashflow")
+def monthly_cashflow(
+    months: int = Query(12, ge=1, le=24),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Monthly income, expense, and net totals."""
+    return Aggregator.monthly_cashflow(db, current_user.id, months)
+
+
 @router.get("/category-distribution")
 def category_distribution(
     start_date: date | None = None,
@@ -53,6 +63,16 @@ def spending_trends(
 ):
     """Daily spending trend for line chart."""
     return Aggregator.daily_trend(db, current_user.id, days)
+
+
+@router.get("/budgets/current")
+def current_budget_overview(
+    month_start: date | None = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Budget usage overview for the selected month."""
+    return Aggregator.budget_overview(db, current_user.id, month_start)
 
 
 @router.get("/prediction")

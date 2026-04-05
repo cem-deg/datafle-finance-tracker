@@ -21,25 +21,30 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [token, setToken] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("datafle_token");
+  });
+  const [isLoading, setIsLoading] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    return localStorage.getItem("datafle_token") !== null;
+  });
 
   // Check for existing token on mount
   useEffect(() => {
-    const stored = localStorage.getItem("datafle_token");
-    if (stored) {
-      setToken(stored);
-      authApi.getMe()
-        .then((u) => setUser(u as User))
-        .catch(() => {
-          localStorage.removeItem("datafle_token");
-          setToken(null);
-        })
-        .finally(() => setIsLoading(false));
-    } else {
-      setIsLoading(false);
+    if (!token) {
+      return;
     }
-  }, []);
+
+    authApi.getMe()
+      .then((u) => setUser(u as User))
+      .catch(() => {
+        localStorage.removeItem("datafle_token");
+        setToken(null);
+        setIsLoading(false);
+      })
+      .finally(() => setIsLoading(false));
+  }, [token]);
 
   const login = useCallback(async (email: string, password: string) => {
     const data = (await authApi.login({ email, password })) as AuthToken;
@@ -59,6 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("datafle_token");
     setToken(null);
     setUser(null);
+    setIsLoading(false);
   }, []);
 
   return (

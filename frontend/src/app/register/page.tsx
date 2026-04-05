@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { APP_NAME } from "@/utils/constants";
-import { Mail, Lock, User, TrendingUp } from "lucide-react";
+import { ArrowLeft, Lock, Mail, Target, TrendingUp, User, Wallet } from "lucide-react";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -36,81 +36,124 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="auth-page">
-      <div className="auth-card animate-in">
-        <div className="auth-logo">
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 8 }}>
-            <div className="logo-icon" style={{ width: 40, height: 40, background: "var(--gradient-primary)", borderRadius: "var(--radius-sm)", display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>
-              <TrendingUp size={22} />
+    <div className="auth-page premium-auth-page">
+      <div className="auth-shell">
+        <div className="auth-brand-panel auth-editorial-panel animate-in">
+          <Link href="/" className="auth-back-link">
+            <ArrowLeft size={16} />
+            Back to landing page
+          </Link>
+
+          <div className="auth-brand-block">
+            <div className="auth-logo auth-logo-left">
+              <div className="logo-icon auth-brand-icon">
+                <TrendingUp size={22} />
+              </div>
+              <div className="auth-brand-lockup">
+                <h1>{APP_NAME}</h1>
+                <p>Create your workspace and shape your money flow.</p>
+              </div>
+            </div>
+
+            <p className="section-kicker auth-kicker">Open your workspace</p>
+            <h2>Start with a product surface that feels more refined from day one.</h2>
+            <p className="auth-brand-text">
+              Set up your account and move directly into a more intentional finance workflow across income, spending, and budgets.
+            </p>
+          </div>
+
+          <div className="auth-editorial-grid">
+            <article className="auth-editorial-card">
+              <span>Control</span>
+              <strong>Track the full money flow in one structured space</strong>
+              <p>Start with a clearer system instead of scattered notes and spreadsheets.</p>
+            </article>
+            <article className="auth-editorial-card">
+              <span>Direction</span>
+              <strong>Build habits inside a product designed for clarity</strong>
+              <p>Every surface is tuned to feel deliberate, composed, and easier to trust.</p>
+            </article>
+          </div>
+
+          <div className="auth-editorial-footer">
+            <div className="auth-inline-metric">
+              <Target size={16} />
+              Stronger planning and budget discipline
+            </div>
+            <div className="auth-inline-metric">
+              <Wallet size={16} />
+              One place for your financial system
             </div>
           </div>
-          <h1>{APP_NAME}</h1>
-          <p>Create your account to get started.</p>
         </div>
 
-        {error && <div className="auth-error" id="register-error">{error}</div>}
-
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label" htmlFor="name">Full Name</label>
-            <div style={{ position: "relative" }}>
-              <User size={18} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--text-tertiary)" }} />
-              <input
-                id="name"
-                type="text"
-                className="form-input"
-                style={{ paddingLeft: 42 }}
-                placeholder="John Doe"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
+        <div className="auth-card premium-auth-card animate-in animate-in-delay-2">
+          <div className="auth-logo">
+            <h1>Create Account</h1>
+            <p>Open your workspace and start building your financial system.</p>
           </div>
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="reg-email">Email</label>
-            <div style={{ position: "relative" }}>
-              <Mail size={18} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--text-tertiary)" }} />
-              <input
-                id="reg-email"
-                type="email"
-                className="form-input"
-                style={{ paddingLeft: 42 }}
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+          {error && <div className="auth-error" id="register-error">{error}</div>}
+
+          <form className="auth-form" onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label className="form-label" htmlFor="name">Full Name</label>
+              <div className="auth-input-wrap">
+                <User size={18} className="auth-input-icon" />
+                <input
+                  id="name"
+                  type="text"
+                  className="form-input auth-input"
+                  placeholder="John Doe"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
             </div>
-          </div>
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="reg-password">Password</label>
-            <div style={{ position: "relative" }}>
-              <Lock size={18} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--text-tertiary)" }} />
-              <input
-                id="reg-password"
-                type="password"
-                className="form-input"
-                style={{ paddingLeft: 42 }}
-                placeholder="Min. 6 characters"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-              />
+            <div className="form-group">
+              <label className="form-label" htmlFor="reg-email">Email</label>
+              <div className="auth-input-wrap">
+                <Mail size={18} className="auth-input-icon" />
+                <input
+                  id="reg-email"
+                  type="email"
+                  className="form-input auth-input"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
             </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="reg-password">Password</label>
+              <div className="auth-input-wrap">
+                <Lock size={18} className="auth-input-icon" />
+                <input
+                  id="reg-password"
+                  type="password"
+                  className="form-input auth-input"
+                  placeholder="Min. 6 characters"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                />
+              </div>
+            </div>
+
+            <button type="submit" className="btn btn-primary auth-submit" id="register-submit" disabled={loading}>
+              {loading ? "Creating account..." : "Create Account"}
+            </button>
+          </form>
+
+          <div className="auth-switch">
+            Already have an account?{" "}
+            <Link href="/login">Sign in</Link>
           </div>
-
-          <button type="submit" className="btn btn-primary" id="register-submit" disabled={loading}>
-            {loading ? "Creating account..." : "Create Account"}
-          </button>
-        </form>
-
-        <div className="auth-switch">
-          Already have an account?{" "}
-          <Link href="/login">Sign in</Link>
         </div>
       </div>
     </div>

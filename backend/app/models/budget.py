@@ -1,31 +1,31 @@
-"""Expense model for tracking user spending."""
+"""Budget model for monthly category limits."""
 
 from datetime import date, datetime, timezone
 
-from sqlalchemy import (
-    Numeric, String, Date, DateTime, Integer, ForeignKey, Text,
-)
+from sqlalchemy import Date, DateTime, ForeignKey, Integer, Numeric, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
 
-class Expense(Base):
-    """Represents a single expense entry."""
+class Budget(Base):
+    """Represents a monthly budget assigned to a category."""
 
-    __tablename__ = "expenses"
+    __tablename__ = "budgets"
+    __table_args__ = (
+        UniqueConstraint("user_id", "category_id", "month_start", name="uq_budget_month"),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     amount: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
-    description: Mapped[str] = mapped_column(Text, nullable=False)
-    expense_date: Mapped[date] = mapped_column(Date, nullable=False)
+    month_start: Mapped[date] = mapped_column(Date, nullable=False)
+    note: Mapped[str | None] = mapped_column(String(255), nullable=True)
     user_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("users.id"), nullable=False
     )
     category_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("categories.id"), nullable=False
     )
-    currency_code: Mapped[str] = mapped_column(String(3), nullable=False, default="USD")
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=lambda: datetime.now(timezone.utc)
     )
@@ -35,6 +35,5 @@ class Expense(Base):
         onupdate=lambda: datetime.now(timezone.utc),
     )
 
-    # Relationships
-    user = relationship("User", back_populates="expenses")
-    category = relationship("Category", back_populates="expenses")
+    user = relationship("User", back_populates="budgets")
+    category = relationship("Category", back_populates="budgets")

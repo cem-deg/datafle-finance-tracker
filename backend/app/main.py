@@ -5,10 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import engine, Base
-from app.routers import auth, categories, expenses, analytics, insights
+from app.routers import auth, budgets, categories, expenses, analytics, incomes, insights
 
 # Create all database tables on startup
-Base.metadata.create_all(bind=engine)
+if settings.AUTO_CREATE_TABLES:
+    Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Datafle API",
@@ -19,11 +20,7 @@ app = FastAPI(
 # CORS middleware — must be added before routes
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:3001",
-    ],
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
@@ -34,6 +31,8 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(categories.router)
 app.include_router(expenses.router)
+app.include_router(incomes.router)
+app.include_router(budgets.router)
 app.include_router(analytics.router)
 app.include_router(insights.router)
 

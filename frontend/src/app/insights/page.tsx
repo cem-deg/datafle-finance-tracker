@@ -49,12 +49,17 @@ export default function InsightsPage() {
   const { convertAndFormat } = useCurrency();
 
   useEffect(() => {
-    setLoading(true);
     insightsApi.get(mode)
       .then((d) => setInsight(d as InsightResponse))
       .catch(() => setInsight(null))
       .finally(() => setLoading(false));
   }, [mode]);
+
+  function handleModeChange(nextMode: "rule" | "ai") {
+    if (nextMode === mode) return;
+    setLoading(true);
+    setMode(nextMode);
+  }
 
   // Calculate health score
   const change = summary?.month_change_percent ?? 0;
@@ -131,10 +136,10 @@ export default function InsightsPage() {
       <div className="page-header animate-in" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16 }}>
         <div><h1>Smart Insights</h1><p>Personalized financial analysis and recommendations</p></div>
         <div className="insight-mode-toggle">
-          <button className={`insight-mode-btn ${mode === "rule" ? "active" : ""}`} onClick={() => setMode("rule")} id="mode-rule">
+          <button className={`insight-mode-btn ${mode === "rule" ? "active" : ""}`} onClick={() => handleModeChange("rule")} id="mode-rule">
             <Cpu size={14} style={{ display: "inline", verticalAlign: "middle", marginRight: 6 }} />Rule-based
           </button>
-          <button className={`insight-mode-btn ${mode === "ai" ? "active" : ""}`} onClick={() => setMode("ai")} id="mode-ai">
+          <button className={`insight-mode-btn ${mode === "ai" ? "active" : ""}`} onClick={() => handleModeChange("ai")} id="mode-ai">
             <Sparkles size={14} style={{ display: "inline", verticalAlign: "middle", marginRight: 6 }} />AI Powered
           </button>
         </div>

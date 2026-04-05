@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { APP_NAME } from "@/utils/constants";
-import { Mail, Lock, TrendingUp } from "lucide-react";
+import { ArrowLeft, Lock, Mail, Shield, TrendingUp, Wallet } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -31,63 +31,107 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="auth-page">
-      <div className="auth-card animate-in">
-        <div className="auth-logo">
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 8 }}>
-            <div className="logo-icon" style={{ width: 40, height: 40, background: "var(--gradient-primary)", borderRadius: "var(--radius-sm)", display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>
-              <TrendingUp size={22} />
+    <div className="auth-page premium-auth-page">
+      <div className="auth-shell">
+        <div className="auth-brand-panel auth-editorial-panel animate-in">
+          <Link href="/" className="auth-back-link">
+            <ArrowLeft size={16} />
+            Back to landing page
+          </Link>
+
+          <div className="auth-brand-block">
+            <div className="auth-logo auth-logo-left">
+              <div className="logo-icon auth-brand-icon">
+                <TrendingUp size={22} />
+              </div>
+              <div className="auth-brand-lockup">
+                <h1>{APP_NAME}</h1>
+                <p>Welcome back to your financial workspace.</p>
+              </div>
+            </div>
+
+            <p className="section-kicker auth-kicker">Private workspace access</p>
+            <h2>Sign in to return to a cleaner, more deliberate finance workflow.</h2>
+            <p className="auth-brand-text">
+              Built for clarity across budgets, cashflow, and decision-making. The experience stays polished from the first screen to the dashboard.
+            </p>
+          </div>
+
+          <div className="auth-editorial-grid">
+            <article className="auth-editorial-card">
+              <span>Workspace</span>
+              <strong>Income, expenses, and budgets in one place</strong>
+              <p>A more composed surface for daily financial control.</p>
+            </article>
+            <article className="auth-editorial-card">
+              <span>Security</span>
+              <strong>Private access with structured auth flow</strong>
+              <p>Your financial data stays behind a dedicated account layer.</p>
+            </article>
+          </div>
+
+          <div className="auth-editorial-footer">
+            <div className="auth-inline-metric">
+              <Wallet size={16} />
+              Clear overview, lower friction
+            </div>
+            <div className="auth-inline-metric">
+              <Shield size={16} />
+              Built with production in mind
             </div>
           </div>
-          <h1>{APP_NAME}</h1>
-          <p>Welcome back! Sign in to continue.</p>
         </div>
 
-        {error && <div className="auth-error" id="login-error">{error}</div>}
-
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label" htmlFor="email">Email</label>
-            <div style={{ position: "relative" }}>
-              <Mail size={18} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--text-tertiary)" }} />
-              <input
-                id="email"
-                type="email"
-                className="form-input"
-                style={{ paddingLeft: 42 }}
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
+        <div className="auth-card premium-auth-card animate-in animate-in-delay-2">
+          <div className="auth-logo">
+            <h1>Sign In</h1>
+            <p>Access your dashboard, budgets, and cashflow overview.</p>
           </div>
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="password">Password</label>
-            <div style={{ position: "relative" }}>
-              <Lock size={18} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--text-tertiary)" }} />
-              <input
-                id="password"
-                type="password"
-                className="form-input"
-                style={{ paddingLeft: 42 }}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+          {error && <div className="auth-error" id="login-error">{error}</div>}
+
+          <form className="auth-form" onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label className="form-label" htmlFor="email">Email</label>
+              <div className="auth-input-wrap">
+                <Mail size={18} className="auth-input-icon" />
+                <input
+                  id="email"
+                  type="email"
+                  className="form-input auth-input"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
             </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="password">Password</label>
+              <div className="auth-input-wrap">
+                <Lock size={18} className="auth-input-icon" />
+                <input
+                  id="password"
+                  type="password"
+                  className="form-input auth-input"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <button type="submit" className="btn btn-primary auth-submit" id="login-submit" disabled={loading}>
+              {loading ? "Signing in..." : "Sign In"}
+            </button>
+          </form>
+
+          <div className="auth-switch">
+            Don&apos;t have an account?{" "}
+            <Link href="/register">Create one</Link>
           </div>
-
-          <button type="submit" className="btn btn-primary" id="login-submit" disabled={loading}>
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
-
-        <div className="auth-switch">
-          Don&apos;t have an account?{" "}
-          <Link href="/register">Create one</Link>
         </div>
       </div>
     </div>

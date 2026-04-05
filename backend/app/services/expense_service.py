@@ -7,12 +7,32 @@ from sqlalchemy import desc
 from sqlalchemy.orm import Session, joinedload
 from fastapi import HTTPException, status
 
+from app.models.category import Category
 from app.models.expense import Expense
 from app.schemas.expense import ExpenseCreate, ExpenseUpdate, ExpenseListResponse
 
 
 class ExpenseService:
     """Handles all expense-related operations."""
+
+    @staticmethod
+    def _validate_category_ownership(
+        db: Session, category_id: int | None, user_id: int
+    ) -> None:
+        """Ensure the selected category belongs to the current user."""
+        if category_id is None:
+            return
+
+        category = (
+            db.query(Category)
+            .filter(Category.id == category_id, Category.user_id == user_id)
+            .first()
+        )
+        if not category:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid category for this user",
+            )
 
     @staticmethod
     def get_all(
@@ -93,6 +113,8 @@ class ExpenseService:
     @staticmethod
     def create(db: Session, data: ExpenseCreate, user_id: int) -> Expense:
         """Create a new expense."""
+        ExpenseService._validate_category_ownership(db, data.category_id, user_id)
+
         expense = Expense(
             amount=data.amount,
             description=data.description,
@@ -122,6 +144,11 @@ class ExpenseService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Expense not found",
             )
+
+        ExpenseService._validate_category_ownership(
+            db, data.category_id, user_id
+        )
+
         for field, value in data.model_dump(exclude_unset=True).items():
             setattr(expense, field, value)
         db.commit()

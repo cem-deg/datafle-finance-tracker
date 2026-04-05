@@ -103,5 +103,10 @@ class CategoryService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Cannot delete category with existing expenses",
             )
+        if category.budgets:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Cannot delete category with existing budgets",
+            )
         db.delete(category)
         db.commit()

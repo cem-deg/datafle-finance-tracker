@@ -5,11 +5,14 @@ import { usePathname } from "next/navigation";
 import { NAV_ITEMS } from "@/utils/constants";
 import {
   LayoutDashboard, Wallet, BarChart3, Lightbulb, Tags,
+  Banknote, Target,
 } from "lucide-react";
 
 const iconMap: Record<string, React.ReactNode> = {
   "layout-dashboard": <LayoutDashboard size={20} />,
   wallet: <Wallet size={20} />,
+  banknote: <Banknote size={20} />,
+  target: <Target size={20} />,
   "bar-chart-3": <BarChart3 size={20} />,
   lightbulb: <Lightbulb size={20} />,
   tags: <Tags size={20} />,

@@ -1,0 +1,86 @@
+"""Income API endpoints."""
+
+from datetime import date
+
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy.orm import Session
+
+from app.database import get_db
+from app.models.user import User
+from app.schemas.income import (
+    IncomeCreate,
+    IncomeListResponse,
+    IncomeResponse,
+    IncomeUpdate,
+)
+from app.services.auth_service import get_current_user
+from app.services.income_service import IncomeService
+
+router = APIRouter(prefix="/api/incomes", tags=["Incomes"])
+
+
+@router.get("/", response_model=IncomeListResponse)
+def list_incomes(
+    page: int = Query(1, ge=1),
+    per_page: int = Query(20, ge=1, le=100),
+    start_date: date | None = None,
+    end_date: date | None = None,
+    min_amount: float | None = None,
+    max_amount: float | None = None,
+    sort_order: str = Query("desc", pattern="^(asc|desc)$"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Return paginated and filtered incomes."""
+    return IncomeService.get_all(
+        db,
+        current_user.id,
+        page,
+        per_page,
+        start_date,
+        end_date,
+        min_amount,
+        max_amount,
+        sort_order,
+    )
+
+
+@router.get("/recent", response_model=list[IncomeResponse])
+def recent_incomes(
+    limit: int = Query(5, ge=1, le=20),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Return recent incomes for the dashboard."""
+    return IncomeService.get_recent(db, current_user.id, limit)
+
+
+@router.post("/", response_model=IncomeResponse, status_code=201)
+def create_income(
+    data: IncomeCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Create a new income."""
+    return IncomeService.create(db, data, current_user.id)
+
+
+@router.put("/{income_id}", response_model=IncomeResponse)
+def update_income(
+    income_id: int,
+    data: IncomeUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Update an existing income."""
+    return IncomeService.update(db, income_id, data, current_user.id)
+
+
+@router.delete("/{income_id}", status_code=204)
+def delete_income(
+    income_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Delete an income."""
+    IncomeService.delete(db, income_id, current_user.id)

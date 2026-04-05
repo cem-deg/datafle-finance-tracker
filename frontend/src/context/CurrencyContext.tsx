@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useState, useCallback } from "react";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 export interface CurrencyInfo {
   code: string;
   symbol: string;
@@ -80,12 +82,12 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     const fetchRates = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/analytics/exchange-rates`);
+        const response = await fetch(`${API_URL}/api/analytics/exchange-rates`);
         if (response.ok) {
           const data = await response.json();
           setRates(data.rates || EXCHANGE_RATES);
         }
-      } catch (err) {
+      } catch {
         // Silently fail and use fallback rates
         console.debug("Using fallback exchange rates");
         setRates(EXCHANGE_RATES);
