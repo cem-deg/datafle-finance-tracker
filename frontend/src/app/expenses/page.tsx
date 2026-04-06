@@ -8,6 +8,38 @@ import { formatDate } from "@/utils/formatters";
 import { useCurrency } from "@/context/CurrencyContext";
 import { Plus, Trash2, Edit3, X, Search, Filter } from "lucide-react";
 
+function parseLocalizedAmount(raw: string): number {
+  const value = raw.trim().replace(/\s+/g, "");
+  if (!value) return Number.NaN;
+
+  const lastComma = value.lastIndexOf(",");
+  const lastDot = value.lastIndexOf(".");
+
+  if (lastComma > -1 && lastDot > -1) {
+    if (lastComma > lastDot) {
+      return Number(value.replace(/\./g, "").replace(",", "."));
+    }
+    return Number(value.replace(/,/g, ""));
+  }
+
+  if (lastComma > -1) {
+    return Number(value.replace(",", "."));
+  }
+
+  if ((value.match(/\./g) || []).length > 1) {
+    return Number(value.replace(/\./g, ""));
+  }
+
+  if (lastDot > -1) {
+    const fraction = value.slice(lastDot + 1);
+    if (/^\d{3}$/.test(fraction)) {
+      return Number(value.replace(".", ""));
+    }
+  }
+
+  return Number(value);
+}
+
 export default function ExpensesPage() {
   const [page, setPage] = useState(1);
   const [categoryFilter, setCategoryFilter] = useState<string>("");
@@ -20,7 +52,7 @@ export default function ExpensesPage() {
 
   const { data, loading, refetch } = useExpenses(params);
   const { categories } = useCategories();
-  const { convertAndFormat } = useCurrency();
+  const { currency, convertAndFormat } = useCurrency();
   const catMap = new Map(categories.map((c) => [c.id, c]));
 
   // Form state
@@ -46,21 +78,30 @@ export default function ExpensesPage() {
       setFormError("All fields are required");
       return;
     }
+
+    const parsedAmount = parseLocalizedAmount(formAmount);
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+      setFormError("Please enter a valid amount");
+      return;
+    }
+
     setSubmitting(true);
     try {
       if (editingId) {
         await expenseApi.update(editingId, {
-          amount: parseFloat(formAmount),
+          amount: parsedAmount,
           description: formDesc,
           category_id: parseInt(formCatId),
           expense_date: formDate,
+          currency_code: currency.code,
         });
       } else {
         await expenseApi.create({
-          amount: parseFloat(formAmount),
+          amount: parsedAmount,
           description: formDesc,
           category_id: parseInt(formCatId),
           expense_date: formDate,
+          currency_code: currency.code,
         });
       }
       setShowAddModal(false);
@@ -161,7 +202,7 @@ export default function ExpensesPage() {
                   <div className="expense-desc">{exp.description}</div>
                   <div className="expense-meta">{cat?.name || "Other"} · {formatDate(exp.expense_date)}</div>
                 </div>
-                <div className="expense-amount">-{convertAndFormat(exp.amount, exp.currency_code || "USD")}</div>
+                <div className="expense-amount">-{convertAndFormat(exp.amount, exp.currency_code || currency.code)}</div>
                 <div className="expense-actions">
                   <button className="btn btn-ghost btn-icon btn-sm" onClick={() => openEdit(exp)} title="Edit">
                     <Edit3 size={15} />
@@ -206,8 +247,8 @@ export default function ExpensesPage() {
             <form onSubmit={handleSubmit}>
               <div className="form-row">
                 <div className="form-group">
-                  <label className="form-label" htmlFor="exp-amount">Amount ($)</label>
-                  <input id="exp-amount" type="number" step="0.01" min="0" className="form-input" placeholder="0.00" value={formAmount} onChange={(e) => setFormAmount(e.target.value)} required />
+                  <label className="form-label" htmlFor="exp-amount">Amount ({currency.code})</label>
+                  <input id="exp-amount" type="text" inputMode="decimal" className="form-input" placeholder="0.00" value={formAmount} onChange={(e) => setFormAmount(e.target.value)} required />
                 </div>
                 <div className="form-group">
                   <label className="form-label" htmlFor="exp-date">Date</label>

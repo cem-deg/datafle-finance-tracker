@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import AppShell from "@/components/layout/AppShell";
 import {
   useBudgetOverview,
@@ -24,13 +25,47 @@ import {
 } from "lucide-react";
 
 export default function DashboardPage() {
-  const { summary, loading: summaryLoading } = useSummary();
-  const { expenses: recentExpenses, loading: recentExpensesLoading } = useRecentExpenses(4);
-  const { incomes: recentIncomes, loading: recentIncomesLoading } = useRecentIncomes(3);
-  const { data: monthly, loading: monthlyLoading } = useMonthlyTotals(6);
-  const { categories } = useCategories();
-  const { data: budgetOverview, loading: budgetLoading } = useBudgetOverview();
-  const { convertAndFormat } = useCurrency();
+  const { summary, loading: summaryLoading, refetch: refetchSummary } = useSummary();
+  const { expenses: recentExpenses, loading: recentExpensesLoading, refetch: refetchRecentExpenses } = useRecentExpenses(4);
+  const { incomes: recentIncomes, loading: recentIncomesLoading, refetch: refetchRecentIncomes } = useRecentIncomes(3);
+  const { data: monthly, loading: monthlyLoading, refetch: refetchMonthly } = useMonthlyTotals(6);
+  const { categories, refetch: refetchCategories } = useCategories();
+  const { data: budgetOverview, loading: budgetLoading, refetch: refetchBudgetOverview } = useBudgetOverview();
+  const { currency, convertAndFormat } = useCurrency();
+
+  useEffect(() => {
+    const refreshDashboard = () => {
+      void refetchSummary();
+      void refetchRecentExpenses();
+      void refetchRecentIncomes();
+      void refetchMonthly();
+      void refetchCategories();
+      void refetchBudgetOverview();
+    };
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        refreshDashboard();
+      }
+    };
+
+    window.addEventListener("focus", refreshDashboard);
+    window.addEventListener("pageshow", refreshDashboard);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      window.removeEventListener("focus", refreshDashboard);
+      window.removeEventListener("pageshow", refreshDashboard);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [
+    refetchBudgetOverview,
+    refetchCategories,
+    refetchMonthly,
+    refetchRecentExpenses,
+    refetchRecentIncomes,
+    refetchSummary,
+  ]);
 
   const catMap = new Map(categories.map((category) => [category.id, category]));
   const topCategory = summary?.top_category_id ? catMap.get(summary.top_category_id) : null;
@@ -50,10 +85,10 @@ export default function DashboardPage() {
           </div>
           {summaryLoading ? <div className="skeleton skeleton-heading" /> : (
             <>
-              <div className="stat-value">{convertAndFormat(summary?.total_income_this_month ?? 0, "USD")}</div>
+              <div className="stat-value">{convertAndFormat(summary?.total_income_this_month ?? 0, currency.code)}</div>
               <div className="stat-label">Income this month</div>
               <div className="badge badge-primary" style={{ marginTop: 10 }}>
-                Net {convertAndFormat(summary?.net_balance_this_month ?? 0, "USD")}
+                Net {convertAndFormat(summary?.net_balance_this_month ?? 0, currency.code)}
               </div>
             </>
           )}
@@ -65,7 +100,7 @@ export default function DashboardPage() {
           </div>
           {summaryLoading ? <div className="skeleton skeleton-heading" /> : (
             <>
-              <div className="stat-value">{convertAndFormat(summary?.total_this_month ?? 0, "USD")}</div>
+              <div className="stat-value">{convertAndFormat(summary?.total_this_month ?? 0, currency.code)}</div>
               <div className="stat-label">Spent this month</div>
               <div className={`stat-change ${spendingUp ? "negative" : "positive"}`}>
                 {spendingUp ? <ArrowUpRight size={14} /> : summary?.month_change_percent === 0 ? <Minus size={14} /> : <ArrowDownRight size={14} />}
@@ -81,7 +116,7 @@ export default function DashboardPage() {
           </div>
           {summaryLoading ? <div className="skeleton skeleton-heading" /> : (
             <>
-              <div className="stat-value">{convertAndFormat(summary?.budget_remaining ?? 0, "USD")}</div>
+              <div className="stat-value">{convertAndFormat(summary?.budget_remaining ?? 0, currency.code)}</div>
               <div className="stat-label">Budget remaining</div>
               <div className="badge badge-primary" style={{ marginTop: 10 }}>
                 {summary?.budget_usage_percent ?? 0}% used
@@ -151,8 +186,8 @@ export default function DashboardPage() {
                     />
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--font-xs)", color: "var(--text-secondary)" }}>
-                    <span>Spent {convertAndFormat(item.spent, "USD")}</span>
-                    <span>Limit {convertAndFormat(item.amount, "USD")}</span>
+                    <span>Spent {convertAndFormat(item.spent, currency.code)}</span>
+                    <span>Limit {convertAndFormat(item.amount, currency.code)}</span>
                   </div>
                 </div>
               ))}

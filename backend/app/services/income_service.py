@@ -3,12 +3,13 @@
 import math
 from datetime import date
 
-from fastapi import HTTPException, status
+from fastapi import status
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
 from app.models.income import Income
 from app.schemas.income import IncomeCreate, IncomeListResponse, IncomeUpdate
+from app.services.crud_utils import apply_updates, commit_and_refresh, get_or_error
 
 
 class IncomeService:
@@ -68,17 +69,11 @@ class IncomeService:
     @staticmethod
     def get_by_id(db: Session, income_id: int, user_id: int) -> Income:
         """Return a single income by ID, scoped to user."""
-        income = (
-            db.query(Income)
-            .filter(Income.id == income_id, Income.user_id == user_id)
-            .first()
+        return get_or_error(
+            db.query(Income).filter(Income.id == income_id, Income.user_id == user_id),
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Income not found",
         )
-        if not income:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Income not found",
-            )
-        return income
 
     @staticmethod
     def create(db: Session, data: IncomeCreate, user_id: int) -> Income:
@@ -92,18 +87,15 @@ class IncomeService:
             user_id=user_id,
         )
         db.add(income)
-        db.commit()
-        db.refresh(income)
+        commit_and_refresh(db, income)
         return income
 
     @staticmethod
     def update(db: Session, income_id: int, data: IncomeUpdate, user_id: int) -> Income:
         """Update an existing income entry."""
         income = IncomeService.get_by_id(db, income_id, user_id)
-        for field, value in data.model_dump(exclude_unset=True).items():
-            setattr(income, field, value)
-        db.commit()
-        db.refresh(income)
+        apply_updates(income, data.model_dump(exclude_unset=True))
+        commit_and_refresh(db, income)
         return income
 
     @staticmethod

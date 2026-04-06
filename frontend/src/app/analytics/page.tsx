@@ -14,7 +14,7 @@ export default function AnalyticsPage() {
   const { data: trends, loading: tLoading } = useTrends(30);
   const { categories } = useCategories();
   const { prediction, loading: pLoading } = usePrediction();
-  const { convertAndFormat } = useCurrency();
+  const { currency, convertAndFormat } = useCurrency();
 
   return (
     <AppShell>
@@ -33,7 +33,7 @@ export default function AnalyticsPage() {
             <div className="skeleton skeleton-heading" />
           ) : prediction?.prediction ? (
             <>
-              <div className="stat-value">{convertAndFormat(prediction.prediction, "USD")}</div>
+              <div className="stat-value">{convertAndFormat(prediction.prediction, currency.code)}</div>
               <div className="stat-label">Predicted next month</div>
               <div className={`stat-change ${prediction.trend === "increasing" ? "negative" : "positive"}`}>
                 {prediction.trend === "increasing" ? <TrendingUp size={14} /> : <TrendingDown size={14} />}

@@ -33,7 +33,7 @@ export default function LoginPage() {
   return (
     <div className="auth-page premium-auth-page">
       <div className="auth-shell">
-        <div className="auth-brand-panel auth-editorial-panel animate-in">
+        <div className="auth-brand-panel auth-editorial-panel auth-brand-panel-primary animate-in">
           <Link href="/" className="auth-back-link">
             <ArrowLeft size={16} />
             Back to landing page
@@ -82,7 +82,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="auth-card premium-auth-card animate-in animate-in-delay-2">
+        <div className="auth-card premium-auth-card auth-form-panel animate-in animate-in-delay-2">
           <div className="auth-logo">
             <h1>Sign In</h1>
             <p>Access your dashboard, budgets, and cashflow overview.</p>
@@ -115,7 +115,7 @@ export default function LoginPage() {
                   id="password"
                   type="password"
                   className="form-input auth-input"
-                  placeholder="••••••••"
+                  placeholder="********"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required

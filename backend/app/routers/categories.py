@@ -1,12 +1,9 @@
 """Category API endpoints."""
 
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from fastapi import APIRouter
 
-from app.database import get_db
-from app.models.user import User
+from app.routers.deps import CurrentUser, DbSession
 from app.schemas.category import CategoryCreate, CategoryUpdate, CategoryResponse
-from app.services.auth_service import get_current_user
 from app.services.category_service import CategoryService
 
 router = APIRouter(prefix="/api/categories", tags=["Categories"])
@@ -14,8 +11,8 @@ router = APIRouter(prefix="/api/categories", tags=["Categories"])
 
 @router.get("/", response_model=list[CategoryResponse])
 def list_categories(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: DbSession,
+    current_user: CurrentUser,
 ):
     """Return all categories for the current user."""
     return CategoryService.get_all(db, current_user.id)
@@ -24,8 +21,8 @@ def list_categories(
 @router.post("/", response_model=CategoryResponse, status_code=201)
 def create_category(
     data: CategoryCreate,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: DbSession,
+    current_user: CurrentUser,
 ):
     """Create a new custom category."""
     return CategoryService.create(db, data, current_user.id)
@@ -35,8 +32,8 @@ def create_category(
 def update_category(
     category_id: int,
     data: CategoryUpdate,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: DbSession,
+    current_user: CurrentUser,
 ):
     """Update an existing category."""
     return CategoryService.update(db, category_id, data, current_user.id)
@@ -45,8 +42,8 @@ def update_category(
 @router.delete("/{category_id}", status_code=204)
 def delete_category(
     category_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: DbSession,
+    current_user: CurrentUser,
 ):
     """Delete a category (only if it has no expenses)."""
     CategoryService.delete(db, category_id, current_user.id)

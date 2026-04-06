@@ -16,10 +16,20 @@ const FALLBACK_COLORS = [
   "#fd79a8", "#00b894", "#e17055", "#636e72", "#74b9ff",
 ];
 
-function CustomTooltip({ active, payload, convertAndFormat }: { active?: boolean; payload?: Array<{ name: string; value: number; payload: { percentage: number } }>; convertAndFormat?: (amount: number, from: string) => string }) {
+function CustomTooltip({
+  active,
+  payload,
+  convertAndFormat,
+  baseCurrency,
+}: {
+  active?: boolean;
+  payload?: Array<{ name: string; value: number; payload: { percentage: number } }>;
+  convertAndFormat?: (amount: number, from: string) => string;
+  baseCurrency: string;
+}) {
   if (!active || !payload?.length) return null;
   const item = payload[0];
-  const formatted = convertAndFormat ? convertAndFormat(item.value, "USD") : `$${item.value.toLocaleString()}`;
+  const formatted = convertAndFormat ? convertAndFormat(item.value, baseCurrency) : `${item.value.toLocaleString()}`;
   
   return (
     <div style={{
@@ -36,7 +46,7 @@ function CustomTooltip({ active, payload, convertAndFormat }: { active?: boolean
 }
 
 export default function CategoryPieChart({ data, categories }: Props) {
-  const { convertAndFormat } = useCurrency();
+  const { currency, convertAndFormat } = useCurrency();
   const catMap = new Map(categories.map((c) => [c.id, c]));
 
   const chartData = data.map((d) => {
@@ -72,7 +82,7 @@ export default function CategoryPieChart({ data, categories }: Props) {
                   <Cell key={i} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip content={<CustomTooltip convertAndFormat={convertAndFormat} />} />
+              <Tooltip content={<CustomTooltip convertAndFormat={convertAndFormat} baseCurrency={currency.code} />} />
             </PieChart>
           </ResponsiveContainer>
         </div>

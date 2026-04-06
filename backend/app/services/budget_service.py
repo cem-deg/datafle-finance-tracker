@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session, joinedload
 from app.models.budget import Budget
 from app.models.category import Category
 from app.schemas.budget import BudgetCreate, BudgetUpdate
+from app.services.crud_utils import apply_updates, commit_and_refresh, get_or_error
 
 
 class BudgetService:
@@ -23,16 +24,11 @@ class BudgetService:
         db: Session, category_id: int, user_id: int
     ) -> None:
         """Ensure the given category belongs to the current user."""
-        category = (
-            db.query(Category)
-            .filter(Category.id == category_id, Category.user_id == user_id)
-            .first()
+        get_or_error(
+            db.query(Category).filter(Category.id == category_id, Category.user_id == user_id),
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid category for this user",
         )
-        if not category:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid category for this user",
-            )
 
     @staticmethod
     def get_all(
@@ -55,18 +51,13 @@ class BudgetService:
     @staticmethod
     def get_by_id(db: Session, budget_id: int, user_id: int) -> Budget:
         """Return a single budget by ID."""
-        budget = (
+        return get_or_error(
             db.query(Budget)
             .options(joinedload(Budget.category))
-            .filter(Budget.id == budget_id, Budget.user_id == user_id)
-            .first()
+            .filter(Budget.id == budget_id, Budget.user_id == user_id),
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Budget not found",
         )
-        if not budget:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Budget not found",
-            )
-        return budget
 
     @staticmethod
     def create(db: Session, data: BudgetCreate, user_id: int) -> Budget:
@@ -86,8 +77,7 @@ class BudgetService:
         if existing:
             existing.amount = data.amount
             existing.note = data.note
-            db.commit()
-            db.refresh(existing)
+            commit_and_refresh(db, existing)
             return BudgetService.get_by_id(db, existing.id, user_id)
 
         budget = Budget(
@@ -98,8 +88,7 @@ class BudgetService:
             user_id=user_id,
         )
         db.add(budget)
-        db.commit()
-        db.refresh(budget)
+        commit_and_refresh(db, budget)
         return BudgetService.get_by_id(db, budget.id, user_id)
 
     @staticmethod
@@ -129,10 +118,8 @@ class BudgetService:
                 detail="A budget already exists for this category and month",
             )
 
-        for field, value in updates.items():
-            setattr(budget, field, value)
-        db.commit()
-        db.refresh(budget)
+        apply_updates(budget, updates)
+        commit_and_refresh(db, budget)
         return BudgetService.get_by_id(db, budget.id, user_id)
 
     @staticmethod

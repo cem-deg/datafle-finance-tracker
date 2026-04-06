@@ -2,23 +2,20 @@
 
 from datetime import date
 
-from fastapi import APIRouter, Depends, Query
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Query
 
-from app.database import get_db
-from app.models.user import User
-from app.services.auth_service import get_current_user
-from app.services.exchange_service import exchange_service
 from app.analysis.aggregator import Aggregator
 from app.analysis.predictor import Predictor
+from app.routers.deps import CurrentUser, DbSession
+from app.services.exchange_service import exchange_service
 
 router = APIRouter(prefix="/api/analytics", tags=["Analytics"])
 
 
 @router.get("/summary")
 def get_summary(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: DbSession,
+    current_user: CurrentUser,
 ):
     """Dashboard summary with key financial metrics."""
     return Aggregator.summary(db, current_user.id)
@@ -26,9 +23,9 @@ def get_summary(
 
 @router.get("/monthly")
 def monthly_totals(
+    db: DbSession,
+    current_user: CurrentUser,
     months: int = Query(12, ge=1, le=24),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
     """Monthly spending totals for chart display."""
     return Aggregator.monthly_totals(db, current_user.id, months)
@@ -36,9 +33,9 @@ def monthly_totals(
 
 @router.get("/cashflow")
 def monthly_cashflow(
+    db: DbSession,
+    current_user: CurrentUser,
     months: int = Query(12, ge=1, le=24),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
     """Monthly income, expense, and net totals."""
     return Aggregator.monthly_cashflow(db, current_user.id, months)
@@ -46,10 +43,10 @@ def monthly_cashflow(
 
 @router.get("/category-distribution")
 def category_distribution(
+    db: DbSession,
+    current_user: CurrentUser,
     start_date: date | None = None,
     end_date: date | None = None,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
     """Category spending distribution for pie chart."""
     return Aggregator.category_distribution(db, current_user.id, start_date, end_date)
@@ -57,9 +54,9 @@ def category_distribution(
 
 @router.get("/trends")
 def spending_trends(
+    db: DbSession,
+    current_user: CurrentUser,
     days: int = Query(30, ge=7, le=365),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
     """Daily spending trend for line chart."""
     return Aggregator.daily_trend(db, current_user.id, days)
@@ -67,9 +64,9 @@ def spending_trends(
 
 @router.get("/budgets/current")
 def current_budget_overview(
+    db: DbSession,
+    current_user: CurrentUser,
     month_start: date | None = None,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
     """Budget usage overview for the selected month."""
     return Aggregator.budget_overview(db, current_user.id, month_start)
@@ -77,8 +74,8 @@ def current_budget_overview(
 
 @router.get("/prediction")
 def get_prediction(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: DbSession,
+    current_user: CurrentUser,
 ):
     """ML-based next month spending prediction."""
     return Predictor.predict_next_month(db, current_user.id)
@@ -86,8 +83,8 @@ def get_prediction(
 
 @router.get("/prediction/categories")
 def get_category_predictions(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: DbSession,
+    current_user: CurrentUser,
 ):
     """ML-based per-category spending predictions."""
     return Predictor.predict_by_category(db, current_user.id)

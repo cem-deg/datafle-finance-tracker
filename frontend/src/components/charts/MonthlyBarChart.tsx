@@ -1,7 +1,8 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
 } from "recharts";
 import { getMonthName } from "@/utils/formatters";
 import { useCurrency } from "@/context/CurrencyContext";
@@ -11,10 +12,22 @@ interface Props {
   data: MonthlyTotal[];
 }
 
-function CustomTooltip({ active, payload, label, convertAndFormat }: { active?: boolean; payload?: Array<{ value: number }>; label?: string; convertAndFormat?: (amount: number, from: string) => string }) {
+function CustomTooltip({
+  active,
+  payload,
+  label,
+  convertAndFormat,
+  baseCurrency,
+}: {
+  active?: boolean;
+  payload?: Array<{ value: number }>;
+  label?: string;
+  convertAndFormat?: (amount: number, from: string) => string;
+  baseCurrency: string;
+}) {
   if (!active || !payload?.length) return null;
   const value = payload[0].value;
-  const formatted = convertAndFormat ? convertAndFormat(value, "USD") : `$${value.toLocaleString()}`;
+  const formatted = convertAndFormat ? convertAndFormat(value, baseCurrency) : `${value.toLocaleString()}`;
   
   return (
     <div style={{
@@ -31,21 +44,43 @@ function CustomTooltip({ active, payload, label, convertAndFormat }: { active?: 
 }
 
 export default function MonthlyBarChart({ data }: Props) {
-  const { convertAndFormat } = useCurrency();
+  const { currency, convertAndFormat } = useCurrency();
   const chartData = data.map((d) => ({ ...d, name: getMonthName(d.month) }));
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [chartSize, setChartSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element) return;
+
+    const updateSize = () => {
+      const rect = element.getBoundingClientRect();
+      setChartSize({
+        width: Math.max(0, Math.floor(rect.width)),
+        height: Math.max(0, Math.floor(rect.height)),
+      });
+    };
+
+    updateSize();
+
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className="card">
       <div className="card-header">
         <h3 className="card-title">Monthly Spending</h3>
       </div>
-      <div className="chart-container">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} barSize={24}>
+      <div ref={containerRef} className="chart-container" style={{ minWidth: 0, minHeight: 280 }}>
+        {chartSize.width > 0 && chartSize.height > 0 ? (
+          <BarChart width={chartSize.width} height={chartSize.height} data={chartData} barSize={24}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
             <XAxis dataKey="name" tick={{ fill: "#8888a0", fontSize: 12 }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fill: "#8888a0", fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v}`} />
-            <Tooltip content={<CustomTooltip convertAndFormat={convertAndFormat} />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
+            <YAxis tick={{ fill: "#8888a0", fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={(v) => convertAndFormat(v, currency.code)} />
+            <Tooltip content={<CustomTooltip convertAndFormat={convertAndFormat} baseCurrency={currency.code} />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
             <Bar dataKey="total" fill="url(#barGradient)" radius={[6, 6, 0, 0]} />
             <defs>
               <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
@@ -54,7 +89,9 @@ export default function MonthlyBarChart({ data }: Props) {
               </linearGradient>
             </defs>
           </BarChart>
-        </ResponsiveContainer>
+        ) : (
+          <div className="skeleton" style={{ height: "100%" }} />
+        )}
       </div>
     </div>
   );

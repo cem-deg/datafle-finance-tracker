@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description:
     "Track your expenses, analyze spending patterns, and get AI-powered financial insights with Datafle.",
   manifest: "/manifest.json",
-  icons: { icon: "/favicon.ico", apple: "/icons/icon-192.png" },
+  icons: { icon: "/icons/icon-192.png", apple: "/icons/icon-192.png" },
 };
 
 export const viewport: Viewport = {

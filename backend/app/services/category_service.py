@@ -6,6 +6,7 @@ from fastapi import HTTPException, status
 from app.models.category import Category
 from app.models.user import User
 from app.schemas.category import CategoryCreate, CategoryUpdate
+from app.services.crud_utils import apply_updates, commit_and_refresh, get_or_error
 
 # Default categories seeded for every new user
 DEFAULT_CATEGORIES = [
@@ -55,17 +56,11 @@ class CategoryService:
     @staticmethod
     def get_by_id(db: Session, category_id: int, user_id: int) -> Category:
         """Return a single category by ID, scoped to user."""
-        category = (
-            db.query(Category)
-            .filter(Category.id == category_id, Category.user_id == user_id)
-            .first()
+        return get_or_error(
+            db.query(Category).filter(Category.id == category_id, Category.user_id == user_id),
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Category not found",
         )
-        if not category:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Category not found",
-            )
-        return category
 
     @staticmethod
     def create(db: Session, data: CategoryCreate, user_id: int) -> Category:
@@ -78,8 +73,7 @@ class CategoryService:
             user_id=user_id,
         )
         db.add(category)
-        db.commit()
-        db.refresh(category)
+        commit_and_refresh(db, category)
         return category
 
     @staticmethod
@@ -88,10 +82,8 @@ class CategoryService:
     ) -> Category:
         """Update a category's attributes."""
         category = CategoryService.get_by_id(db, category_id, user_id)
-        for field, value in data.model_dump(exclude_unset=True).items():
-            setattr(category, field, value)
-        db.commit()
-        db.refresh(category)
+        apply_updates(category, data.model_dump(exclude_unset=True))
+        commit_and_refresh(db, category)
         return category
 
     @staticmethod

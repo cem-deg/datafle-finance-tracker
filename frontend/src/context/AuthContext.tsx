@@ -21,14 +21,19 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(() => {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem("datafle_token");
-  });
-  const [isLoading, setIsLoading] = useState<boolean>(() => {
-    if (typeof window === "undefined") return true;
-    return localStorage.getItem("datafle_token") !== null;
-  });
+  const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem("datafle_token");
+
+    if (!storedToken) {
+      queueMicrotask(() => setIsLoading(false));
+      return;
+    }
+
+    queueMicrotask(() => setToken(storedToken));
+  }, []);
 
   // Check for existing token on mount
   useEffect(() => {

@@ -8,12 +8,44 @@ import { formatDate } from "@/utils/formatters";
 import { useCurrency } from "@/context/CurrencyContext";
 import { Edit3, Plus, Trash2, X } from "lucide-react";
 
+function parseLocalizedAmount(raw: string): number {
+  const value = raw.trim().replace(/\s+/g, "");
+  if (!value) return Number.NaN;
+
+  const lastComma = value.lastIndexOf(",");
+  const lastDot = value.lastIndexOf(".");
+
+  if (lastComma > -1 && lastDot > -1) {
+    if (lastComma > lastDot) {
+      return Number(value.replace(/\./g, "").replace(",", "."));
+    }
+    return Number(value.replace(/,/g, ""));
+  }
+
+  if (lastComma > -1) {
+    return Number(value.replace(",", "."));
+  }
+
+  if ((value.match(/\./g) || []).length > 1) {
+    return Number(value.replace(/\./g, ""));
+  }
+
+  if (lastDot > -1) {
+    const fraction = value.slice(lastDot + 1);
+    if (/^\d{3}$/.test(fraction)) {
+      return Number(value.replace(".", ""));
+    }
+  }
+
+  return Number(value);
+}
+
 export default function IncomePage() {
   const [page, setPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const { data, loading, refetch } = useIncomes({ page, per_page: 15 });
-  const { convertAndFormat } = useCurrency();
+  const { currency, convertAndFormat } = useCurrency();
 
   const [formAmount, setFormAmount] = useState("");
   const [formDesc, setFormDesc] = useState("");
@@ -38,13 +70,20 @@ export default function IncomePage() {
       return;
     }
 
+    const parsedAmount = parseLocalizedAmount(formAmount);
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+      setFormError("Please enter a valid amount");
+      return;
+    }
+
     setSubmitting(true);
     try {
       const payload = {
-        amount: parseFloat(formAmount),
+        amount: parsedAmount,
         description: formDesc,
         source: formSource,
         income_date: formDate,
+        currency_code: currency.code,
       };
 
       if (editingId) {
@@ -165,8 +204,8 @@ export default function IncomePage() {
             <form onSubmit={handleSubmit}>
               <div className="form-row">
                 <div className="form-group">
-                  <label className="form-label" htmlFor="income-amount">Amount</label>
-                  <input id="income-amount" type="number" step="0.01" min="0" className="form-input" value={formAmount} onChange={(e) => setFormAmount(e.target.value)} required />
+                  <label className="form-label" htmlFor="income-amount">Amount ({currency.code})</label>
+                  <input id="income-amount" type="text" inputMode="decimal" className="form-input" value={formAmount} onChange={(e) => setFormAmount(e.target.value)} required />
                 </div>
                 <div className="form-group">
                   <label className="form-label" htmlFor="income-date">Date</label>

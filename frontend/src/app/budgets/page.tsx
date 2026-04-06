@@ -21,7 +21,7 @@ export default function BudgetsPage() {
   const { budgets, loading, refetch } = useBudgets(monthStart);
   const { data: overview, loading: overviewLoading } = useBudgetOverview(monthStart);
   const { categories } = useCategories();
-  const { convertAndFormat } = useCurrency();
+  const { currency, convertAndFormat } = useCurrency();
 
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -131,7 +131,7 @@ export default function BudgetsPage() {
                     <div className="expense-desc">{budget.category.name}</div>
                     <div className="expense-meta">{budget.note || "Monthly category budget"}</div>
                   </div>
-                  <div className="expense-amount">{convertAndFormat(budget.amount, "USD")}</div>
+                  <div className="expense-amount">{convertAndFormat(budget.amount, currency.code)}</div>
                   <div className="expense-actions">
                     <button className="btn btn-ghost btn-icon btn-sm" onClick={() => openEdit(budget)} title="Edit">
                       <Edit3 size={15} />
@@ -181,8 +181,8 @@ export default function BudgetsPage() {
                     />
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--font-xs)", color: "var(--text-secondary)" }}>
-                    <span>Spent {convertAndFormat(item.spent, "USD")}</span>
-                    <span>{item.is_over_budget ? "Over by" : "Remaining"} {convertAndFormat(Math.abs(item.remaining), "USD")}</span>
+                    <span>Spent {convertAndFormat(item.spent, currency.code)}</span>
+                    <span>{item.is_over_budget ? "Over by" : "Remaining"} {convertAndFormat(Math.abs(item.remaining), currency.code)}</span>
                   </div>
                 </div>
               ))}

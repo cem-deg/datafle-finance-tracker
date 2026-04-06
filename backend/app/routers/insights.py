@@ -1,16 +1,14 @@
 """Smart Insights API endpoints."""
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Query
 from sqlalchemy.orm import Session
 
-from app.database import get_db
-from app.models.user import User
 from app.models.category import Category
-from app.services.auth_service import get_current_user
 from app.analysis.aggregator import Aggregator
 from app.analysis.predictor import Predictor
 from app.ai.rule_based import RuleBasedProvider
 from app.ai.gemini_provider import GeminiProvider
+from app.routers.deps import CurrentUser, DbSession
 
 router = APIRouter(prefix="/api/insights", tags=["Insights"])
 
@@ -55,9 +53,9 @@ def _build_financial_context(db: Session, user_id: int) -> dict:
 
 @router.get("/")
 def get_insights(
+    db: DbSession,
+    current_user: CurrentUser,
     mode: str = Query("rule", pattern="^(rule|ai)$"),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
     """Get smart financial insights (rule-based or AI-powered)."""
     context = _build_financial_context(db, current_user.id)

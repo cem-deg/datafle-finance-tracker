@@ -38,7 +38,7 @@ export default function RegisterPage() {
   return (
     <div className="auth-page premium-auth-page">
       <div className="auth-shell">
-        <div className="auth-brand-panel auth-editorial-panel animate-in">
+        <div className="auth-brand-panel auth-editorial-panel auth-brand-panel-primary animate-in">
           <Link href="/" className="auth-back-link">
             <ArrowLeft size={16} />
             Back to landing page
@@ -87,7 +87,7 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        <div className="auth-card premium-auth-card animate-in animate-in-delay-2">
+        <div className="auth-card premium-auth-card auth-form-panel animate-in animate-in-delay-2">
           <div className="auth-logo">
             <h1>Create Account</h1>
             <p>Open your workspace and start building your financial system.</p>

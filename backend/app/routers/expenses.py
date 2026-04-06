@@ -2,15 +2,12 @@
 
 from datetime import date
 
-from fastapi import APIRouter, Depends, Query
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Query
 
-from app.database import get_db
-from app.models.user import User
+from app.routers.deps import CurrentUser, DbSession
 from app.schemas.expense import (
     ExpenseCreate, ExpenseUpdate, ExpenseResponse, ExpenseListResponse,
 )
-from app.services.auth_service import get_current_user
 from app.services.expense_service import ExpenseService
 
 router = APIRouter(prefix="/api/expenses", tags=["Expenses"])
@@ -18,6 +15,8 @@ router = APIRouter(prefix="/api/expenses", tags=["Expenses"])
 
 @router.get("/", response_model=ExpenseListResponse)
 def list_expenses(
+    db: DbSession,
+    current_user: CurrentUser,
     page: int = Query(1, ge=1),
     per_page: int = Query(20, ge=1, le=100),
     category_id: int | None = None,
@@ -27,8 +26,6 @@ def list_expenses(
     max_amount: float | None = None,
     sort_by: str = Query("date", pattern="^(date|amount)$"),
     sort_order: str = Query("desc", pattern="^(asc|desc)$"),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
     """Return paginated and filtered expenses."""
     return ExpenseService.get_all(
@@ -40,9 +37,9 @@ def list_expenses(
 
 @router.get("/recent", response_model=list[ExpenseResponse])
 def recent_expenses(
+    db: DbSession,
+    current_user: CurrentUser,
     limit: int = Query(5, ge=1, le=20),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
     """Return the most recent expenses for the dashboard."""
     return ExpenseService.get_recent(db, current_user.id, limit)
@@ -51,8 +48,8 @@ def recent_expenses(
 @router.get("/{expense_id}", response_model=ExpenseResponse)
 def get_expense(
     expense_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: DbSession,
+    current_user: CurrentUser,
 ):
     """Return a single expense by ID."""
     return ExpenseService.get_by_id(db, expense_id, current_user.id)
@@ -61,8 +58,8 @@ def get_expense(
 @router.post("/", response_model=ExpenseResponse, status_code=201)
 def create_expense(
     data: ExpenseCreate,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: DbSession,
+    current_user: CurrentUser,
 ):
     """Create a new expense."""
     return ExpenseService.create(db, data, current_user.id)
@@ -72,8 +69,8 @@ def create_expense(
 def update_expense(
     expense_id: int,
     data: ExpenseUpdate,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: DbSession,
+    current_user: CurrentUser,
 ):
     """Update an existing expense."""
     return ExpenseService.update(db, expense_id, data, current_user.id)
@@ -82,8 +79,8 @@ def update_expense(
 @router.delete("/{expense_id}", status_code=204)
 def delete_expense(
     expense_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: DbSession,
+    current_user: CurrentUser,
 ):
     """Delete an expense."""
     ExpenseService.delete(db, expense_id, current_user.id)

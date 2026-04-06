@@ -35,6 +35,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   };
 
   const response = await fetch(`${API_URL}${endpoint}`, {
+    cache: "no-store",
     ...options,
     headers,
   });

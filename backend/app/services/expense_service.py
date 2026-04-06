@@ -5,11 +5,12 @@ from datetime import date
 
 from sqlalchemy import desc
 from sqlalchemy.orm import Session, joinedload
-from fastapi import HTTPException, status
+from fastapi import status
 
 from app.models.category import Category
 from app.models.expense import Expense
 from app.schemas.expense import ExpenseCreate, ExpenseUpdate, ExpenseListResponse
+from app.services.crud_utils import apply_updates, commit_and_refresh, get_or_error
 
 
 class ExpenseService:
@@ -23,16 +24,11 @@ class ExpenseService:
         if category_id is None:
             return
 
-        category = (
-            db.query(Category)
-            .filter(Category.id == category_id, Category.user_id == user_id)
-            .first()
+        get_or_error(
+            db.query(Category).filter(Category.id == category_id, Category.user_id == user_id),
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid category for this user",
         )
-        if not category:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid category for this user",
-            )
 
     @staticmethod
     def get_all(
@@ -97,18 +93,13 @@ class ExpenseService:
     @staticmethod
     def get_by_id(db: Session, expense_id: int, user_id: int) -> Expense:
         """Return a single expense by ID, scoped to user."""
-        expense = (
+        return get_or_error(
             db.query(Expense)
             .options(joinedload(Expense.category))
-            .filter(Expense.id == expense_id, Expense.user_id == user_id)
-            .first()
+            .filter(Expense.id == expense_id, Expense.user_id == user_id),
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Expense not found",
         )
-        if not expense:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Expense not found",
-            )
-        return expense
 
     @staticmethod
     def create(db: Session, data: ExpenseCreate, user_id: int) -> Expense:
@@ -124,8 +115,7 @@ class ExpenseService:
             user_id=user_id,
         )
         db.add(expense)
-        db.commit()
-        db.refresh(expense)
+        commit_and_refresh(db, expense)
         # Reload with category relationship
         return ExpenseService.get_by_id(db, expense.id, user_id)
 
@@ -134,40 +124,28 @@ class ExpenseService:
         db: Session, expense_id: int, data: ExpenseUpdate, user_id: int
     ) -> Expense:
         """Update an existing expense."""
-        expense = (
-            db.query(Expense)
-            .filter(Expense.id == expense_id, Expense.user_id == user_id)
-            .first()
+        expense = get_or_error(
+            db.query(Expense).filter(Expense.id == expense_id, Expense.user_id == user_id),
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Expense not found",
         )
-        if not expense:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Expense not found",
-            )
 
         ExpenseService._validate_category_ownership(
             db, data.category_id, user_id
         )
 
-        for field, value in data.model_dump(exclude_unset=True).items():
-            setattr(expense, field, value)
-        db.commit()
-        db.refresh(expense)
+        apply_updates(expense, data.model_dump(exclude_unset=True))
+        commit_and_refresh(db, expense)
         return ExpenseService.get_by_id(db, expense.id, user_id)
 
     @staticmethod
     def delete(db: Session, expense_id: int, user_id: int) -> None:
         """Delete an expense."""
-        expense = (
-            db.query(Expense)
-            .filter(Expense.id == expense_id, Expense.user_id == user_id)
-            .first()
+        expense = get_or_error(
+            db.query(Expense).filter(Expense.id == expense_id, Expense.user_id == user_id),
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Expense not found",
         )
-        if not expense:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Expense not found",
-            )
         db.delete(expense)
         db.commit()
 
