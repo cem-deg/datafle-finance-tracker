@@ -12,14 +12,14 @@ export default function LoadingList({
   className = "",
 }: LoadingListProps) {
   return (
-    <>
+    <div className="loading-list" aria-busy="true" aria-live="polite">
       {Array.from({ length: count }).map((_, index) => (
         <div
           key={index}
           className={`skeleton ${className}`.trim()}
-          style={{ height, marginBottom: 8 }}
+          style={{ height }}
         />
       ))}
-    </>
+    </div>
   );
 }

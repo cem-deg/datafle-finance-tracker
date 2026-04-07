@@ -53,22 +53,22 @@ export const FEATURE_PANELS: FeaturePanel[] = [
     title: "Executive-grade overview",
     description: "Income, expenses, budgets, and balance shown in one premium command center.",
     icon: "overview",
-    accent: "var(--accent-primary-light)",
-    background: "rgba(124, 106, 239, 0.12)",
+    accent: "var(--color-primary)",
+    background: "var(--color-primary-soft)",
   },
   {
     title: "Adaptive cashflow intelligence",
     description: "Insight and prediction layers that turn raw activity into financial direction.",
     icon: "insight",
-    accent: "var(--accent-secondary)",
-    background: "rgba(0, 210, 211, 0.12)",
+    accent: "var(--color-secondary)",
+    background: "var(--color-secondary-soft)",
   },
   {
     title: "Built for serious control",
     description: "Monthly budgets, category precision, and fast execution without spreadsheet fatigue.",
     icon: "control",
-    accent: "var(--accent-warning)",
-    background: "rgba(253, 203, 110, 0.12)",
+    accent: "var(--color-warning)",
+    background: "var(--color-warning-soft)",
   },
 ];
 

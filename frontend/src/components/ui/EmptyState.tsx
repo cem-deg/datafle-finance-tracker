@@ -8,6 +8,7 @@ interface EmptyStateProps {
   icon?: string;
   compact?: boolean;
   note?: string;
+  tone?: "default" | "error";
 }
 
 export default function EmptyState({
@@ -15,13 +16,20 @@ export default function EmptyState({
   description,
   actionLabel,
   onAction,
-  icon = "•",
+  icon = "*",
   compact = false,
   note,
+  tone = "default",
 }: EmptyStateProps) {
   return (
-    <div className={`empty-state ${compact ? "empty-state-compact" : ""}`.trim()}>
-      <div className="empty-icon" aria-hidden="true">{icon}</div>
+    <div
+      className={`empty-state empty-state-${tone} ${
+        compact ? "empty-state-compact" : ""
+      }`.trim()}
+    >
+      <div className="empty-icon" aria-hidden="true">
+        {icon}
+      </div>
       <h3>{title}</h3>
       <p>{description}</p>
       {note ? <div className="empty-note">{note}</div> : null}

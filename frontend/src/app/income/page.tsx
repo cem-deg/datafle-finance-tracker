@@ -4,12 +4,15 @@ import { FormEvent, useState } from "react";
 import { Edit3, Plus, Trash2 } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
 import EmptyState from "@/components/ui/EmptyState";
+import FormActions from "@/components/ui/FormActions";
+import FormField from "@/components/ui/FormField";
 import InlineMessage from "@/components/ui/InlineMessage";
 import LoadingList from "@/components/ui/LoadingList";
 import ModalShell from "@/components/ui/ModalShell";
 import PageFeedback from "@/components/ui/PageFeedback";
 import PageHeader from "@/components/ui/PageHeader";
 import PaginationControls from "@/components/ui/PaginationControls";
+import RecordRow from "@/components/ui/RecordRow";
 import { useFlashMessage } from "@/hooks/useFlashMessage";
 import { useIncomes } from "@/hooks/useData";
 import { incomeApi } from "@/services/api";
@@ -179,48 +182,40 @@ export default function IncomePage() {
           />
         ) : (
           data?.items.map((income) => (
-            <div key={income.id} className="expense-item">
-              <div
-                className="stat-icon"
-                style={{
-                  width: 42,
-                  height: 42,
-                  minWidth: 42,
-                  background: "rgba(0,184,148,0.15)",
-                  color: "var(--accent-success)",
-                }}
-              >
-                <Plus size={16} />
-              </div>
-              <div className="expense-info">
-                <div className="expense-desc">{income.description}</div>
-                <div className="expense-meta">
-                  {income.source} | {formatDate(income.income_date)}
+            <RecordRow
+              key={income.id}
+              leading={
+                <div className="stat-icon metric-icon-success metric-icon-md">
+                  <Plus size={16} />
                 </div>
-              </div>
-              <div className="expense-amount" style={{ color: "var(--accent-success)" }}>
-                +{convertAndFormat(income.amount, income.currency_code)}
-              </div>
-              <div className="expense-actions">
-                <button
-                  className="btn btn-ghost btn-icon btn-sm"
-                  onClick={() => openEdit(income)}
-                  title="Edit"
-                  type="button"
-                >
-                  <Edit3 size={15} />
-                </button>
-                <button
-                  className="btn btn-ghost btn-icon btn-sm"
-                  onClick={() => void handleDelete(income.id)}
-                  title="Delete"
-                  type="button"
-                  style={{ color: "var(--accent-danger)" }}
-                >
-                  <Trash2 size={15} />
-                </button>
-              </div>
-            </div>
+              }
+              title={income.description}
+              meta={`${income.source} | ${formatDate(income.income_date)}`}
+              amount={`+${convertAndFormat(income.amount, income.currency_code)}`}
+              amountClassName="amount-positive"
+              actions={
+                <>
+                  <button
+                    className="btn btn-ghost btn-icon btn-sm"
+                    onClick={() => openEdit(income)}
+                    title="Edit"
+                    type="button"
+                    aria-label={`Edit income ${income.description}`}
+                  >
+                    <Edit3 size={15} />
+                  </button>
+                  <button
+                    className="btn btn-ghost btn-icon btn-sm btn-danger-ghost"
+                    onClick={() => void handleDelete(income.id)}
+                    title="Delete"
+                    type="button"
+                    aria-label={`Delete income ${income.description}`}
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </>
+              }
+            />
           ))
         )}
       </div>
@@ -233,14 +228,16 @@ export default function IncomePage() {
 
       {showModal ? (
         <ModalShell title={editingId ? "Edit Income" : "Add Income"} onClose={closeModal}>
-          {formError ? <InlineMessage message={formError} className="modal-message" /> : null}
+          {formError ? <InlineMessage message={formError} className="modal-message" id="income-form-error" /> : null}
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="form-shell">
             <div className="form-row">
-              <div className="form-group">
-                <label className="form-label" htmlFor="income-amount">
-                  Amount ({currency.code})
-                </label>
+              <FormField
+                label={`Amount (${currency.code})`}
+                htmlFor="income-amount"
+                help="Enter the amount received in your selected currency."
+                helpId="income-amount-help"
+              >
                 <input
                   id="income-amount"
                   type="text"
@@ -249,29 +246,26 @@ export default function IncomePage() {
                   value={form.amount}
                   onChange={(event) => updateForm("amount", event.target.value)}
                   placeholder="0.00"
+                  aria-invalid={Boolean(formError)}
+                  aria-describedby={formError ? "income-amount-help income-form-error" : "income-amount-help"}
                   required
                 />
-                <span className="form-help">Enter the amount received in your selected currency.</span>
-              </div>
-              <div className="form-group">
-                <label className="form-label" htmlFor="income-date">
-                  Date
-                </label>
+              </FormField>
+              <FormField label="Date" htmlFor="income-date">
                 <input
                   id="income-date"
                   type="date"
                   className="form-input"
                   value={form.incomeDate}
                   onChange={(event) => updateForm("incomeDate", event.target.value)}
+                  aria-invalid={Boolean(formError)}
+                  aria-describedby={formError ? "income-form-error" : undefined}
                   required
                 />
-              </div>
+              </FormField>
             </div>
 
-            <div className="form-group">
-              <label className="form-label" htmlFor="income-desc">
-                Description
-              </label>
+            <FormField label="Description" htmlFor="income-desc">
               <input
                 id="income-desc"
                 type="text"
@@ -280,14 +274,18 @@ export default function IncomePage() {
                 onChange={(event) => updateForm("description", event.target.value)}
                 placeholder="What was this income for?"
                 maxLength={120}
+                aria-invalid={Boolean(formError)}
+                aria-describedby={formError ? "income-form-error" : undefined}
                 required
               />
-            </div>
+            </FormField>
 
-            <div className="form-group">
-              <label className="form-label" htmlFor="income-source">
-                Source
-              </label>
+            <FormField
+              label="Source"
+              htmlFor="income-source"
+              help="Examples: Salary, Freelance, Bonus, Refund."
+              helpId="income-source-help"
+            >
               <input
                 id="income-source"
                 type="text"
@@ -296,19 +294,20 @@ export default function IncomePage() {
                 onChange={(event) => updateForm("source", event.target.value)}
                 placeholder="Salary, freelance, refund..."
                 maxLength={80}
+                aria-invalid={Boolean(formError)}
+                aria-describedby={formError ? "income-source-help income-form-error" : "income-source-help"}
                 required
               />
-              <span className="form-help">Examples: Salary, Freelance, Bonus, Refund.</span>
-            </div>
+            </FormField>
 
-            <div className="modal-actions">
+            <FormActions>
               <button type="button" className="btn btn-secondary" onClick={closeModal}>
                 Cancel
               </button>
               <button type="submit" className="btn btn-primary" disabled={submitting}>
                 {submitting ? "Saving..." : editingId ? "Update" : "Add Income"}
               </button>
-            </div>
+            </FormActions>
           </form>
         </ModalShell>
       ) : null}

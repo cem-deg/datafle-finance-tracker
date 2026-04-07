@@ -31,15 +31,9 @@ function CustomTooltip({
   const formatted = convertAndFormat ? convertAndFormat(value, baseCurrency) : `${value.toLocaleString()}`;
   
   return (
-    <div style={{
-      background: "var(--bg-elevated)",
-      border: "1px solid var(--glass-border)",
-      borderRadius: "var(--radius-md)",
-      padding: "10px 14px",
-      fontSize: "var(--font-sm)",
-    }}>
-      <p style={{ color: "var(--text-secondary)", marginBottom: 4 }}>{label}</p>
-      <p style={{ fontWeight: 700 }}>{formatted}</p>
+    <div className="chart-tooltip">
+      <p className="chart-tooltip-label">{label}</p>
+      <p className="chart-tooltip-value">{formatted}</p>
     </div>
   );
 }
@@ -66,16 +60,16 @@ function TrendLineChart({ data }: Props) {
           <LineChart data={chartData}>
             <defs>
               <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#00d2d3" stopOpacity={0.3} />
-                <stop offset="100%" stopColor="#00d2d3" stopOpacity={0} />
+                <stop offset="0%" stopColor="var(--chart-2)" stopOpacity={0.28} />
+                <stop offset="100%" stopColor="var(--chart-2)" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-            <XAxis dataKey="name" tick={{ fill: "#8888a0", fontSize: 11 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
-            <YAxis tick={{ fill: "#8888a0", fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={(v) => convertAndFormat(v, "USD")} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
+            <XAxis dataKey="name" tick={{ fill: "var(--text-secondary)", fontSize: 11 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
+            <YAxis tick={{ fill: "var(--text-secondary)", fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={(v) => convertAndFormat(v, "USD")} />
             <Tooltip content={<CustomTooltip convertAndFormat={convertAndFormat} baseCurrency="USD" />} />
             <Area type="monotone" dataKey="total" fill="url(#lineGradient)" stroke="none" />
-            <Line type="monotone" dataKey="total" stroke="#00d2d3" strokeWidth={2.5} dot={false} activeDot={{ r: 5, fill: "#00d2d3", stroke: "var(--bg-primary)", strokeWidth: 2 }} />
+            <Line type="monotone" dataKey="total" stroke="var(--chart-2)" strokeWidth={2.5} dot={false} activeDot={{ r: 5, fill: "var(--chart-2)", stroke: "var(--bg-primary)", strokeWidth: 2 }} />
           </LineChart>
         </ResponsiveContainer>
       </div>

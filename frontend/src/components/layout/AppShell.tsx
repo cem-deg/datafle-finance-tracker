@@ -24,8 +24,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     return (
       <div className="auth-page">
         <div className="text-center">
-          <div className="skeleton" style={{ width: 60, height: 60, borderRadius: "50%", margin: "0 auto 16px" }} />
-          <div className="skeleton skeleton-text" style={{ width: 120, margin: "0 auto" }} />
+          <div className="skeleton mx-auto mb-md" style={{ width: 60, height: 60, borderRadius: "50%" }} />
+          <div className="skeleton skeleton-text mx-auto" style={{ width: 120 }} />
         </div>
       </div>
     );

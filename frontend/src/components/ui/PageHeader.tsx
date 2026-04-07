@@ -10,21 +10,12 @@ interface PageHeaderProps {
 
 export default function PageHeader({ title, description, actions }: PageHeaderProps) {
   return (
-    <div
-      className="page-header animate-in"
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
-        flexWrap: "wrap",
-        gap: 16,
-      }}
-    >
-      <div>
+    <div className="page-header animate-in">
+      <div className="page-header-content">
         <h1>{title}</h1>
         <p>{description}</p>
       </div>
-      {actions}
+      {actions ? <div className="page-header-actions">{actions}</div> : null}
     </div>
   );
 }

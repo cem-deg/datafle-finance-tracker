@@ -69,7 +69,7 @@ export const CATEGORY_ICON_GROUPS = [
 export const CATEGORY_ICONS = CATEGORY_ICON_GROUPS.flatMap((g) => g.icons);
 
 export const CATEGORY_COLORS = [
-  "#ff6b6b", "#feca57", "#a29bfe", "#fd79a8", "#00cec9",
-  "#00b894", "#6c5ce7", "#636e72", "#e17055", "#74b9ff",
-  "#55efc4", "#fab1a0", "#81ecec", "#dfe6e9", "#b2bec3",
+  "#4c6ef5", "#2f8f83", "#2f9e6f", "#bf8825", "#8b6ccf",
+  "#4f95d9", "#c17a49", "#8a98ad", "#5c7cfa", "#5fa8a0",
+  "#5ca37a", "#c08d58", "#7b8fcf", "#9aa8bd", "#6f7d91",
 ] as const;

@@ -4,6 +4,8 @@ import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import FormField from "@/components/ui/FormField";
+import InlineMessage from "@/components/ui/InlineMessage";
 import { APP_NAME } from "@/utils/constants";
 import { ArrowLeft, Lock, Mail, Target, TrendingUp, User, Wallet } from "lucide-react";
 
@@ -93,11 +95,21 @@ export default function RegisterPage() {
             <p>Open your workspace and start building your financial system.</p>
           </div>
 
-          {error && <div className="auth-error" id="register-error">{error}</div>}
+          {error ? (
+            <InlineMessage
+              message={error}
+              className="auth-error"
+              id="register-error"
+            />
+          ) : null}
 
-          <form className="auth-form" onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label className="form-label" htmlFor="name">Full Name</label>
+          <form className="auth-form form-shell" onSubmit={handleSubmit}>
+            <FormField
+              label="Full Name"
+              htmlFor="name"
+              help="This helps personalize your workspace and account profile."
+              helpId="register-name-help"
+            >
               <div className="auth-input-wrap">
                 <User size={18} className="auth-input-icon" />
                 <input
@@ -107,13 +119,20 @@ export default function RegisterPage() {
                   placeholder="John Doe"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  disabled={loading}
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? "register-name-help register-error" : "register-name-help"}
                   required
                 />
               </div>
-            </div>
+            </FormField>
 
-            <div className="form-group">
-              <label className="form-label" htmlFor="reg-email">Email</label>
+            <FormField
+              label="Email"
+              htmlFor="reg-email"
+              help="Use an email you can sign back in with later."
+              helpId="register-email-help"
+            >
               <div className="auth-input-wrap">
                 <Mail size={18} className="auth-input-icon" />
                 <input
@@ -123,13 +142,20 @@ export default function RegisterPage() {
                   placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? "register-email-help register-error" : "register-email-help"}
                   required
                 />
               </div>
-            </div>
+            </FormField>
 
-            <div className="form-group">
-              <label className="form-label" htmlFor="reg-password">Password</label>
+            <FormField
+              label="Password"
+              htmlFor="reg-password"
+              help="Use at least 6 characters. Longer passwords are stronger."
+              helpId="register-password-help"
+            >
               <div className="auth-input-wrap">
                 <Lock size={18} className="auth-input-icon" />
                 <input
@@ -140,10 +166,13 @@ export default function RegisterPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  disabled={loading}
                   minLength={6}
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? "register-password-help register-error" : "register-password-help"}
                 />
               </div>
-            </div>
+            </FormField>
 
             <button type="submit" className="btn btn-primary auth-submit" id="register-submit" disabled={loading}>
               {loading ? "Creating account..." : "Create Account"}

@@ -9,6 +9,7 @@ interface InlineMessageProps {
   tone?: InlineMessageTone;
   className?: string;
   onDismiss?: () => void;
+  id?: string;
 }
 
 export default function InlineMessage({
@@ -16,12 +17,18 @@ export default function InlineMessage({
   tone = "error",
   className = "",
   onDismiss,
+  id,
 }: InlineMessageProps) {
   const icon =
     tone === "success" ? <CheckCircle2 size={16} /> : tone === "info" ? <Info size={16} /> : <AlertCircle size={16} />;
 
   return (
-    <div className={`inline-message inline-message-${tone} ${className}`.trim()} role="alert">
+    <div
+      className={`inline-message inline-message-${tone} ${className}`.trim()}
+      id={id}
+      role={tone === "error" ? "alert" : "status"}
+      aria-live={tone === "error" ? "assertive" : "polite"}
+    >
       <div className="inline-message-content">
         <span className="inline-message-icon" aria-hidden="true">
           {icon}

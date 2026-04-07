@@ -100,15 +100,15 @@ export default function LandingSections({
               </div>
               <div className={styles.mockupStats}>
                 <div className={styles.mockupStat}>
-                  <label>Monthly income</label>
+                  <span>Monthly income</span>
                   <strong>$6,300</strong>
                 </div>
                 <div className={styles.mockupStat}>
-                  <label>Planned budgets</label>
+                  <span>Planned budgets</span>
                   <strong>8 categories</strong>
                 </div>
                 <div className={styles.mockupStat}>
-                  <label>Cash runway</label>
+                  <span>Cash runway</span>
                   <strong>Healthy</strong>
                 </div>
               </div>

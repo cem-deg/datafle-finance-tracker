@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import Navbar from "@/components/layout/Navbar";
 import { ChevronDown } from "lucide-react";
 
@@ -54,23 +54,37 @@ export default function FAQPage() {
     <>
       <Navbar />
       <div className="faq-page">
-        <div className="section-header animate-in" style={{ marginBottom: "var(--space-xl)" }}>
+        <div className="section-header animate-in section-heading-tight">
           <h2>Frequently Asked Questions</h2>
           <p>Find answers to common questions about Datafle</p>
         </div>
 
         {FAQ_DATA.map((item, i) => (
-          <div
+          <section
             key={i}
-            className={`faq-item animate-in ${openIdx === i ? "open" : ""}`}
-            style={{ animationDelay: `${i * 50}ms` }}
+            className={`faq-item animate-in animate-delay ${openIdx === i ? "open" : ""}`}
+            style={{ "--delay": `${i * 50}ms` } as CSSProperties}
           >
-            <button className="faq-question" onClick={() => setOpenIdx(openIdx === i ? null : i)}>
+            <button
+              className="faq-question"
+              onClick={() => setOpenIdx(openIdx === i ? null : i)}
+              type="button"
+              aria-expanded={openIdx === i}
+              aria-controls={`faq-answer-${i}`}
+              id={`faq-question-${i}`}
+            >
               <span>{item.q}</span>
               <ChevronDown size={18} />
             </button>
-            <div className="faq-answer">{item.a}</div>
-          </div>
+            <div
+              className="faq-answer"
+              id={`faq-answer-${i}`}
+              role="region"
+              aria-labelledby={`faq-question-${i}`}
+            >
+              {item.a}
+            </div>
+          </section>
         ))}
       </div>
     </>

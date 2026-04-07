@@ -79,7 +79,7 @@ export default function Navbar() {
         </div>
 
         <div className="nav-actions">
-          <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme" id="theme-toggle-nav" aria-label="Toggle theme">
+          <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme" id="theme-toggle-nav" aria-label="Toggle theme" type="button">
             {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
           <Link href="/login" className="btn btn-ghost btn-sm nav-signin">Sign In</Link>
@@ -90,6 +90,7 @@ export default function Navbar() {
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
             aria-controls="landing-mobile-menu"
+            type="button"
           >
             <span className="hamburger-icon" aria-hidden="true">
               <span className="hamburger-line line-top" />
@@ -102,7 +103,7 @@ export default function Navbar() {
 
       {menuOpen && (
         <>
-          <div className={`mobile-menu-overlay ${menuClosing ? "is-closing" : ""}`} onClick={closeMenu} />
+          <div className={`mobile-menu-overlay ${menuClosing ? "is-closing" : ""}`} onClick={closeMenu} aria-hidden="true" />
           <div className={`mobile-menu ${menuClosing ? "is-closing" : ""}`} id="landing-mobile-menu" role="dialog" aria-modal="true" aria-label="Navigation menu">
             <Link href="/#features" className="nav-link" onClick={closeMenu}>Features</Link>
             <Link href="/#product" className="nav-link" onClick={closeMenu}>Product</Link>
@@ -110,8 +111,8 @@ export default function Navbar() {
             <Link href="/faq" className="nav-link" onClick={closeMenu}>FAQ</Link>
             <hr className="mobile-divider" />
             <Link href="/login" className="nav-link" onClick={closeMenu}>Sign In</Link>
-            <Link href="/register" className="btn btn-primary" onClick={closeMenu} style={{ textAlign: "center" }}>Get Started</Link>
-            <button className="theme-toggle" onClick={toggleTheme} style={{ alignSelf: "flex-start", marginTop: "var(--space-sm)" }} aria-label="Toggle theme">
+            <Link href="/register" className="btn btn-primary btn-full text-center" onClick={closeMenu}>Get Started</Link>
+            <button className="theme-toggle mt-md" onClick={toggleTheme} aria-label="Toggle theme" type="button">
               {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
             </button>
           </div>

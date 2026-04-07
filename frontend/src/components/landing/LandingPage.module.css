@@ -4,9 +4,9 @@
   z-index: 1;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at top left, rgba(124, 106, 239, 0.16), transparent 34%),
-    radial-gradient(circle at 82% 18%, rgba(0, 210, 211, 0.14), transparent 28%),
-    linear-gradient(180deg, #06060b 0%, #080911 38%, #0b0d18 100%);
+    radial-gradient(circle at top left, rgba(var(--rgb-primary), 0.16), transparent 34%),
+    radial-gradient(circle at 82% 18%, rgba(var(--rgb-secondary), 0.14), transparent 28%),
+    linear-gradient(180deg, var(--color-background) 0%, color-mix(in srgb, var(--color-background) 82%, black) 38%, color-mix(in srgb, var(--color-background) 72%, black) 100%);
 }
 
 [data-theme="light"] .page :global(.landing-navbar) {
@@ -27,9 +27,9 @@
 
 [data-theme="light"] .page {
   background:
-    radial-gradient(circle at top left, rgba(124, 106, 239, 0.1), transparent 34%),
-    radial-gradient(circle at 82% 18%, rgba(0, 210, 211, 0.08), transparent 28%),
-    linear-gradient(180deg, #f7f7fb 0%, #f2f4fb 40%, #edf2f7 100%);
+    radial-gradient(circle at top left, rgba(var(--rgb-primary), 0.1), transparent 34%),
+    radial-gradient(circle at 82% 18%, rgba(var(--rgb-secondary), 0.08), transparent 28%),
+    linear-gradient(180deg, var(--color-background) 0%, color-mix(in srgb, var(--color-background) 84%, white) 40%, color-mix(in srgb, var(--color-background) 72%, var(--color-surface-hover)) 100%);
 }
 
 .hero {
@@ -45,8 +45,8 @@
   pointer-events: none;
   background:
     linear-gradient(125deg, rgba(255, 255, 255, 0.03) 0%, transparent 42%),
-    radial-gradient(circle at 22% 25%, rgba(124, 106, 239, 0.2), transparent 30%),
-    radial-gradient(circle at 78% 28%, rgba(0, 210, 211, 0.14), transparent 26%);
+    radial-gradient(circle at 22% 25%, rgba(var(--rgb-primary), 0.2), transparent 30%),
+    radial-gradient(circle at 78% 28%, rgba(var(--rgb-secondary), 0.14), transparent 26%);
 }
 
 .heroOrb {
@@ -63,7 +63,7 @@
   height: 320px;
   top: 110px;
   left: -80px;
-  background: radial-gradient(circle, rgba(124, 106, 239, 0.26), transparent 65%);
+  background: radial-gradient(circle, rgba(var(--rgb-primary), 0.26), transparent 65%);
 }
 
 .orbTwo {
@@ -72,7 +72,7 @@
   top: 180px;
   right: 4%;
   animation-delay: -4s;
-  background: radial-gradient(circle, rgba(0, 210, 211, 0.2), transparent 64%);
+  background: radial-gradient(circle, rgba(var(--rgb-secondary), 0.2), transparent 64%);
 }
 
 .orbThree {
@@ -81,7 +81,7 @@
   bottom: 60px;
   right: 28%;
   animation-delay: -8s;
-  background: radial-gradient(circle, rgba(253, 203, 110, 0.12), transparent 68%);
+  background: radial-gradient(circle, rgba(var(--rgb-warning), 0.12), transparent 68%);
 }
 
 .heroGrid,
@@ -168,8 +168,8 @@
 
 .heroActions :global(.btn-primary),
 .ctaActions :global(.btn-primary) {
-  background: linear-gradient(135deg, #9185ff 0%, #00d2d3 100%);
-  box-shadow: 0 16px 40px rgba(124, 106, 239, 0.35);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  box-shadow: 0 16px 40px rgba(var(--rgb-primary), 0.26);
 }
 
 .heroActions :global(.btn-secondary),
@@ -217,8 +217,8 @@
   inset: 16% 14%;
   border-radius: 50%;
   background:
-    radial-gradient(circle, rgba(124, 106, 239, 0.28), transparent 58%),
-    radial-gradient(circle at 72% 26%, rgba(0, 210, 211, 0.22), transparent 48%);
+    radial-gradient(circle, rgba(var(--rgb-primary), 0.28), transparent 58%),
+    radial-gradient(circle at 72% 26%, rgba(var(--rgb-secondary), 0.22), transparent 48%);
   filter: blur(24px);
   opacity: 0.92;
   z-index: 0;
@@ -357,7 +357,7 @@
   height: 10px;
   border-radius: 50%;
   background:
-    radial-gradient(circle at 38% 36%, rgba(124, 106, 239, 0.56), rgba(7, 10, 16, 0.95) 58%),
+    radial-gradient(circle at 38% 36%, rgba(var(--rgb-primary), 0.56), rgba(7, 10, 16, 0.95) 58%),
     #0a0f17;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
 }
@@ -368,7 +368,7 @@
   border-radius: 26px;
   padding: 2.9rem 0.72rem 0.72rem;
   background:
-    radial-gradient(circle at 50% -12%, rgba(124, 106, 239, 0.16), transparent 38%),
+    radial-gradient(circle at 50% -12%, rgba(var(--rgb-primary), 0.16), transparent 38%),
     linear-gradient(180deg, #0f1421 0%, #090c15 100%);
   overflow: hidden;
   display: grid;
@@ -450,7 +450,7 @@
   width: 78%;
   height: 100%;
   border-radius: 2px;
-  background: linear-gradient(90deg, #7bf2ca 0%, #00d2d3 100%);
+  background: linear-gradient(90deg, var(--color-success) 0%, var(--color-secondary) 100%);
 }
 
 .phoneCard {
@@ -482,7 +482,7 @@
 }
 
 .phoneCard > span {
-  color: #7bf2ca;
+  color: var(--color-success);
   font-size: 0.78rem;
 }
 
@@ -520,7 +520,7 @@
 .phoneChartPill {
   padding: 0.3rem 0.52rem;
   border-radius: 999px;
-  background: rgba(124, 106, 239, 0.14);
+  background: var(--color-primary-soft);
   color: #b7b1ff;
   font-size: 0.68rem;
   font-weight: 700;
@@ -532,7 +532,7 @@
   border-radius: 18px;
   overflow: hidden;
   background:
-    linear-gradient(180deg, rgba(124, 106, 239, 0.12), rgba(124, 106, 239, 0.02)),
+    linear-gradient(180deg, rgba(var(--rgb-primary), 0.12), rgba(var(--rgb-primary), 0.02)),
     rgba(255, 255, 255, 0.03);
 }
 
@@ -555,9 +555,9 @@
   animation: chartDrift 4.8s ease-in-out infinite;
 }
 
-.lineOne { top: 34%; background: linear-gradient(90deg, transparent 0%, #7c6aef 20%, #00d2d3 72%, transparent 100%); }
-.lineTwo { top: 54%; background: linear-gradient(90deg, transparent 0%, #fdcb6e 18%, #7c6aef 65%, transparent 100%); animation-delay: -1.2s; }
-.lineThree { top: 70%; background: linear-gradient(90deg, transparent 0%, #00d2d3 12%, #81ecec 68%, transparent 100%); animation-delay: -2.1s; }
+.lineOne { top: 34%; background: linear-gradient(90deg, transparent 0%, var(--color-primary) 20%, var(--color-secondary) 72%, transparent 100%); }
+.lineTwo { top: 54%; background: linear-gradient(90deg, transparent 0%, var(--color-warning) 18%, var(--color-primary) 65%, transparent 100%); animation-delay: -1.2s; }
+.lineThree { top: 70%; background: linear-gradient(90deg, transparent 0%, var(--color-secondary) 12%, var(--color-info) 68%, transparent 100%); animation-delay: -2.1s; }
 
 .phoneActivityList {
   display: grid;
@@ -580,17 +580,17 @@
 }
 
 .positive {
-  background: #00b894;
-  box-shadow: 0 0 14px rgba(0, 184, 148, 0.45);
+  background: var(--color-success);
+  box-shadow: 0 0 14px rgba(var(--rgb-success), 0.32);
 }
 
 .negative {
-  background: #ff6b6b;
-  box-shadow: 0 0 14px rgba(255, 107, 107, 0.35);
+  background: var(--color-danger);
+  box-shadow: 0 0 14px rgba(var(--rgb-danger), 0.24);
 }
 
-.positiveText { color: #7bf2ca; }
-.negativeText { color: #ff9f9f; }
+.positiveText { color: var(--color-success); }
+.negativeText { color: color-mix(in srgb, var(--color-danger) 70%, white); }
 
 .phoneBottomNav {
   display: grid;
@@ -608,9 +608,9 @@
 }
 
 .active {
-  background: linear-gradient(135deg, rgba(124, 106, 239, 0.18), rgba(0, 210, 211, 0.16));
+  background: linear-gradient(135deg, rgba(var(--rgb-primary), 0.18), rgba(var(--rgb-secondary), 0.16));
   color: var(--text-primary);
-  border: 1px solid rgba(124, 106, 239, 0.18);
+  border: 1px solid rgba(var(--rgb-primary), 0.18);
 }
 
 .section {
@@ -761,7 +761,7 @@
   height: 220px;
   border-radius: 26px;
   background:
-    linear-gradient(180deg, rgba(124, 106, 239, 0.14), rgba(124, 106, 239, 0.02)),
+    linear-gradient(180deg, rgba(var(--rgb-primary), 0.14), rgba(var(--rgb-primary), 0.02)),
     rgba(255, 255, 255, 0.03);
   overflow: hidden;
 }
@@ -784,19 +784,19 @@
 
 .mockupLine.one {
   top: 32%;
-  background: linear-gradient(90deg, transparent 0%, #7c6aef 20%, #00d2d3 58%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, var(--color-primary) 20%, var(--color-secondary) 58%, transparent 100%);
   transform: rotate(-5deg);
 }
 
 .mockupLine.two {
   top: 48%;
-  background: linear-gradient(90deg, transparent 0%, #fdcb6e 26%, #7c6aef 54%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, var(--color-warning) 26%, var(--color-primary) 54%, transparent 100%);
   transform: rotate(3deg);
 }
 
 .mockupLine.three {
   top: 64%;
-  background: linear-gradient(90deg, transparent 0%, #00d2d3 18%, #81ecec 56%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, var(--color-secondary) 18%, var(--color-info) 56%, transparent 100%);
   transform: rotate(-2deg);
 }
 
@@ -895,7 +895,7 @@
   gap: 0.45rem;
   padding: 0.4rem 0.72rem;
   border-radius: 999px;
-  background: rgba(124, 106, 239, 0.14);
+  background: var(--color-primary-soft);
   color: var(--accent-primary-light);
   font-size: 0.78rem;
   font-weight: 700;
@@ -986,11 +986,11 @@
 }
 
 .barBefore {
-  background: linear-gradient(90deg, #7c6aef, #a29bfe);
+  background: linear-gradient(90deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 72%, white));
 }
 
 .barAfter {
-  background: linear-gradient(90deg, #00d2d3, #81ecec);
+  background: linear-gradient(90deg, var(--color-secondary), var(--color-info));
 }
 
 .pricingGrid {
@@ -1008,7 +1008,7 @@
 }
 
 .highlight {
-  border-color: rgba(124, 106, 239, 0.35);
+  border-color: rgba(var(--rgb-primary), 0.35);
 }
 
 .pricingTop {
@@ -1034,7 +1034,7 @@
 .pricingBadge {
   padding: 0.45rem 0.72rem;
   border-radius: 999px;
-  background: rgba(124, 106, 239, 0.12);
+  background: var(--color-primary-soft);
   color: var(--accent-primary-light);
   font-size: 0.78rem;
   font-weight: 700;
@@ -1054,7 +1054,7 @@
 }
 
 .pricingPoints svg {
-  color: #7bf2ca;
+  color: var(--color-success);
   flex-shrink: 0;
   margin-top: 0.15rem;
 }
@@ -1147,7 +1147,7 @@
 
 [data-theme="light"] .phoneScreen {
   background:
-    radial-gradient(circle at 50% -12%, rgba(124, 106, 239, 0.1), transparent 34%),
+    radial-gradient(circle at 50% -12%, rgba(var(--rgb-primary), 0.1), transparent 34%),
     linear-gradient(180deg, #f7f8fc 0%, #ecf1f7 100%);
 }
 

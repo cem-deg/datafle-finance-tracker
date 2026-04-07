@@ -3,10 +3,14 @@
 import { FormEvent, useMemo, useState } from "react";
 import { Edit3, Plus, Target, Trash2 } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
+import BudgetUsageList from "@/components/ui/BudgetUsageList";
 import EmptyState from "@/components/ui/EmptyState";
+import FormActions from "@/components/ui/FormActions";
+import FormField from "@/components/ui/FormField";
 import InlineMessage from "@/components/ui/InlineMessage";
 import LoadingList from "@/components/ui/LoadingList";
 import ModalShell from "@/components/ui/ModalShell";
+import PanelCard from "@/components/ui/PanelCard";
 import PageFeedback from "@/components/ui/PageFeedback";
 import PageHeader from "@/components/ui/PageHeader";
 import { SUPPORTED_CURRENCIES, useCurrency } from "@/context/CurrencyContext";
@@ -171,18 +175,17 @@ export default function BudgetsPage() {
         title="Budgets"
         description="Set category limits and watch spending against them"
         actions={
-          <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+          <>
             <input
               type="month"
-              className="form-input"
+              className="form-input month-field"
               value={selectedMonth}
               onChange={(event) => setSelectedMonth(event.target.value)}
-              style={{ minWidth: 180 }}
             />
             <button className="btn btn-primary" onClick={openCreate} type="button">
               <Plus size={18} /> Add Budget
             </button>
-          </div>
+          </>
         }
       />
 
@@ -193,11 +196,11 @@ export default function BudgetsPage() {
       />
 
       <div className="charts-grid">
-        <div className="card animate-in animate-in-delay-1">
-          <div className="card-header">
-            <h3 className="card-title">Budget Limits</h3>
-          </div>
-          <div className="expense-list">
+        <PanelCard
+          className="animate-in animate-in-delay-1"
+          title="Budget Limits"
+          bodyClassName="expense-list"
+        >
             {loading ? (
               <LoadingList count={4} height={52} />
             ) : error ? (
@@ -238,26 +241,21 @@ export default function BudgetsPage() {
                     >
                       <Edit3 size={15} />
                     </button>
-                    <button
-                      className="btn btn-ghost btn-icon btn-sm"
-                      onClick={() => void handleDelete(budget.id)}
-                      title="Delete"
-                      type="button"
-                      style={{ color: "var(--accent-danger)" }}
-                    >
-                      <Trash2 size={15} />
-                    </button>
+                  <button
+                    className="btn btn-ghost btn-icon btn-sm btn-danger-ghost"
+                    onClick={() => void handleDelete(budget.id)}
+                    title="Delete"
+                    type="button"
+                  >
+                    <Trash2 size={15} />
+                  </button>
                   </div>
                 </div>
               ))
             )}
-          </div>
-        </div>
+        </PanelCard>
 
-        <div className="card animate-in animate-in-delay-2">
-          <div className="card-header">
-            <h3 className="card-title">Usage Overview</h3>
-          </div>
+        <PanelCard className="animate-in animate-in-delay-2" title="Usage Overview">
           {overviewLoading ? (
             <LoadingList count={4} height={58} />
           ) : overviewError ? (
@@ -277,93 +275,37 @@ export default function BudgetsPage() {
               compact
             />
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>
-              {overview.map((item) => (
-                <div
-                  key={item.budget_id}
-                  style={{
-                    padding: "var(--space-sm)",
-                    borderRadius: "var(--radius-md)",
-                    background: "var(--bg-elevated)",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      marginBottom: 8,
-                      gap: 12,
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <Target size={14} style={{ color: item.category_color }} />
-                      <strong style={{ fontSize: "var(--font-sm)" }}>{item.category_name}</strong>
-                    </div>
-                    <span
-                      style={{
-                        color: item.is_over_budget ? "var(--accent-danger)" : "var(--text-secondary)",
-                        fontSize: "var(--font-xs)",
-                      }}
-                    >
-                      {item.usage_percent}%
-                    </span>
-                  </div>
-                  <div
-                    style={{
-                      height: 8,
-                      borderRadius: 999,
-                      background: "rgba(255,255,255,0.08)",
-                      overflow: "hidden",
-                      marginBottom: 8,
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: `${Math.min(item.usage_percent, 100)}%`,
-                        height: "100%",
-                        background: item.is_over_budget ? "var(--accent-danger)" : item.category_color,
-                      }}
-                    />
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      fontSize: "var(--font-xs)",
-                      color: "var(--text-secondary)",
-                      gap: 12,
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    <span>Spent {convertAndFormat(item.spent, "USD")}</span>
-                    <span>
-                      {item.is_over_budget ? "Over by" : "Remaining"}{" "}
-                      {convertAndFormat(Math.abs(item.remaining), "USD")}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <BudgetUsageList
+              items={overview}
+              renderIcon={(item) => <Target size={14} style={{ color: item.category_color }} />}
+              renderMeta={(item) => (
+                <>
+                  <span>Spent {convertAndFormat(item.spent, "USD")}</span>
+                  <span>
+                    {item.is_over_budget ? "Over by" : "Remaining"}{" "}
+                    {convertAndFormat(Math.abs(item.remaining ?? 0), "USD")}
+                  </span>
+                </>
+              )}
+            />
           )}
-        </div>
+        </PanelCard>
       </div>
 
       {showModal ? (
         <ModalShell title={editingId ? "Edit Budget" : "Add Budget"} onClose={closeModal}>
-          {formError ? <InlineMessage message={formError} className="modal-message" /> : null}
+          {formError ? <InlineMessage message={formError} className="modal-message" id="budget-form-error" /> : null}
 
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label className="form-label" htmlFor="budget-category">
-                Category
-              </label>
+          <form onSubmit={handleSubmit} className="form-shell">
+            <FormField label="Category" htmlFor="budget-category">
               <select
                 id="budget-category"
                 className="form-select"
                 value={form.categoryId}
                 onChange={(event) => updateForm("categoryId", event.target.value)}
                 disabled={categoriesLoading || availableCategories.length === 0}
+                aria-invalid={Boolean(formError)}
+                aria-describedby={formError ? "budget-form-error" : undefined}
                 required
               >
                 <option value="">
@@ -375,13 +317,15 @@ export default function BudgetsPage() {
                   </option>
                 ))}
               </select>
-            </div>
+            </FormField>
 
             <div className="form-row">
-              <div className="form-group">
-                <label className="form-label" htmlFor="budget-amount">
-                  Monthly limit
-                </label>
+              <FormField
+                label="Monthly limit"
+                htmlFor="budget-amount"
+                help="Set the monthly ceiling you want to stay under."
+                helpId="budget-amount-help"
+              >
                 <input
                   id="budget-amount"
                   type="text"
@@ -390,19 +334,24 @@ export default function BudgetsPage() {
                   value={form.amount}
                   onChange={(event) => updateForm("amount", event.target.value)}
                   placeholder="0.00"
+                  aria-invalid={Boolean(formError)}
+                  aria-describedby={formError ? "budget-amount-help budget-form-error" : "budget-amount-help"}
                   required
                 />
-                <span className="form-help">Set the monthly ceiling you want to stay under.</span>
-              </div>
-              <div className="form-group">
-                <label className="form-label" htmlFor="budget-currency">
-                  Currency
-                </label>
+              </FormField>
+              <FormField
+                label="Currency"
+                htmlFor="budget-currency"
+                help="This currency is stored with the budget for accurate reporting."
+                helpId="budget-currency-help"
+              >
                 <select
                   id="budget-currency"
                   className="form-select"
                   value={form.currencyCode}
                   onChange={(event) => updateForm("currencyCode", event.target.value)}
+                  aria-invalid={Boolean(formError)}
+                  aria-describedby={formError ? "budget-currency-help budget-form-error" : "budget-currency-help"}
                 >
                   {SUPPORTED_CURRENCIES.map((supportedCurrency) => (
                     <option key={supportedCurrency.code} value={supportedCurrency.code}>
@@ -410,14 +359,15 @@ export default function BudgetsPage() {
                     </option>
                   ))}
                 </select>
-                <span className="form-help">This currency is stored with the budget for accurate reporting.</span>
-              </div>
+              </FormField>
             </div>
 
-            <div className="form-group">
-              <label className="form-label" htmlFor="budget-note">
-                Note
-              </label>
+            <FormField
+              label="Note"
+              htmlFor="budget-note"
+              help="Add context like fixed bills or savings targets if helpful."
+              helpId="budget-note-help"
+            >
               <input
                 id="budget-note"
                 type="text"
@@ -426,11 +376,12 @@ export default function BudgetsPage() {
                 onChange={(event) => updateForm("note", event.target.value)}
                 placeholder="Optional note for this category budget"
                 maxLength={120}
+                aria-invalid={Boolean(formError)}
+                aria-describedby={formError ? "budget-note-help budget-form-error" : "budget-note-help"}
               />
-              <span className="form-help">Add context like fixed bills or savings targets if helpful.</span>
-            </div>
+            </FormField>
 
-            <div className="modal-actions">
+            <FormActions>
               <button type="button" className="btn btn-secondary" onClick={closeModal}>
                 Cancel
               </button>
@@ -441,7 +392,7 @@ export default function BudgetsPage() {
               >
                 {submitting ? "Saving..." : editingId ? "Update" : "Save Budget"}
               </button>
-            </div>
+            </FormActions>
           </form>
         </ModalShell>
       ) : null}

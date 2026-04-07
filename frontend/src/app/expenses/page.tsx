@@ -4,12 +4,15 @@ import { FormEvent, useMemo, useState } from "react";
 import { Edit3, Filter, Plus, Search, Trash2 } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
 import EmptyState from "@/components/ui/EmptyState";
+import FormActions from "@/components/ui/FormActions";
+import FormField from "@/components/ui/FormField";
 import InlineMessage from "@/components/ui/InlineMessage";
 import LoadingList from "@/components/ui/LoadingList";
 import ModalShell from "@/components/ui/ModalShell";
 import PageFeedback from "@/components/ui/PageFeedback";
 import PageHeader from "@/components/ui/PageHeader";
 import PaginationControls from "@/components/ui/PaginationControls";
+import RecordRow from "@/components/ui/RecordRow";
 import { useCategories, useExpenses } from "@/hooks/useData";
 import { useFlashMessage } from "@/hooks/useFlashMessage";
 import { useCurrency } from "@/context/CurrencyContext";
@@ -170,7 +173,7 @@ export default function ExpensesPage() {
         title="Expenses"
         description="Track and manage your spending"
         actions={
-          <button className="btn btn-primary" onClick={openCreate} id="add-expense-btn">
+          <button className="btn btn-primary" onClick={openCreate} id="add-expense-btn" type="button">
             <Plus size={18} /> Add Expense
           </button>
         }
@@ -182,29 +185,21 @@ export default function ExpensesPage() {
         errorMessages={[error, categoriesError]}
       />
 
-      <div className="filter-bar animate-in animate-in-delay-1">
-        <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
-          <Search
-            size={16}
-            style={{
-              position: "absolute",
-              left: 12,
-              top: "50%",
-              transform: "translateY(-50%)",
-              color: "var(--text-tertiary)",
-            }}
-          />
+      <div className="filter-bar toolbar-row animate-in animate-in-delay-1">
+        <div className="toolbar-field-grow">
+          <div className="input-with-icon">
+            <Search size={16} className="input-icon" />
           <input
             className="form-input"
-            style={{ paddingLeft: 36 }}
             placeholder="Search expenses on this page..."
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
             id="search-expenses"
           />
+          </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <Filter size={16} style={{ color: "var(--text-tertiary)" }} />
+        <div className="toolbar-field toolbar-field-sm">
+          <Filter size={16} className="microcopy" />
           <select
             className="form-select"
             value={categoryFilter}
@@ -213,7 +208,6 @@ export default function ExpensesPage() {
               setPage(1);
             }}
             id="category-filter"
-            style={{ minWidth: 160 }}
             disabled={categoriesLoading}
           >
             <option value="">All Categories</option>
@@ -253,40 +247,40 @@ export default function ExpensesPage() {
           filteredItems.map((expense) => {
             const category = categoryMap.get(expense.category_id);
             return (
-              <div key={expense.id} className="expense-item">
-                <div
-                  className="category-dot"
-                  style={{ background: category?.color || "#636e72" }}
-                />
-                <div className="expense-info">
-                  <div className="expense-desc">{expense.description}</div>
-                  <div className="expense-meta">
-                    {category?.name || "Other"} | {formatDate(expense.expense_date)}
-                  </div>
-                </div>
-                <div className="expense-amount">
-                  -{convertAndFormat(expense.amount, expense.currency_code || currency.code)}
-                </div>
-                <div className="expense-actions">
-                  <button
+              <RecordRow
+                key={expense.id}
+                leading={
+                  <div
+                    className="category-dot"
+                    style={{ background: category?.color || "var(--color-muted)" }}
+                  />
+                }
+                title={expense.description}
+                meta={`${category?.name || "Other"} | ${formatDate(expense.expense_date)}`}
+                amount={`-${convertAndFormat(expense.amount, expense.currency_code || currency.code)}`}
+                actions={
+                  <>
+                    <button
                     className="btn btn-ghost btn-icon btn-sm"
                     onClick={() => openEdit(expense)}
                     title="Edit"
                     type="button"
+                    aria-label={`Edit expense ${expense.description}`}
                   >
-                    <Edit3 size={15} />
-                  </button>
-                  <button
-                    className="btn btn-ghost btn-icon btn-sm"
-                    onClick={() => void handleDelete(expense.id)}
-                    title="Delete"
-                    type="button"
-                    style={{ color: "var(--accent-danger)" }}
-                  >
-                    <Trash2 size={15} />
-                  </button>
-                </div>
-              </div>
+                      <Edit3 size={15} />
+                    </button>
+                    <button
+                      className="btn btn-ghost btn-icon btn-sm btn-danger-ghost"
+                      onClick={() => void handleDelete(expense.id)}
+                      title="Delete"
+                      type="button"
+                      aria-label={`Delete expense ${expense.description}`}
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </>
+                }
+              />
             );
           })
         )}
@@ -300,14 +294,16 @@ export default function ExpensesPage() {
 
       {showModal ? (
         <ModalShell title={editingId ? "Edit Expense" : "Add Expense"} onClose={closeModal}>
-          {formError ? <InlineMessage message={formError} className="modal-message" /> : null}
+          {formError ? <InlineMessage message={formError} className="modal-message" id="expense-form-error" /> : null}
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="form-shell">
             <div className="form-row">
-              <div className="form-group">
-                <label className="form-label" htmlFor="exp-amount">
-                  Amount ({currency.code})
-                </label>
+              <FormField
+                label={`Amount (${currency.code})`}
+                htmlFor="exp-amount"
+                help="Use your selected currency. Both commas and periods are accepted."
+                helpId="exp-amount-help"
+              >
                 <input
                   id="exp-amount"
                   type="text"
@@ -316,29 +312,26 @@ export default function ExpensesPage() {
                   placeholder="0.00"
                   value={form.amount}
                   onChange={(event) => updateForm("amount", event.target.value)}
+                  aria-invalid={Boolean(formError)}
+                  aria-describedby={formError ? "exp-amount-help expense-form-error" : "exp-amount-help"}
                   required
                 />
-                <span className="form-help">Use your selected currency. Both commas and periods are accepted.</span>
-              </div>
-              <div className="form-group">
-                <label className="form-label" htmlFor="exp-date">
-                  Date
-                </label>
+              </FormField>
+              <FormField label="Date" htmlFor="exp-date">
                 <input
                   id="exp-date"
                   type="date"
                   className="form-input"
                   value={form.expenseDate}
                   onChange={(event) => updateForm("expenseDate", event.target.value)}
+                  aria-invalid={Boolean(formError)}
+                  aria-describedby={formError ? "expense-form-error" : undefined}
                   required
                 />
-              </div>
+              </FormField>
             </div>
 
-            <div className="form-group">
-              <label className="form-label" htmlFor="exp-desc">
-                Description
-              </label>
+            <FormField label="Description" htmlFor="exp-desc">
               <input
                 id="exp-desc"
                 type="text"
@@ -347,20 +340,26 @@ export default function ExpensesPage() {
                 value={form.description}
                 onChange={(event) => updateForm("description", event.target.value)}
                 maxLength={120}
+                aria-invalid={Boolean(formError)}
+                aria-describedby={formError ? "expense-form-error" : undefined}
                 required
               />
-            </div>
+            </FormField>
 
-            <div className="form-group">
-              <label className="form-label" htmlFor="exp-category">
-                Category
-              </label>
+            <FormField
+              label="Category"
+              htmlFor="exp-category"
+              help="Choose the category that best matches this purchase."
+              helpId="exp-category-help"
+            >
               <select
                 id="exp-category"
                 className="form-select"
                 value={form.categoryId}
                 onChange={(event) => updateForm("categoryId", event.target.value)}
                 disabled={categoriesLoading || categories.length === 0}
+                aria-invalid={Boolean(formError)}
+                aria-describedby={formError ? "exp-category-help expense-form-error" : "exp-category-help"}
                 required
               >
                 <option value="">
@@ -372,10 +371,9 @@ export default function ExpensesPage() {
                   </option>
                 ))}
               </select>
-              <span className="form-help">Choose the category that best matches this purchase.</span>
-            </div>
+            </FormField>
 
-            <div className="modal-actions">
+            <FormActions>
               <button type="button" className="btn btn-secondary" onClick={closeModal}>
                 Cancel
               </button>
@@ -386,7 +384,7 @@ export default function ExpensesPage() {
               >
                 {submitting ? "Saving..." : editingId ? "Update" : "Add Expense"}
               </button>
-            </div>
+            </FormActions>
           </form>
         </ModalShell>
       ) : null}

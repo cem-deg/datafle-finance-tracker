@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useId, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -31,11 +31,27 @@ export default function Sidebar() {
   const { currency, setCurrency } = useCurrency();
   const [profileExpanded, setProfileExpanded] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const settingsTitleId = useId();
 
   const initial = user?.name?.charAt(0)?.toUpperCase() || "U";
   const memberSince = user?.created_at
     ? new Date(user.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })
     : "";
+
+  useEffect(() => {
+    if (!showSettings) {
+      return;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setShowSettings(false);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [showSettings]);
 
   return (
     <>
@@ -60,9 +76,8 @@ export default function Sidebar() {
         </nav>
 
         {/* Theme Toggle */}
-        <div style={{ padding: "0 var(--space-md)", marginBottom: "var(--space-sm)" }}>
-          <button className="theme-toggle w-full" onClick={toggleTheme} title="Toggle theme" id="theme-toggle-sidebar"
-            style={{ width: "100%", justifyContent: "center", gap: 8, fontSize: "var(--font-xs)", fontWeight: 500 }}>
+        <div className="sidebar-theme-toggle-wrap">
+          <button className="theme-toggle btn-full" onClick={toggleTheme} title="Toggle theme" id="theme-toggle-sidebar" type="button">
             {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
             {theme === "dark" ? "Light Mode" : "Dark Mode"}
           </button>
@@ -71,20 +86,26 @@ export default function Sidebar() {
         {/* Profile Section */}
         <div className="sidebar-footer">
           <div className="profile-panel">
-            <div className="sidebar-user" onClick={() => setProfileExpanded(!profileExpanded)} style={{ margin: 0, padding: 0 }}>
+            <button
+              className="sidebar-user sidebar-profile-trigger"
+              onClick={() => setProfileExpanded(!profileExpanded)}
+              type="button"
+              aria-expanded={profileExpanded}
+              aria-controls="sidebar-profile-details"
+            >
               <div className="avatar">{initial}</div>
               <div className="user-info">
                 <div className="user-name">{user?.name || "User"}</div>
                 <div className="user-email">{user?.email || ""}</div>
               </div>
-              <ChevronDown size={16} style={{
-                color: "var(--text-tertiary)", transition: "transform 200ms ease",
-                transform: profileExpanded ? "rotate(180deg)" : "rotate(0)"
-              }} />
-            </div>
+              <ChevronDown
+                size={16}
+                className={`sidebar-profile-chevron ${profileExpanded ? "open" : ""}`}
+              />
+            </button>
 
             {profileExpanded && (
-              <div className="profile-expanded">
+              <div className="profile-expanded" id="sidebar-profile-details">
                 <div className="profile-detail">
                   <Calendar size={14} />
                   <span>Member since {memberSince}</span>
@@ -93,13 +114,20 @@ export default function Sidebar() {
                   <Globe size={14} />
                   <span>{currency.flag} {currency.code}</span>
                 </div>
-                <div style={{ display: "flex", gap: "var(--space-sm)", marginTop: "var(--space-md)", justifyContent: "center", alignItems: "center" }}>
-                  <button className="btn btn-ghost btn-sm" style={{ flex: 1, fontSize: "var(--font-xs)", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
-                    onClick={() => setShowSettings(true)}>
+                <div className="sidebar-profile-actions">
+                  <button
+                    className="btn btn-ghost btn-sm btn-equal"
+                    onClick={() => setShowSettings(true)}
+                    type="button"
+                  >
                     <Settings size={14} /> Settings
                   </button>
-                  <button className="btn btn-ghost btn-sm" style={{ flex: 1, color: "var(--accent-danger)", fontSize: "var(--font-xs)", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
-                    onClick={logout} id="logout-btn">
+                  <button
+                    className="btn btn-ghost btn-sm btn-equal btn-danger-ghost"
+                    onClick={logout}
+                    id="logout-btn"
+                    type="button"
+                  >
                     <LogOut size={14} /> Logout
                   </button>
                 </div>
@@ -111,39 +139,56 @@ export default function Sidebar() {
 
       {/* Settings Modal */}
       {showSettings && (
-        <div className="modal-overlay" onClick={() => setShowSettings(false)} style={{ zIndex: 1000 }}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-xl)" }}>
-              <h2 className="modal-title">Settings</h2>
-              <button className="btn btn-ghost btn-icon" onClick={() => setShowSettings(false)}><X size={20} /></button>
+        <div className="modal-overlay modal-overlay-elevated" onClick={() => setShowSettings(false)}>
+          <div
+            className="modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={settingsTitleId}
+            tabIndex={-1}
+          >
+            <div className="sidebar-settings-header">
+              <h2 className="modal-title" id={settingsTitleId}>Settings</h2>
+              <button className="btn btn-ghost btn-icon" onClick={() => setShowSettings(false)} type="button" aria-label="Close settings"><X size={20} /></button>
             </div>
 
             <div className="settings-section">
               <h3>Currency</h3>
-              <p style={{ fontSize: "var(--font-xs)", color: "var(--text-secondary)", marginBottom: "var(--space-sm)" }}>
+              <p className="settings-help">
                 Select your preferred currency for displaying amounts
               </p>
               <div className="currency-grid">
                 {SUPPORTED_CURRENCIES.map((c) => (
-                  <div key={c.code}
+                  <button
+                    key={c.code}
+                    type="button"
                     className={`currency-option ${currency.code === c.code ? "selected" : ""}`}
-                    onClick={() => setCurrency(c.code)}>
+                    onClick={() => setCurrency(c.code)}
+                    aria-pressed={currency.code === c.code}
+                  >
                     <span className="currency-flag">{c.flag}</span>
                     <span>{c.code}</span>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
 
             <div className="settings-section">
               <h3>Theme</h3>
-              <div style={{ display: "flex", gap: "var(--space-sm)", justifyContent: "center" }}>
-                <button className={`btn ${theme === "dark" ? "btn-primary" : "btn-secondary"}`}
-                  onClick={() => { if (theme !== "dark") toggleTheme(); }} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+              <div className="settings-theme-row">
+                <button
+                  className={`btn btn-equal ${theme === "dark" ? "btn-primary" : "btn-secondary"}`}
+                  onClick={() => { if (theme !== "dark") toggleTheme(); }}
+                  type="button"
+                >
                   <Moon size={16} /> Dark
                 </button>
-                <button className={`btn ${theme === "light" ? "btn-primary" : "btn-secondary"}`}
-                  onClick={() => { if (theme !== "light") toggleTheme(); }} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                <button
+                  className={`btn btn-equal ${theme === "light" ? "btn-primary" : "btn-secondary"}`}
+                  onClick={() => { if (theme !== "light") toggleTheme(); }}
+                  type="button"
+                >
                   <Sun size={16} /> Light
                 </button>
               </div>

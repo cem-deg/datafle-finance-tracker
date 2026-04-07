@@ -5,9 +5,10 @@ import AppShell from "@/components/layout/AppShell";
 import MonthlyBarChart from "@/components/charts/MonthlyBarChart";
 import CategoryPieChart from "@/components/charts/CategoryPieChart";
 import TrendLineChart from "@/components/charts/TrendLineChart";
-import EmptyState from "@/components/ui/EmptyState";
+import StatCard from "@/components/ui/StatCard";
 import PageFeedback from "@/components/ui/PageFeedback";
 import PageHeader from "@/components/ui/PageHeader";
+import StateSurface from "@/components/ui/StateSurface";
 import {
   useCategoryDistribution,
   useCategories,
@@ -47,29 +48,22 @@ export default function AnalyticsPage() {
 
       <div
         className="stat-grid"
-        style={{
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          marginBottom: "var(--space-xl)",
-        }}
+        style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}
       >
-        <div className="stat-card animate-in animate-in-delay-1">
-          <div
-            className="stat-icon"
-            style={{
-              background: "rgba(124,106,239,0.15)",
-              color: "var(--accent-primary-light)",
-            }}
-          >
-            <BrainCircuit size={22} />
-          </div>
-          {predictionLoading ? (
-            <div className="skeleton skeleton-heading" />
-          ) : prediction?.prediction != null ? (
-            <>
-              <div className="stat-value">
-                {convertAndFormat(prediction.prediction, "USD")}
-              </div>
-              <div className="stat-label">Predicted next month</div>
+        <StatCard
+          className="animate-in animate-in-delay-1"
+          icon={<BrainCircuit size={22} />}
+          iconClassName="metric-icon"
+          label={prediction?.prediction != null ? "Predicted next month" : prediction?.message || "Add expenses to get predictions"}
+          loading={predictionLoading}
+          value={
+            prediction?.prediction != null
+              ? convertAndFormat(prediction.prediction, "USD")
+              : "Need more data"
+          }
+          valueClassName={prediction?.prediction != null ? "" : "stat-value-compact"}
+          meta={
+            prediction?.prediction != null ? (
               <div
                 className={`stat-change ${
                   prediction.trend === "increasing" ? "negative" : "positive"
@@ -82,73 +76,68 @@ export default function AnalyticsPage() {
                 )}
                 {prediction.trend ?? "stable"} | {prediction.confidence} confidence
               </div>
-            </>
-          ) : (
-            <>
-              <div className="stat-value" style={{ fontSize: "var(--font-lg)" }}>
-                Need more data
-              </div>
-              <div className="stat-label">
-                {prediction?.message || "Add expenses to get predictions"}
-              </div>
-            </>
-          )}
-        </div>
+            ) : undefined
+          }
+        />
 
-        <div className="stat-card animate-in animate-in-delay-2">
-          <div
-            className="stat-icon"
-            style={{ background: "rgba(0,210,211,0.15)", color: "var(--accent-secondary)" }}
-          >
-            <Target size={22} />
-          </div>
-          {predictionLoading ? (
-            <div className="skeleton skeleton-heading" />
-          ) : (
-            <>
-              <div className="stat-value">{prediction?.data_points ?? 0}</div>
-              <div className="stat-label">Months of data</div>
-              <div className="badge badge-primary" style={{ marginTop: 8 }}>
-                R2 = {prediction?.r_squared?.toFixed(3) ?? "-"}
-              </div>
-            </>
-          )}
-        </div>
+        <StatCard
+          className="animate-in animate-in-delay-2"
+          icon={<Target size={22} />}
+          iconClassName="metric-icon-cyan"
+          label="Months of data"
+          loading={predictionLoading}
+          value={prediction?.data_points ?? 0}
+          meta={<div className="badge badge-primary mt-sm">R2 = {prediction?.r_squared?.toFixed(3) ?? "-"}</div>}
+        />
       </div>
 
       <div className="charts-grid animate-in animate-in-delay-2">
         {monthlyLoading ? (
-          <div className="card">
-            <div className="skeleton" style={{ height: 300 }} />
-          </div>
+          <StateSurface type="loading" framed className="animate-in" />
         ) : monthlyError ? (
-          <div className="card">
-            <EmptyState
-              title="Monthly totals unavailable"
-              description="Try reloading the analytics page."
-              actionLabel="Retry"
-              onAction={() => void refetchMonthly()}
-              icon="!"
-              compact
-            />
-          </div>
+          <StateSurface
+            type="error"
+            framed
+            title="Monthly totals unavailable"
+            description="Try reloading the analytics page."
+            actionLabel="Retry"
+            onAction={() => void refetchMonthly()}
+            icon="!"
+            compact
+          />
+        ) : monthly.length === 0 ? (
+          <StateSurface
+            type="empty"
+            framed
+            title="No monthly totals yet"
+            description="Add a few transactions to start seeing your spending trend."
+            icon="~"
+            compact
+          />
         ) : (
           <MonthlyBarChart data={monthly} />
         )}
 
         {categoryLoading ? (
-          <div className="card">
-            <div className="skeleton" style={{ height: 300 }} />
-          </div>
+          <StateSurface type="loading" framed />
         ) : categoryError || categoriesError ? (
-          <div className="card">
-            <EmptyState
-              title="Category analytics unavailable"
-              description="Category data could not be loaded right now."
-              icon="!"
-              compact
-            />
-          </div>
+          <StateSurface
+            type="error"
+            framed
+            title="Category analytics unavailable"
+            description="Category data could not be loaded right now."
+            icon="!"
+            compact
+          />
+        ) : categoryDistribution.length === 0 ? (
+          <StateSurface
+            type="empty"
+            framed
+            title="No category breakdown yet"
+            description="Once spending is categorized, the distribution will show up here."
+            icon="%"
+            compact
+          />
         ) : (
           <CategoryPieChart data={categoryDistribution} categories={categories} />
         )}
@@ -156,18 +145,25 @@ export default function AnalyticsPage() {
 
       <div className="animate-in animate-in-delay-3">
         {trendsLoading ? (
-          <div className="card">
-            <div className="skeleton" style={{ height: 300 }} />
-          </div>
+          <StateSurface type="loading" framed />
         ) : trendsError ? (
-          <div className="card">
-            <EmptyState
-              title="Trend chart unavailable"
-              description="Trend data could not be loaded right now."
-              icon="!"
-              compact
-            />
-          </div>
+          <StateSurface
+            type="error"
+            framed
+            title="Trend chart unavailable"
+            description="Trend data could not be loaded right now."
+            icon="!"
+            compact
+          />
+        ) : trends.length === 0 ? (
+          <StateSurface
+            type="empty"
+            framed
+            title="No trend data yet"
+            description="Recent daily activity will appear here once you have more entries."
+            icon="/"
+            compact
+          />
         ) : (
           <TrendLineChart data={trends} />
         )}

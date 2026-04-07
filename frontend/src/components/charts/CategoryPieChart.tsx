@@ -5,6 +5,7 @@ import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
 } from "recharts";
 import { useCurrency } from "@/context/CurrencyContext";
+import { CATEGORY_COLORS } from "@/utils/constants";
 import type { CategoryDistribution, Category } from "@/types";
 
 interface Props {
@@ -12,10 +13,7 @@ interface Props {
   categories: Category[];
 }
 
-const FALLBACK_COLORS = [
-  "#7c6aef", "#00d2d3", "#ff6b6b", "#feca57", "#a29bfe",
-  "#fd79a8", "#00b894", "#e17055", "#636e72", "#74b9ff",
-];
+const FALLBACK_COLORS = CATEGORY_COLORS;
 
 function CustomTooltip({
   active,
@@ -33,14 +31,8 @@ function CustomTooltip({
   const formatted = convertAndFormat ? convertAndFormat(item.value, baseCurrency) : `${item.value.toLocaleString()}`;
   
   return (
-    <div style={{
-      background: "var(--bg-elevated)",
-      border: "1px solid var(--glass-border)",
-      borderRadius: "var(--radius-md)",
-      padding: "10px 14px",
-      fontSize: "var(--font-sm)",
-    }}>
-      <p style={{ fontWeight: 600, marginBottom: 4 }}>{item.name}</p>
+    <div className="chart-tooltip">
+      <p className="chart-tooltip-value" style={{ marginBottom: 4 }}>{item.name}</p>
       <p>{formatted} ({item.payload.percentage}%)</p>
     </div>
   );
@@ -66,8 +58,8 @@ function CategoryPieChart({ data, categories }: Props) {
       <div className="card-header">
         <h3 className="card-title">Category Distribution</h3>
       </div>
-      <div className="chart-container" style={{ display: "flex", alignItems: "center" }}>
-        <div style={{ width: "55%", height: "100%" }}>
+      <div className="chart-container chart-layout">
+        <div className="chart-main">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -88,12 +80,12 @@ function CategoryPieChart({ data, categories }: Props) {
             </PieChart>
           </ResponsiveContainer>
         </div>
-        <div style={{ width: "45%", display: "flex", flexDirection: "column", gap: 8 }}>
+        <div className="chart-sidebar">
           {chartData.slice(0, 6).map((entry, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "var(--font-xs)" }}>
-              <div style={{ width: 10, height: 10, borderRadius: "50%", background: entry.color, flexShrink: 0 }} />
-              <span style={{ flex: 1, color: "var(--text-secondary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{entry.name}</span>
-              <span style={{ fontWeight: 600 }}>{entry.percentage}%</span>
+            <div key={i} className="chart-legend-item">
+              <div className="chart-legend-dot" style={{ background: entry.color }} />
+              <span className="chart-legend-label">{entry.name}</span>
+              <span className="chart-legend-value">{entry.percentage}%</span>
             </div>
           ))}
         </div>

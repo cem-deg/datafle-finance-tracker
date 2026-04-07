@@ -59,6 +59,8 @@ import {
 } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
 import EmptyState from "@/components/ui/EmptyState";
+import FormActions from "@/components/ui/FormActions";
+import FormField from "@/components/ui/FormField";
 import InlineMessage from "@/components/ui/InlineMessage";
 import LoadingList from "@/components/ui/LoadingList";
 import ModalShell from "@/components/ui/ModalShell";
@@ -131,7 +133,7 @@ interface CategoryFormState {
 const initialFormState = (): CategoryFormState => ({
   name: "",
   icon: "circle",
-  color: "#6c5ce7",
+  color: CATEGORY_COLORS[0],
 });
 
 export default function CategoriesPage() {
@@ -251,7 +253,7 @@ export default function CategoriesPage() {
         {loading ? (
           <LoadingList count={8} height={68} />
         ) : error ? (
-          <div style={{ gridColumn: "1 / -1" }}>
+          <div className="category-grid-full">
             <EmptyState
               title="Could not load categories"
               description="Try refreshing the page or checking the backend connection."
@@ -261,7 +263,7 @@ export default function CategoriesPage() {
             />
           </div>
         ) : categories.length === 0 ? (
-          <div style={{ gridColumn: "1 / -1" }}>
+          <div className="category-grid-full">
             <EmptyState
               title="No categories yet"
               description="Create categories to organize your expenses."
@@ -283,16 +285,17 @@ export default function CategoriesPage() {
                   onClick={() => openEdit(category)}
                   title="Edit"
                   type="button"
+                  aria-label={`Edit category ${category.name}`}
                 >
                   <Edit3 size={14} />
                 </button>
                 {!category.is_default ? (
                   <button
-                    className="btn btn-ghost btn-icon btn-sm"
+                    className="btn btn-ghost btn-icon btn-sm btn-danger-ghost"
                     onClick={() => void handleDelete(category.id)}
                     title="Delete"
                     type="button"
-                    style={{ color: "var(--accent-danger)" }}
+                    aria-label={`Delete category ${category.name}`}
                   >
                     <Trash2 size={14} />
                   </button>
@@ -305,13 +308,15 @@ export default function CategoriesPage() {
 
       {showModal ? (
         <ModalShell title={editId ? "Edit Category" : "New Category"} onClose={closeModal}>
-          {formError ? <InlineMessage message={formError} className="modal-message" /> : null}
+          {formError ? <InlineMessage message={formError} className="modal-message" id="category-form-error" /> : null}
 
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label className="form-label" htmlFor="cat-name">
-                Name
-              </label>
+          <form onSubmit={handleSubmit} className="form-shell">
+            <FormField
+              label="Name"
+              htmlFor="cat-name"
+              help="Keep names short and specific so they are easy to scan in reports."
+              helpId="cat-name-help"
+            >
               <input
                 id="cat-name"
                 type="text"
@@ -320,13 +325,16 @@ export default function CategoriesPage() {
                 value={form.name}
                 onChange={(event) => updateForm("name", event.target.value)}
                 maxLength={60}
+                aria-invalid={Boolean(formError)}
+                aria-describedby={formError ? "cat-name-help category-form-error" : "cat-name-help"}
                 required
               />
-              <span className="form-help">Keep names short and specific so they are easy to scan in reports.</span>
-            </div>
+            </FormField>
 
-            <div className="form-group">
-              <label className="form-label">Color</label>
+            <FormField
+              label="Color"
+              help="Use a distinct color so charts and lists stay easy to read."
+            >
               <div className="color-picker">
                 {CATEGORY_COLORS.map((color) => (
                   <button
@@ -336,35 +344,27 @@ export default function CategoriesPage() {
                     style={{ background: color }}
                     onClick={() => updateForm("color", color)}
                     aria-label={`Choose ${color} as the category color`}
+                    aria-pressed={form.color === color}
                   />
                 ))}
               </div>
-              <span className="form-help">Use a distinct color so charts and lists stay easy to read.</span>
-            </div>
+            </FormField>
 
-            <div className="form-group">
-              <label className="form-label">Icon</label>
-              <div style={{ position: "relative", marginBottom: "var(--space-sm)" }}>
-                <Search
-                  size={14}
-                  style={{
-                    position: "absolute",
-                    left: 10,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    color: "var(--text-tertiary)",
-                  }}
-                />
+            <FormField
+              label="Icon"
+              help="Pick a simple icon that is recognizable at a glance."
+            >
+              <div className="input-with-icon mb-md">
+                <Search size={14} className="input-icon" />
                 <input
                   className="form-input"
-                  style={{ padding: "8px 12px 8px 32px", fontSize: "var(--font-xs)" }}
                   placeholder="Search icons..."
                   value={iconSearch}
                   onChange={(event) => setIconSearch(event.target.value)}
+                  aria-label="Search category icons"
                 />
               </div>
-              <span className="form-help">Pick a simple icon that is recognizable at a glance.</span>
-              <div style={{ maxHeight: 240, overflowY: "auto" }}>
+              <div className="picker-panel">
                 {filteredGroups.length === 0 ? (
                   <EmptyState
                     title="No icons found"
@@ -384,22 +384,16 @@ export default function CategoriesPage() {
                             onClick={() => updateForm("icon", icon)}
                             title={icon}
                             aria-label={`Use ${icon} icon`}
-                            style={{
-                              width: 36,
-                              height: 36,
-                              borderRadius: "var(--radius-sm)",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              background: form.icon === icon ? form.color : "var(--bg-elevated)",
-                              color: form.icon === icon ? "white" : "var(--text-secondary)",
-                              cursor: "pointer",
-                              border:
-                                form.icon === icon
-                                  ? `2px solid ${form.color}`
-                                  : "2px solid transparent",
-                              transition: "all 150ms ease",
-                            }}
+                            aria-pressed={form.icon === icon}
+                            className={`icon-option ${form.icon === icon ? "selected" : ""}`}
+                            style={
+                              form.icon === icon
+                                ? {
+                                    background: form.color,
+                                    borderColor: form.color,
+                                  }
+                                : undefined
+                            }
                           >
                             {ICON_MAP[icon] || <Circle size={18} />}
                           </button>
@@ -409,16 +403,16 @@ export default function CategoriesPage() {
                   ))
                 )}
               </div>
-            </div>
+            </FormField>
 
-            <div className="modal-actions">
+            <FormActions>
               <button type="button" className="btn btn-secondary" onClick={closeModal}>
                 Cancel
               </button>
               <button type="submit" className="btn btn-primary" disabled={submitting}>
                 {submitting ? "Saving..." : editId ? "Update" : "Create"}
               </button>
-            </div>
+            </FormActions>
           </form>
         </ModalShell>
       ) : null}

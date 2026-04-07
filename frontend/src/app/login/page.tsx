@@ -4,6 +4,8 @@ import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import FormField from "@/components/ui/FormField";
+import InlineMessage from "@/components/ui/InlineMessage";
 import { APP_NAME } from "@/utils/constants";
 import { ArrowLeft, Lock, Mail, Shield, TrendingUp, Wallet } from "lucide-react";
 
@@ -88,11 +90,21 @@ export default function LoginPage() {
             <p>Access your dashboard, budgets, and cashflow overview.</p>
           </div>
 
-          {error && <div className="auth-error" id="login-error">{error}</div>}
+          {error ? (
+            <InlineMessage
+              message={error}
+              className="auth-error"
+              id="login-error"
+            />
+          ) : null}
 
-          <form className="auth-form" onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label className="form-label" htmlFor="email">Email</label>
+          <form className="auth-form form-shell" onSubmit={handleSubmit}>
+            <FormField
+              label="Email"
+              htmlFor="email"
+              help="Use the email address tied to your finance workspace."
+              helpId="login-email-help"
+            >
               <div className="auth-input-wrap">
                 <Mail size={18} className="auth-input-icon" />
                 <input
@@ -102,13 +114,20 @@ export default function LoginPage() {
                   placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? "login-email-help login-error" : "login-email-help"}
                   required
                 />
               </div>
-            </div>
+            </FormField>
 
-            <div className="form-group">
-              <label className="form-label" htmlFor="password">Password</label>
+            <FormField
+              label="Password"
+              htmlFor="password"
+              help="Enter the password you use to access your account."
+              helpId="login-password-help"
+            >
               <div className="auth-input-wrap">
                 <Lock size={18} className="auth-input-icon" />
                 <input
@@ -118,10 +137,13 @@ export default function LoginPage() {
                   placeholder="********"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? "login-password-help login-error" : "login-password-help"}
                   required
                 />
               </div>
-            </div>
+            </FormField>
 
             <button type="submit" className="btn btn-primary auth-submit" id="login-submit" disabled={loading}>
               {loading ? "Signing in..." : "Sign In"}
