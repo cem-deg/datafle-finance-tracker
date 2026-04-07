@@ -1,84 +1,148 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
+import { Edit3, Plus, Target, Trash2 } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
+import EmptyState from "@/components/ui/EmptyState";
+import InlineMessage from "@/components/ui/InlineMessage";
+import LoadingList from "@/components/ui/LoadingList";
+import ModalShell from "@/components/ui/ModalShell";
+import PageFeedback from "@/components/ui/PageFeedback";
+import PageHeader from "@/components/ui/PageHeader";
+import { SUPPORTED_CURRENCIES, useCurrency } from "@/context/CurrencyContext";
+import { useFlashMessage } from "@/hooks/useFlashMessage";
 import { useBudgetOverview, useBudgets, useCategories } from "@/hooks/useData";
 import { budgetApi } from "@/services/api";
-import { useCurrency } from "@/context/CurrencyContext";
-import { Edit3, Plus, Target, Trash2, X } from "lucide-react";
+import { getLocalMonthInputValue } from "@/utils/date";
+import { parseLocalizedAmount } from "@/utils/amount";
+
+interface BudgetFormState {
+  amount: string;
+  currencyCode: string;
+  categoryId: string;
+  note: string;
+}
 
 function currentMonthValue() {
-  return new Date().toISOString().slice(0, 7);
+  return getLocalMonthInputValue();
 }
 
 function toMonthStart(monthValue: string) {
   return `${monthValue}-01`;
 }
 
+const initialFormState = (currencyCode: string): BudgetFormState => ({
+  amount: "",
+  currencyCode,
+  categoryId: "",
+  note: "",
+});
+
 export default function BudgetsPage() {
   const [selectedMonth, setSelectedMonth] = useState(currentMonthValue());
-  const monthStart = toMonthStart(selectedMonth);
-  const { budgets, loading, refetch } = useBudgets(monthStart);
-  const { data: overview, loading: overviewLoading } = useBudgetOverview(monthStart);
-  const { categories } = useCategories();
-  const { currency, convertAndFormat } = useCurrency();
-
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [formAmount, setFormAmount] = useState("");
-  const [formCategoryId, setFormCategoryId] = useState("");
-  const [formNote, setFormNote] = useState("");
+  const [form, setForm] = useState<BudgetFormState>(initialFormState("USD"));
   const [formError, setFormError] = useState("");
+  const [pageMessage, setPageMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  useFlashMessage(pageMessage, setPageMessage);
+
+  const monthStart = toMonthStart(selectedMonth);
+  const { budgets, loading, error, refetch } = useBudgets(monthStart);
+  const {
+    data: overview,
+    loading: overviewLoading,
+    error: overviewError,
+    refetch: refetchOverview,
+  } = useBudgetOverview(monthStart);
+  const {
+    categories,
+    loading: categoriesLoading,
+    error: categoriesError,
+  } = useCategories();
+  const { currency, convertAndFormat } = useCurrency();
 
   const usedCategoryIds = useMemo(
     () => new Set(budgets.filter((budget) => budget.id !== editingId).map((budget) => budget.category_id)),
     [budgets, editingId]
   );
 
+  function updateForm<K extends keyof BudgetFormState>(field: K, value: BudgetFormState[K]) {
+    setForm((current) => ({ ...current, [field]: value }));
+  }
+
   function resetForm() {
     setEditingId(null);
-    setFormAmount("");
-    setFormCategoryId("");
-    setFormNote("");
+    setForm(initialFormState(currency.code));
     setFormError("");
   }
 
-  function openEdit(budget: { id: number; amount: number; category_id: number; note?: string | null }) {
-    setEditingId(budget.id);
-    setFormAmount(String(budget.amount));
-    setFormCategoryId(String(budget.category_id));
-    setFormNote(budget.note || "");
+  function closeModal() {
+    setShowModal(false);
+    resetForm();
+  }
+
+  function openCreate() {
+    resetForm();
     setShowModal(true);
   }
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    if (!formAmount || !formCategoryId) {
-      setFormError("Amount and category are required");
+  function openEdit(budget: {
+    id: number;
+    amount: number;
+    currency_code: string;
+    category_id: number;
+    note?: string | null;
+  }) {
+    setEditingId(budget.id);
+    setForm({
+      amount: String(budget.amount),
+      currencyCode: budget.currency_code || "USD",
+      categoryId: String(budget.category_id),
+      note: budget.note || "",
+    });
+    setFormError("");
+    setShowModal(true);
+  }
+
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    setFormError("");
+
+    if (!form.amount || !form.categoryId || !form.currencyCode) {
+      setFormError("Amount, category, and currency are required.");
+      return;
+    }
+
+    const parsedAmount = parseLocalizedAmount(form.amount);
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+      setFormError("Enter a valid monthly limit greater than 0.");
       return;
     }
 
     setSubmitting(true);
     try {
       const payload = {
-        amount: parseFloat(formAmount),
-        category_id: parseInt(formCategoryId, 10),
+        amount: parsedAmount,
+        currency_code: form.currencyCode,
+        category_id: Number.parseInt(form.categoryId, 10),
         month_start: monthStart,
-        note: formNote || undefined,
+        note: form.note.trim() || undefined,
       };
 
       if (editingId) {
         await budgetApi.update(editingId, payload);
+        setPageMessage("Budget updated.");
       } else {
         await budgetApi.create(payload);
+        setPageMessage("Budget saved.");
       }
 
-      setShowModal(false);
-      resetForm();
-      refetch();
-    } catch (err: unknown) {
-      setFormError(err instanceof Error ? err.message : "Failed to save budget");
+      closeModal();
+      await refetch();
+    } catch (submitError: unknown) {
+      setFormError(submitError instanceof Error ? submitError.message : "Failed to save budget.");
     } finally {
       setSubmitting(false);
     }
@@ -86,28 +150,47 @@ export default function BudgetsPage() {
 
   async function handleDelete(id: number) {
     if (!confirm("Delete this budget?")) return;
+
+    setPageMessage(null);
     try {
       await budgetApi.delete(id);
-      refetch();
-    } catch {
-      // silent
+      setPageMessage("Budget deleted.");
+      await refetch();
+    } catch (deleteError: unknown) {
+      setPageMessage(deleteError instanceof Error ? deleteError.message : "Failed to delete budget.");
     }
   }
 
+  const availableCategories = categories.filter(
+    (category) => !usedCategoryIds.has(category.id) || String(category.id) === form.categoryId
+  );
+
   return (
     <AppShell>
-      <div className="page-header animate-in" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16 }}>
-        <div>
-          <h1>Budgets</h1>
-          <p>Set category limits and watch spending against them</p>
-        </div>
-        <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-          <input type="month" className="form-input" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} style={{ minWidth: 180 }} />
-          <button className="btn btn-primary" onClick={() => { resetForm(); setShowModal(true); }}>
-            <Plus size={18} /> Add Budget
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title="Budgets"
+        description="Set category limits and watch spending against them"
+        actions={
+          <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+            <input
+              type="month"
+              className="form-input"
+              value={selectedMonth}
+              onChange={(event) => setSelectedMonth(event.target.value)}
+              style={{ minWidth: 180 }}
+            />
+            <button className="btn btn-primary" onClick={openCreate} type="button">
+              <Plus size={18} /> Add Budget
+            </button>
+          </div>
+        }
+      />
+
+      <PageFeedback
+        successMessage={pageMessage}
+        onDismissSuccess={() => setPageMessage(null)}
+        errorMessages={[error, overviewError, categoriesError]}
+      />
 
       <div className="charts-grid">
         <div className="card animate-in animate-in-delay-1">
@@ -116,13 +199,25 @@ export default function BudgetsPage() {
           </div>
           <div className="expense-list">
             {loading ? (
-              Array.from({ length: 4 }).map((_, index) => (
-                <div key={index} className="skeleton" style={{ height: 52, marginBottom: 8 }} />
-              ))
+              <LoadingList count={4} height={52} />
+            ) : error ? (
+              <EmptyState
+                title="Could not load budgets"
+                description="Try refreshing the page or selecting another month."
+                actionLabel="Retry"
+                onAction={() => void refetch()}
+                icon="!"
+                compact
+              />
             ) : budgets.length === 0 ? (
-              <div className="empty-state" style={{ padding: "var(--space-xl)" }}>
-                <p>No budgets set for this month.</p>
-              </div>
+              <EmptyState
+                title="No budgets set"
+                description="Create a category budget for this month to start tracking spending."
+                actionLabel="Add Budget"
+                onAction={openCreate}
+                icon="="
+                compact
+              />
             ) : (
               budgets.map((budget) => (
                 <div key={budget.id} className="expense-item">
@@ -131,12 +226,25 @@ export default function BudgetsPage() {
                     <div className="expense-desc">{budget.category.name}</div>
                     <div className="expense-meta">{budget.note || "Monthly category budget"}</div>
                   </div>
-                  <div className="expense-amount">{convertAndFormat(budget.amount, currency.code)}</div>
+                  <div className="expense-amount">
+                    {convertAndFormat(budget.amount, budget.currency_code || "USD")}
+                  </div>
                   <div className="expense-actions">
-                    <button className="btn btn-ghost btn-icon btn-sm" onClick={() => openEdit(budget)} title="Edit">
+                    <button
+                      className="btn btn-ghost btn-icon btn-sm"
+                      onClick={() => openEdit(budget)}
+                      title="Edit"
+                      type="button"
+                    >
                       <Edit3 size={15} />
                     </button>
-                    <button className="btn btn-ghost btn-icon btn-sm" onClick={() => handleDelete(budget.id)} title="Delete" style={{ color: "var(--accent-danger)" }}>
+                    <button
+                      className="btn btn-ghost btn-icon btn-sm"
+                      onClick={() => void handleDelete(budget.id)}
+                      title="Delete"
+                      type="button"
+                      style={{ color: "var(--accent-danger)" }}
+                    >
                       <Trash2 size={15} />
                     </button>
                   </div>
@@ -151,27 +259,65 @@ export default function BudgetsPage() {
             <h3 className="card-title">Usage Overview</h3>
           </div>
           {overviewLoading ? (
-            Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="skeleton" style={{ height: 58, marginBottom: 10 }} />
-            ))
+            <LoadingList count={4} height={58} />
+          ) : overviewError ? (
+            <EmptyState
+              title="Could not load budget usage"
+              description="Try refreshing once your budget data is available."
+              actionLabel="Retry"
+              onAction={() => void refetchOverview()}
+              icon="!"
+              compact
+            />
           ) : overview.length === 0 ? (
-            <div className="empty-state" style={{ padding: "var(--space-xl)" }}>
-              <p>Add budgets to see category usage.</p>
-            </div>
+            <EmptyState
+              title="Nothing to compare yet"
+              description="Add budgets to see how much of each limit has been used."
+              icon="%"
+              compact
+            />
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>
               {overview.map((item) => (
-                <div key={item.budget_id} style={{ padding: "var(--space-sm)", borderRadius: "var(--radius-md)", background: "var(--bg-elevated)" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <div
+                  key={item.budget_id}
+                  style={{
+                    padding: "var(--space-sm)",
+                    borderRadius: "var(--radius-md)",
+                    background: "var(--bg-elevated)",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginBottom: 8,
+                      gap: 12,
+                    }}
+                  >
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <Target size={14} style={{ color: item.category_color }} />
                       <strong style={{ fontSize: "var(--font-sm)" }}>{item.category_name}</strong>
                     </div>
-                    <span style={{ color: item.is_over_budget ? "var(--accent-danger)" : "var(--text-secondary)", fontSize: "var(--font-xs)" }}>
+                    <span
+                      style={{
+                        color: item.is_over_budget ? "var(--accent-danger)" : "var(--text-secondary)",
+                        fontSize: "var(--font-xs)",
+                      }}
+                    >
                       {item.usage_percent}%
                     </span>
                   </div>
-                  <div style={{ height: 8, borderRadius: 999, background: "rgba(255,255,255,0.08)", overflow: "hidden", marginBottom: 8 }}>
+                  <div
+                    style={{
+                      height: 8,
+                      borderRadius: 999,
+                      background: "rgba(255,255,255,0.08)",
+                      overflow: "hidden",
+                      marginBottom: 8,
+                    }}
+                  >
                     <div
                       style={{
                         width: `${Math.min(item.usage_percent, 100)}%`,
@@ -180,9 +326,21 @@ export default function BudgetsPage() {
                       }}
                     />
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--font-xs)", color: "var(--text-secondary)" }}>
-                    <span>Spent {convertAndFormat(item.spent, currency.code)}</span>
-                    <span>{item.is_over_budget ? "Over by" : "Remaining"} {convertAndFormat(Math.abs(item.remaining), currency.code)}</span>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      fontSize: "var(--font-xs)",
+                      color: "var(--text-secondary)",
+                      gap: 12,
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <span>Spent {convertAndFormat(item.spent, "USD")}</span>
+                    <span>
+                      {item.is_over_budget ? "Over by" : "Remaining"}{" "}
+                      {convertAndFormat(Math.abs(item.remaining), "USD")}
+                    </span>
                   </div>
                 </div>
               ))}
@@ -191,49 +349,102 @@ export default function BudgetsPage() {
         </div>
       </div>
 
-      {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h2 className="modal-title">{editingId ? "Edit Budget" : "Add Budget"}</h2>
-              <button className="btn btn-ghost btn-icon" onClick={() => setShowModal(false)}><X size={20} /></button>
+      {showModal ? (
+        <ModalShell title={editingId ? "Edit Budget" : "Add Budget"} onClose={closeModal}>
+          {formError ? <InlineMessage message={formError} className="modal-message" /> : null}
+
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label className="form-label" htmlFor="budget-category">
+                Category
+              </label>
+              <select
+                id="budget-category"
+                className="form-select"
+                value={form.categoryId}
+                onChange={(event) => updateForm("categoryId", event.target.value)}
+                disabled={categoriesLoading || availableCategories.length === 0}
+                required
+              >
+                <option value="">
+                  {categoriesLoading ? "Loading categories..." : "Select category"}
+                </option>
+                {availableCategories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            {formError && <div className="auth-error" style={{ marginBottom: 16 }}>{formError}</div>}
-
-            <form onSubmit={handleSubmit}>
+            <div className="form-row">
               <div className="form-group">
-                <label className="form-label" htmlFor="budget-category">Category</label>
-                <select id="budget-category" className="form-select" value={formCategoryId} onChange={(e) => setFormCategoryId(e.target.value)} required>
-                  <option value="">Select category</option>
-                  {categories
-                    .filter((category) => !usedCategoryIds.has(category.id) || String(category.id) === formCategoryId)
-                    .map((category) => (
-                      <option key={category.id} value={category.id}>{category.name}</option>
-                    ))}
+                <label className="form-label" htmlFor="budget-amount">
+                  Monthly limit
+                </label>
+                <input
+                  id="budget-amount"
+                  type="text"
+                  inputMode="decimal"
+                  className="form-input"
+                  value={form.amount}
+                  onChange={(event) => updateForm("amount", event.target.value)}
+                  placeholder="0.00"
+                  required
+                />
+                <span className="form-help">Set the monthly ceiling you want to stay under.</span>
+              </div>
+              <div className="form-group">
+                <label className="form-label" htmlFor="budget-currency">
+                  Currency
+                </label>
+                <select
+                  id="budget-currency"
+                  className="form-select"
+                  value={form.currencyCode}
+                  onChange={(event) => updateForm("currencyCode", event.target.value)}
+                >
+                  {SUPPORTED_CURRENCIES.map((supportedCurrency) => (
+                    <option key={supportedCurrency.code} value={supportedCurrency.code}>
+                      {supportedCurrency.code}
+                    </option>
+                  ))}
                 </select>
+                <span className="form-help">This currency is stored with the budget for accurate reporting.</span>
               </div>
+            </div>
 
-              <div className="form-group">
-                <label className="form-label" htmlFor="budget-amount">Monthly limit</label>
-                <input id="budget-amount" type="number" step="0.01" min="0" className="form-input" value={formAmount} onChange={(e) => setFormAmount(e.target.value)} required />
-              </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="budget-note">
+                Note
+              </label>
+              <input
+                id="budget-note"
+                type="text"
+                className="form-input"
+                value={form.note}
+                onChange={(event) => updateForm("note", event.target.value)}
+                placeholder="Optional note for this category budget"
+                maxLength={120}
+              />
+              <span className="form-help">Add context like fixed bills or savings targets if helpful.</span>
+            </div>
 
-              <div className="form-group">
-                <label className="form-label" htmlFor="budget-note">Note</label>
-                <input id="budget-note" type="text" className="form-input" value={formNote} onChange={(e) => setFormNote(e.target.value)} placeholder="Optional note" />
-              </div>
-
-              <div className="modal-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={submitting}>
-                  {submitting ? "Saving..." : editingId ? "Update" : "Save Budget"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <div className="modal-actions">
+              <button type="button" className="btn btn-secondary" onClick={closeModal}>
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={submitting || categoriesLoading || availableCategories.length === 0}
+              >
+                {submitting ? "Saving..." : editingId ? "Update" : "Save Budget"}
+              </button>
+            </div>
+          </form>
+        </ModalShell>
+      ) : null}
     </AppShell>
   );
 }

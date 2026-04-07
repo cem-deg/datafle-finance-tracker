@@ -41,6 +41,12 @@ export interface CategoryCreate {
   color?: string;
 }
 
+export interface CategoryUpdate {
+  name?: string;
+  icon?: string;
+  color?: string;
+}
+
 export interface Expense {
   id: number;
   amount: number;
@@ -96,6 +102,14 @@ export interface IncomeCreate {
   currency_code?: string;
 }
 
+export interface IncomeUpdate {
+  amount?: number;
+  description?: string;
+  income_date?: string;
+  source?: string;
+  currency_code?: string;
+}
+
 export interface IncomeList {
   items: Income[];
   total: number;
@@ -107,6 +121,7 @@ export interface IncomeList {
 export interface Budget {
   id: number;
   amount: number;
+  currency_code: string;
   month_start: string;
   category_id: number;
   note?: string | null;
@@ -117,8 +132,17 @@ export interface Budget {
 
 export interface BudgetCreate {
   amount: number;
+  currency_code?: string;
   month_start: string;
   category_id: number;
+  note?: string;
+}
+
+export interface BudgetUpdate {
+  amount?: number;
+  currency_code?: string;
+  month_start?: string;
+  category_id?: number;
   note?: string;
 }
 
@@ -185,8 +209,30 @@ export interface Prediction {
   message: string;
 }
 
+export interface CategoryPrediction {
+  category_id: number;
+  prediction: number;
+  confidence: string;
+}
+
 export interface InsightResponse {
   mode: string;
   provider: string;
   insight: string;
+}
+
+export interface ApiValidationErrorItem {
+  field: string;
+  message: string;
+}
+
+export interface ApiErrorResponse {
+  detail: string;
+  errors?: ApiValidationErrorItem[] | null;
+}
+
+export interface ExchangeRatesResponse {
+  base: string;
+  rates: Record<string, number>;
+  cached: boolean;
 }

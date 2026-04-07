@@ -9,13 +9,9 @@ import type {
   CashflowPoint,
   Category,
   DailyTrend,
-  DashboardSummary,
   Expense,
-  ExpenseList,
   Income,
-  IncomeList,
   MonthlyTotal,
-  Prediction,
 } from "@/types";
 
 type QueryParams = Record<string, string | number>;
@@ -71,10 +67,7 @@ function useAsyncResource<T>(
 
 export function useExpenses(params?: QueryParams) {
   const stableParams = useStableParams(params);
-  const loader = useCallback(
-    () => expenseApi.getAll(stableParams) as Promise<ExpenseList | null>,
-    [stableParams]
-  );
+  const loader = useCallback(() => expenseApi.getAll(stableParams), [stableParams]);
 
   const { data, loading, error, refetch } = useAsyncResource(loader, {
     initialData: null,
@@ -85,21 +78,18 @@ export function useExpenses(params?: QueryParams) {
 }
 
 export function useRecentExpenses(limit = 5) {
-  const loader = useCallback(() => expenseApi.getRecent(limit) as Promise<Expense[]>, [limit]);
-  const { data, loading, refetch } = useAsyncResource(loader, {
+  const loader = useCallback(() => expenseApi.getRecent(limit), [limit]);
+  const { data, loading, error, refetch } = useAsyncResource(loader, {
     initialData: [] as Expense[],
-    silent: true,
+    errorMessage: "Failed to load recent expenses",
   });
 
-  return { expenses: data, loading, refetch };
+  return { expenses: data, loading, error, refetch };
 }
 
 export function useIncomes(params?: QueryParams) {
   const stableParams = useStableParams(params);
-  const loader = useCallback(
-    () => incomeApi.getAll(stableParams) as Promise<IncomeList | null>,
-    [stableParams]
-  );
+  const loader = useCallback(() => incomeApi.getAll(stableParams), [stableParams]);
 
   const { data, loading, error, refetch } = useAsyncResource(loader, {
     initialData: null,
@@ -110,107 +100,104 @@ export function useIncomes(params?: QueryParams) {
 }
 
 export function useRecentIncomes(limit = 5) {
-  const loader = useCallback(() => incomeApi.getRecent(limit) as Promise<Income[]>, [limit]);
-  const { data, loading, refetch } = useAsyncResource(loader, {
+  const loader = useCallback(() => incomeApi.getRecent(limit), [limit]);
+  const { data, loading, error, refetch } = useAsyncResource(loader, {
     initialData: [] as Income[],
-    silent: true,
+    errorMessage: "Failed to load recent income",
   });
 
-  return { incomes: data, loading, refetch };
+  return { incomes: data, loading, error, refetch };
 }
 
 export function useCategories() {
-  const loader = useCallback(() => categoryApi.getAll() as Promise<Category[]>, []);
-  const { data, loading, refetch } = useAsyncResource(loader, {
+  const loader = useCallback(() => categoryApi.getAll(), []);
+  const { data, loading, error, refetch } = useAsyncResource(loader, {
     initialData: [] as Category[],
-    silent: true,
+    errorMessage: "Failed to load categories",
   });
 
-  return { categories: data, loading, refetch };
+  return { categories: data, loading, error, refetch };
 }
 
 export function useBudgets(monthStart?: string) {
-  const loader = useCallback(() => budgetApi.getAll(monthStart) as Promise<Budget[]>, [monthStart]);
-  const { data, loading, refetch } = useAsyncResource(loader, {
+  const loader = useCallback(() => budgetApi.getAll(monthStart), [monthStart]);
+  const { data, loading, error, refetch } = useAsyncResource(loader, {
     initialData: [] as Budget[],
-    silent: true,
+    errorMessage: "Failed to load budgets",
   });
 
-  return { budgets: data, loading, refetch };
+  return { budgets: data, loading, error, refetch };
 }
 
 export function useSummary() {
-  const loader = useCallback(() => analyticsApi.getSummary() as Promise<DashboardSummary | null>, []);
-  const { data, loading, refetch } = useAsyncResource(loader, {
+  const loader = useCallback(() => analyticsApi.getSummary(), []);
+  const { data, loading, error, refetch } = useAsyncResource(loader, {
     initialData: null,
-    silent: true,
+    errorMessage: "Failed to load dashboard summary",
   });
 
-  return { summary: data, loading, refetch };
+  return { summary: data, loading, error, refetch };
 }
 
 export function useMonthlyTotals(months = 12) {
-  const loader = useCallback(() => analyticsApi.getMonthly(months) as Promise<MonthlyTotal[]>, [months]);
-  const { data, loading, refetch } = useAsyncResource(loader, {
+  const loader = useCallback(() => analyticsApi.getMonthly(months), [months]);
+  const { data, loading, error, refetch } = useAsyncResource(loader, {
     initialData: [] as MonthlyTotal[],
-    silent: true,
+    errorMessage: "Failed to load monthly totals",
   });
 
-  return { data, loading, refetch };
+  return { data, loading, error, refetch };
 }
 
 export function useCashflow(months = 12) {
-  const loader = useCallback(() => analyticsApi.getCashflow(months) as Promise<CashflowPoint[]>, [months]);
-  const { data, loading } = useAsyncResource(loader, {
+  const loader = useCallback(() => analyticsApi.getCashflow(months), [months]);
+  const { data, loading, error } = useAsyncResource(loader, {
     initialData: [] as CashflowPoint[],
-    silent: true,
+    errorMessage: "Failed to load cashflow data",
   });
 
-  return { data, loading };
+  return { data, loading, error };
 }
 
 export function useCategoryDistribution() {
-  const loader = useCallback(
-    () => analyticsApi.getCategoryDistribution() as Promise<CategoryDistribution[]>,
-    []
-  );
-  const { data, loading } = useAsyncResource(loader, {
+  const loader = useCallback(() => analyticsApi.getCategoryDistribution(), []);
+  const { data, loading, error } = useAsyncResource(loader, {
     initialData: [] as CategoryDistribution[],
-    silent: true,
+    errorMessage: "Failed to load category distribution",
   });
 
-  return { data, loading };
+  return { data, loading, error };
 }
 
 export function useBudgetOverview(monthStart?: string) {
   const loader = useCallback(
-    () => analyticsApi.getBudgetOverview(monthStart) as Promise<BudgetOverviewItem[]>,
+    () => analyticsApi.getBudgetOverview(monthStart),
     [monthStart]
   );
-  const { data, loading, refetch } = useAsyncResource(loader, {
+  const { data, loading, error, refetch } = useAsyncResource(loader, {
     initialData: [] as BudgetOverviewItem[],
-    silent: true,
+    errorMessage: "Failed to load budget overview",
   });
 
-  return { data, loading, refetch };
+  return { data, loading, error, refetch };
 }
 
 export function useTrends(days = 30) {
-  const loader = useCallback(() => analyticsApi.getTrends(days) as Promise<DailyTrend[]>, [days]);
-  const { data, loading } = useAsyncResource(loader, {
+  const loader = useCallback(() => analyticsApi.getTrends(days), [days]);
+  const { data, loading, error } = useAsyncResource(loader, {
     initialData: [] as DailyTrend[],
-    silent: true,
+    errorMessage: "Failed to load trend data",
   });
 
-  return { data, loading };
+  return { data, loading, error };
 }
 
 export function usePrediction() {
-  const loader = useCallback(() => analyticsApi.getPrediction() as Promise<Prediction | null>, []);
-  const { data, loading } = useAsyncResource(loader, {
+  const loader = useCallback(() => analyticsApi.getPrediction(), []);
+  const { data, loading, error } = useAsyncResource(loader, {
     initialData: null,
-    silent: true,
+    errorMessage: "Failed to load prediction",
   });
 
-  return { prediction: data, loading };
+  return { prediction: data, loading, error };
 }

@@ -1,114 +1,149 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { FormEvent, useMemo, useState } from "react";
+import { Edit3, Filter, Plus, Search, Trash2 } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
-import { useExpenses, useCategories } from "@/hooks/useData";
-import { expenseApi } from "@/services/api";
-import { formatDate } from "@/utils/formatters";
+import EmptyState from "@/components/ui/EmptyState";
+import InlineMessage from "@/components/ui/InlineMessage";
+import LoadingList from "@/components/ui/LoadingList";
+import ModalShell from "@/components/ui/ModalShell";
+import PageFeedback from "@/components/ui/PageFeedback";
+import PageHeader from "@/components/ui/PageHeader";
+import PaginationControls from "@/components/ui/PaginationControls";
+import { useCategories, useExpenses } from "@/hooks/useData";
+import { useFlashMessage } from "@/hooks/useFlashMessage";
 import { useCurrency } from "@/context/CurrencyContext";
-import { Plus, Trash2, Edit3, X, Search, Filter } from "lucide-react";
+import { expenseApi } from "@/services/api";
+import { getLocalDateInputValue } from "@/utils/date";
+import { formatDate } from "@/utils/formatters";
+import { parseLocalizedAmount } from "@/utils/amount";
 
-function parseLocalizedAmount(raw: string): number {
-  const value = raw.trim().replace(/\s+/g, "");
-  if (!value) return Number.NaN;
-
-  const lastComma = value.lastIndexOf(",");
-  const lastDot = value.lastIndexOf(".");
-
-  if (lastComma > -1 && lastDot > -1) {
-    if (lastComma > lastDot) {
-      return Number(value.replace(/\./g, "").replace(",", "."));
-    }
-    return Number(value.replace(/,/g, ""));
-  }
-
-  if (lastComma > -1) {
-    return Number(value.replace(",", "."));
-  }
-
-  if ((value.match(/\./g) || []).length > 1) {
-    return Number(value.replace(/\./g, ""));
-  }
-
-  if (lastDot > -1) {
-    const fraction = value.slice(lastDot + 1);
-    if (/^\d{3}$/.test(fraction)) {
-      return Number(value.replace(".", ""));
-    }
-  }
-
-  return Number(value);
+interface ExpenseFormState {
+  amount: string;
+  description: string;
+  categoryId: string;
+  expenseDate: string;
 }
+
+const initialFormState = (): ExpenseFormState => ({
+  amount: "",
+  description: "",
+  categoryId: "",
+  expenseDate: getLocalDateInputValue(),
+});
 
 export default function ExpensesPage() {
   const [page, setPage] = useState(1);
   const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [form, setForm] = useState<ExpenseFormState>(initialFormState);
+  const [formError, setFormError] = useState("");
+  const [pageMessage, setPageMessage] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  useFlashMessage(pageMessage, setPageMessage);
 
   const params: Record<string, string | number> = { page, per_page: 15 };
   if (categoryFilter) params.category_id = categoryFilter;
 
-  const { data, loading, refetch } = useExpenses(params);
-  const { categories } = useCategories();
+  const { data, loading, error, refetch } = useExpenses(params);
+  const {
+    categories,
+    loading: categoriesLoading,
+    error: categoriesError,
+  } = useCategories();
   const { currency, convertAndFormat } = useCurrency();
-  const catMap = new Map(categories.map((c) => [c.id, c]));
 
-  // Form state
-  const [formAmount, setFormAmount] = useState("");
-  const [formDesc, setFormDesc] = useState("");
-  const [formCatId, setFormCatId] = useState("");
-  const [formDate, setFormDate] = useState(new Date().toISOString().split("T")[0]);
-  const [formError, setFormError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const categoryMap = useMemo(
+    () => new Map(categories.map((category) => [category.id, category])),
+    [categories]
+  );
+
+  const filteredItems = useMemo(
+    () =>
+      data?.items.filter((expense) =>
+        !searchTerm || expense.description.toLowerCase().includes(searchTerm.toLowerCase())
+      ) ?? [],
+    [data?.items, searchTerm]
+  );
+
+  function updateForm<K extends keyof ExpenseFormState>(field: K, value: ExpenseFormState[K]) {
+    setForm((current) => ({ ...current, [field]: value }));
+  }
 
   function resetForm() {
-    setFormAmount("");
-    setFormDesc("");
-    setFormCatId("");
-    setFormDate(new Date().toISOString().split("T")[0]);
+    setForm(initialFormState());
     setFormError("");
     setEditingId(null);
   }
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    if (!formAmount || !formDesc || !formCatId) {
-      setFormError("All fields are required");
+  function closeModal() {
+    setShowModal(false);
+    resetForm();
+  }
+
+  function openCreate() {
+    resetForm();
+    setShowModal(true);
+  }
+
+  function openEdit(expense: {
+    id: number;
+    amount: number;
+    description: string;
+    category_id: number;
+    expense_date: string;
+  }) {
+    setEditingId(expense.id);
+    setForm({
+      amount: String(expense.amount),
+      description: expense.description,
+      categoryId: String(expense.category_id),
+      expenseDate: expense.expense_date,
+    });
+    setFormError("");
+    setShowModal(true);
+  }
+
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    setFormError("");
+
+    const description = form.description.trim();
+    if (!form.amount || !description || !form.categoryId || !form.expenseDate) {
+      setFormError("Amount, description, category, and date are required.");
       return;
     }
 
-    const parsedAmount = parseLocalizedAmount(formAmount);
+    const parsedAmount = parseLocalizedAmount(form.amount);
     if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
-      setFormError("Please enter a valid amount");
+      setFormError("Enter a valid amount greater than 0.");
       return;
     }
 
     setSubmitting(true);
     try {
+      const payload = {
+        amount: parsedAmount,
+        description,
+        category_id: Number.parseInt(form.categoryId, 10),
+        expense_date: form.expenseDate,
+        currency_code: currency.code,
+      };
+
       if (editingId) {
-        await expenseApi.update(editingId, {
-          amount: parsedAmount,
-          description: formDesc,
-          category_id: parseInt(formCatId),
-          expense_date: formDate,
-          currency_code: currency.code,
-        });
+        await expenseApi.update(editingId, payload);
+        setPageMessage("Expense updated.");
       } else {
-        await expenseApi.create({
-          amount: parsedAmount,
-          description: formDesc,
-          category_id: parseInt(formCatId),
-          expense_date: formDate,
-          currency_code: currency.code,
-        });
+        await expenseApi.create(payload);
+        setPageMessage("Expense added.");
       }
-      setShowAddModal(false);
-      resetForm();
-      refetch();
-    } catch (err: unknown) {
-      setFormError(err instanceof Error ? err.message : "Failed to save");
+
+      closeModal();
+      await refetch();
+    } catch (submitError: unknown) {
+      setFormError(submitError instanceof Error ? submitError.message : "Failed to save expense.");
     } finally {
       setSubmitting(false);
     }
@@ -116,47 +151,55 @@ export default function ExpensesPage() {
 
   async function handleDelete(id: number) {
     if (!confirm("Delete this expense?")) return;
+
+    setPageMessage(null);
     try {
       await expenseApi.delete(id);
-      refetch();
-    } catch { /* silent */ }
+      setPageMessage("Expense deleted.");
+      await refetch();
+    } catch (deleteError: unknown) {
+      setPageMessage(deleteError instanceof Error ? deleteError.message : "Failed to delete expense.");
+    }
   }
 
-  function openEdit(exp: { id: number; amount: number; description: string; category_id: number; expense_date: string }) {
-    setFormAmount(String(exp.amount));
-    setFormDesc(exp.description);
-    setFormCatId(String(exp.category_id));
-    setFormDate(exp.expense_date);
-    setEditingId(exp.id);
-    setShowAddModal(true);
-  }
-
-  const filtered = data?.items.filter((e) =>
-    !searchTerm || e.description.toLowerCase().includes(searchTerm.toLowerCase())
-  ) ?? [];
+  const hasFilters = Boolean(searchTerm || categoryFilter);
 
   return (
     <AppShell>
-      <div className="page-header animate-in" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16 }}>
-        <div>
-          <h1>Expenses</h1>
-          <p>Track and manage your spending</p>
-        </div>
-        <button className="btn btn-primary" onClick={() => { resetForm(); setShowAddModal(true); }} id="add-expense-btn">
-          <Plus size={18} /> Add Expense
-        </button>
-      </div>
+      <PageHeader
+        title="Expenses"
+        description="Track and manage your spending"
+        actions={
+          <button className="btn btn-primary" onClick={openCreate} id="add-expense-btn">
+            <Plus size={18} /> Add Expense
+          </button>
+        }
+      />
 
-      {/* Filter Bar */}
+      <PageFeedback
+        successMessage={pageMessage}
+        onDismissSuccess={() => setPageMessage(null)}
+        errorMessages={[error, categoriesError]}
+      />
+
       <div className="filter-bar animate-in animate-in-delay-1">
         <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
-          <Search size={16} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--text-tertiary)" }} />
+          <Search
+            size={16}
+            style={{
+              position: "absolute",
+              left: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: "var(--text-tertiary)",
+            }}
+          />
           <input
             className="form-input"
             style={{ paddingLeft: 36 }}
-            placeholder="Search expenses..."
+            placeholder="Search expenses on this page..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(event) => setSearchTerm(event.target.value)}
             id="search-expenses"
           />
         </div>
@@ -165,49 +208,81 @@ export default function ExpensesPage() {
           <select
             className="form-select"
             value={categoryFilter}
-            onChange={(e) => { setCategoryFilter(e.target.value); setPage(1); }}
+            onChange={(event) => {
+              setCategoryFilter(event.target.value);
+              setPage(1);
+            }}
             id="category-filter"
             style={{ minWidth: 160 }}
+            disabled={categoriesLoading}
           >
             <option value="">All Categories</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
             ))}
           </select>
         </div>
       </div>
 
-      {/* Expense List */}
       <div className="expense-list animate-in animate-in-delay-2">
         {loading ? (
-          Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="skeleton" style={{ height: 60, marginBottom: 8 }} />
-          ))
-        ) : filtered.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon">💸</div>
-            <h3>No expenses found</h3>
-            <p>Start tracking your spending by adding your first expense.</p>
-            <button className="btn btn-primary" onClick={() => { resetForm(); setShowAddModal(true); }}>
-              <Plus size={16} /> Add Expense
-            </button>
-          </div>
+          <LoadingList count={8} height={60} />
+        ) : error ? (
+          <EmptyState
+            title="Could not load expenses"
+            description="Try refreshing the page or checking the backend connection."
+            actionLabel="Retry"
+            onAction={() => void refetch()}
+            icon="!"
+          />
+        ) : filteredItems.length === 0 ? (
+          <EmptyState
+            title={hasFilters ? "No matching expenses" : "No expenses found"}
+            description={
+              hasFilters
+                ? "Try another search term or category."
+                : "Start tracking your spending by adding your first expense."
+            }
+            actionLabel={hasFilters ? undefined : "Add Expense"}
+            onAction={hasFilters ? undefined : openCreate}
+            icon="$"
+          />
         ) : (
-          filtered.map((exp) => {
-            const cat = catMap.get(exp.category_id);
+          filteredItems.map((expense) => {
+            const category = categoryMap.get(expense.category_id);
             return (
-              <div key={exp.id} className="expense-item">
-                <div className="category-dot" style={{ background: cat?.color || "#636e72" }} />
+              <div key={expense.id} className="expense-item">
+                <div
+                  className="category-dot"
+                  style={{ background: category?.color || "#636e72" }}
+                />
                 <div className="expense-info">
-                  <div className="expense-desc">{exp.description}</div>
-                  <div className="expense-meta">{cat?.name || "Other"} · {formatDate(exp.expense_date)}</div>
+                  <div className="expense-desc">{expense.description}</div>
+                  <div className="expense-meta">
+                    {category?.name || "Other"} | {formatDate(expense.expense_date)}
+                  </div>
                 </div>
-                <div className="expense-amount">-{convertAndFormat(exp.amount, exp.currency_code || currency.code)}</div>
+                <div className="expense-amount">
+                  -{convertAndFormat(expense.amount, expense.currency_code || currency.code)}
+                </div>
                 <div className="expense-actions">
-                  <button className="btn btn-ghost btn-icon btn-sm" onClick={() => openEdit(exp)} title="Edit">
+                  <button
+                    className="btn btn-ghost btn-icon btn-sm"
+                    onClick={() => openEdit(expense)}
+                    title="Edit"
+                    type="button"
+                  >
                     <Edit3 size={15} />
                   </button>
-                  <button className="btn btn-ghost btn-icon btn-sm" onClick={() => handleDelete(exp.id)} title="Delete" style={{ color: "var(--accent-danger)" }}>
+                  <button
+                    className="btn btn-ghost btn-icon btn-sm"
+                    onClick={() => void handleDelete(expense.id)}
+                    title="Delete"
+                    type="button"
+                    style={{ color: "var(--accent-danger)" }}
+                  >
                     <Trash2 size={15} />
                   </button>
                 </div>
@@ -217,70 +292,104 @@ export default function ExpensesPage() {
         )}
       </div>
 
-      {/* Pagination */}
-      {data && data.total_pages > 1 && (
-        <div className="pagination">
-          <button className="pagination-btn" disabled={page <= 1} onClick={() => setPage(page - 1)}>←</button>
-          {Array.from({ length: Math.min(data.total_pages, 7) }).map((_, i) => {
-            const p = i + 1;
-            return (
-              <button key={p} className={`pagination-btn ${page === p ? "active" : ""}`} onClick={() => setPage(p)}>
-                {p}
-              </button>
-            );
-          })}
-          <button className="pagination-btn" disabled={page >= data.total_pages} onClick={() => setPage(page + 1)}>→</button>
-        </div>
-      )}
+      <PaginationControls
+        page={page}
+        totalPages={data?.total_pages ?? 0}
+        onPageChange={setPage}
+      />
 
-      {/* Add/Edit Modal */}
-      {showAddModal && (
-        <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h2 className="modal-title">{editingId ? "Edit Expense" : "Add Expense"}</h2>
-              <button className="btn btn-ghost btn-icon" onClick={() => setShowAddModal(false)}><X size={20} /></button>
+      {showModal ? (
+        <ModalShell title={editingId ? "Edit Expense" : "Add Expense"} onClose={closeModal}>
+          {formError ? <InlineMessage message={formError} className="modal-message" /> : null}
+
+          <form onSubmit={handleSubmit}>
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label" htmlFor="exp-amount">
+                  Amount ({currency.code})
+                </label>
+                <input
+                  id="exp-amount"
+                  type="text"
+                  inputMode="decimal"
+                  className="form-input"
+                  placeholder="0.00"
+                  value={form.amount}
+                  onChange={(event) => updateForm("amount", event.target.value)}
+                  required
+                />
+                <span className="form-help">Use your selected currency. Both commas and periods are accepted.</span>
+              </div>
+              <div className="form-group">
+                <label className="form-label" htmlFor="exp-date">
+                  Date
+                </label>
+                <input
+                  id="exp-date"
+                  type="date"
+                  className="form-input"
+                  value={form.expenseDate}
+                  onChange={(event) => updateForm("expenseDate", event.target.value)}
+                  required
+                />
+              </div>
             </div>
 
-            {formError && <div className="auth-error" style={{ marginBottom: 16 }}>{formError}</div>}
+            <div className="form-group">
+              <label className="form-label" htmlFor="exp-desc">
+                Description
+              </label>
+              <input
+                id="exp-desc"
+                type="text"
+                className="form-input"
+                placeholder="What did you spend on?"
+                value={form.description}
+                onChange={(event) => updateForm("description", event.target.value)}
+                maxLength={120}
+                required
+              />
+            </div>
 
-            <form onSubmit={handleSubmit}>
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label" htmlFor="exp-amount">Amount ({currency.code})</label>
-                  <input id="exp-amount" type="text" inputMode="decimal" className="form-input" placeholder="0.00" value={formAmount} onChange={(e) => setFormAmount(e.target.value)} required />
-                </div>
-                <div className="form-group">
-                  <label className="form-label" htmlFor="exp-date">Date</label>
-                  <input id="exp-date" type="date" className="form-input" value={formDate} onChange={(e) => setFormDate(e.target.value)} required />
-                </div>
-              </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="exp-category">
+                Category
+              </label>
+              <select
+                id="exp-category"
+                className="form-select"
+                value={form.categoryId}
+                onChange={(event) => updateForm("categoryId", event.target.value)}
+                disabled={categoriesLoading || categories.length === 0}
+                required
+              >
+                <option value="">
+                  {categoriesLoading ? "Loading categories..." : "Select category"}
+                </option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+              <span className="form-help">Choose the category that best matches this purchase.</span>
+            </div>
 
-              <div className="form-group">
-                <label className="form-label" htmlFor="exp-desc">Description</label>
-                <input id="exp-desc" type="text" className="form-input" placeholder="What did you spend on?" value={formDesc} onChange={(e) => setFormDesc(e.target.value)} required />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label" htmlFor="exp-category">Category</label>
-                <select id="exp-category" className="form-select" value={formCatId} onChange={(e) => setFormCatId(e.target.value)} required>
-                  <option value="">Select category</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="modal-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowAddModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={submitting}>
-                  {submitting ? "Saving..." : editingId ? "Update" : "Add Expense"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <div className="modal-actions">
+              <button type="button" className="btn btn-secondary" onClick={closeModal}>
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={submitting || categoriesLoading || categories.length === 0}
+              >
+                {submitting ? "Saving..." : editingId ? "Update" : "Add Expense"}
+              </button>
+            </div>
+          </form>
+        </ModalShell>
+      ) : null}
     </AppShell>
   );
 }

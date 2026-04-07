@@ -47,3 +47,4 @@ def delete_category(
 ):
     """Delete a category (only if it has no expenses)."""
     CategoryService.delete(db, category_id, current_user.id)
+    return None

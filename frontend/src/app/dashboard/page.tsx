@@ -1,18 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
-import AppShell from "@/components/layout/AppShell";
-import {
-  useBudgetOverview,
-  useCategories,
-  useMonthlyTotals,
-  useRecentExpenses,
-  useRecentIncomes,
-  useSummary,
-} from "@/hooks/useData";
-import { useCurrency } from "@/context/CurrencyContext";
-import MonthlyBarChart from "@/components/charts/MonthlyBarChart";
-import { formatDateShort, formatPercent } from "@/utils/formatters";
+import Link from "next/link";
+import { useEffect, useMemo, useRef } from "react";
 import {
   ArrowDownRight,
   ArrowUpRight,
@@ -23,23 +12,65 @@ import {
   ShoppingBag,
   Target,
 } from "lucide-react";
+import AppShell from "@/components/layout/AppShell";
+import MonthlyBarChart from "@/components/charts/MonthlyBarChart";
+import EmptyState from "@/components/ui/EmptyState";
+import LoadingList from "@/components/ui/LoadingList";
+import PageFeedback from "@/components/ui/PageFeedback";
+import PageHeader from "@/components/ui/PageHeader";
+import {
+  useBudgetOverview,
+  useCategories,
+  useMonthlyTotals,
+  useRecentExpenses,
+  useRecentIncomes,
+  useSummary,
+} from "@/hooks/useData";
+import { useCurrency } from "@/context/CurrencyContext";
+import { formatDateShort, formatPercent } from "@/utils/formatters";
 
 export default function DashboardPage() {
-  const { summary, loading: summaryLoading, refetch: refetchSummary } = useSummary();
-  const { expenses: recentExpenses, loading: recentExpensesLoading, refetch: refetchRecentExpenses } = useRecentExpenses(4);
-  const { incomes: recentIncomes, loading: recentIncomesLoading, refetch: refetchRecentIncomes } = useRecentIncomes(3);
-  const { data: monthly, loading: monthlyLoading, refetch: refetchMonthly } = useMonthlyTotals(6);
-  const { categories, refetch: refetchCategories } = useCategories();
-  const { data: budgetOverview, loading: budgetLoading, refetch: refetchBudgetOverview } = useBudgetOverview();
-  const { currency, convertAndFormat } = useCurrency();
+  const { summary, loading: summaryLoading, error: summaryError, refetch: refetchSummary } = useSummary();
+  const {
+    expenses: recentExpenses,
+    loading: recentExpensesLoading,
+    error: recentExpensesError,
+    refetch: refetchRecentExpenses,
+  } = useRecentExpenses(4);
+  const {
+    incomes: recentIncomes,
+    loading: recentIncomesLoading,
+    error: recentIncomesError,
+    refetch: refetchRecentIncomes,
+  } = useRecentIncomes(3);
+  const {
+    data: monthly,
+    loading: monthlyLoading,
+    error: monthlyError,
+    refetch: refetchMonthly,
+  } = useMonthlyTotals(6);
+  const { categories, error: categoriesError } = useCategories();
+  const {
+    data: budgetOverview,
+    loading: budgetLoading,
+    error: budgetError,
+    refetch: refetchBudgetOverview,
+  } = useBudgetOverview();
+  const { convertAndFormat } = useCurrency();
+  const lastRefreshRef = useRef(0);
 
   useEffect(() => {
     const refreshDashboard = () => {
+      const now = Date.now();
+      if (now - lastRefreshRef.current < 5000) {
+        return;
+      }
+
+      lastRefreshRef.current = now;
       void refetchSummary();
       void refetchRecentExpenses();
       void refetchRecentIncomes();
       void refetchMonthly();
-      void refetchCategories();
       void refetchBudgetOverview();
     };
 
@@ -49,61 +80,100 @@ export default function DashboardPage() {
       }
     };
 
-    window.addEventListener("focus", refreshDashboard);
-    window.addEventListener("pageshow", refreshDashboard);
     document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("pageshow", refreshDashboard);
 
     return () => {
-      window.removeEventListener("focus", refreshDashboard);
-      window.removeEventListener("pageshow", refreshDashboard);
       document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("pageshow", refreshDashboard);
     };
   }, [
     refetchBudgetOverview,
-    refetchCategories,
     refetchMonthly,
     refetchRecentExpenses,
     refetchRecentIncomes,
     refetchSummary,
   ]);
 
-  const catMap = new Map(categories.map((category) => [category.id, category]));
-  const topCategory = summary?.top_category_id ? catMap.get(summary.top_category_id) : null;
+  const categoryMap = useMemo(
+    () => new Map(categories.map((category) => [category.id, category])),
+    [categories]
+  );
+  const topCategory = summary?.top_category_id ? categoryMap.get(summary.top_category_id) : null;
   const spendingUp = (summary?.month_change_percent ?? 0) > 0;
+  const hasDashboardErrors = useMemo(
+    () =>
+      [
+        summaryError,
+        recentExpensesError,
+        recentIncomesError,
+        monthlyError,
+        categoriesError,
+        budgetError,
+      ].filter(Boolean) as string[],
+    [
+      budgetError,
+      categoriesError,
+      monthlyError,
+      recentExpensesError,
+      recentIncomesError,
+      summaryError,
+    ]
+  );
 
   return (
     <AppShell>
-      <div className="page-header animate-in">
-        <h1>Dashboard</h1>
-        <p>Your income, spending, and budget health in one place</p>
-      </div>
+      <PageHeader
+        title="Dashboard"
+        description="Your income, spending, and budget health in one place"
+      />
+
+      <PageFeedback errorMessages={hasDashboardErrors} />
 
       <div className="stat-grid">
         <div className="stat-card animate-in animate-in-delay-1">
-          <div className="stat-icon" style={{ background: "rgba(0,184,148,0.15)", color: "var(--accent-success)" }}>
+          <div
+            className="stat-icon"
+            style={{ background: "rgba(0,184,148,0.15)", color: "var(--accent-success)" }}
+          >
             <DollarSign size={22} />
           </div>
-          {summaryLoading ? <div className="skeleton skeleton-heading" /> : (
+          {summaryLoading ? (
+            <div className="skeleton skeleton-heading" />
+          ) : (
             <>
-              <div className="stat-value">{convertAndFormat(summary?.total_income_this_month ?? 0, currency.code)}</div>
+              <div className="stat-value">
+                {convertAndFormat(summary?.total_income_this_month ?? 0, "USD")}
+              </div>
               <div className="stat-label">Income this month</div>
               <div className="badge badge-primary" style={{ marginTop: 10 }}>
-                Net {convertAndFormat(summary?.net_balance_this_month ?? 0, currency.code)}
+                Net {convertAndFormat(summary?.net_balance_this_month ?? 0, "USD")}
               </div>
             </>
           )}
         </div>
 
         <div className="stat-card animate-in animate-in-delay-2">
-          <div className="stat-icon" style={{ background: "rgba(255,107,107,0.15)", color: "var(--accent-danger)" }}>
+          <div
+            className="stat-icon"
+            style={{ background: "rgba(255,107,107,0.15)", color: "var(--accent-danger)" }}
+          >
             <CreditCard size={22} />
           </div>
-          {summaryLoading ? <div className="skeleton skeleton-heading" /> : (
+          {summaryLoading ? (
+            <div className="skeleton skeleton-heading" />
+          ) : (
             <>
-              <div className="stat-value">{convertAndFormat(summary?.total_this_month ?? 0, currency.code)}</div>
+              <div className="stat-value">{convertAndFormat(summary?.total_this_month ?? 0, "USD")}</div>
               <div className="stat-label">Spent this month</div>
               <div className={`stat-change ${spendingUp ? "negative" : "positive"}`}>
-                {spendingUp ? <ArrowUpRight size={14} /> : summary?.month_change_percent === 0 ? <Minus size={14} /> : <ArrowDownRight size={14} />}
+                {spendingUp ? (
+                  <ArrowUpRight size={14} />
+                ) : summary?.month_change_percent === 0 ? (
+                  <Minus size={14} />
+                ) : (
+                  <ArrowDownRight size={14} />
+                )}
                 {formatPercent(summary?.month_change_percent ?? 0)}
               </div>
             </>
@@ -111,12 +181,20 @@ export default function DashboardPage() {
         </div>
 
         <div className="stat-card animate-in animate-in-delay-3">
-          <div className="stat-icon" style={{ background: "rgba(124,106,239,0.15)", color: "var(--accent-primary-light)" }}>
+          <div
+            className="stat-icon"
+            style={{
+              background: "rgba(124,106,239,0.15)",
+              color: "var(--accent-primary-light)",
+            }}
+          >
             <Target size={22} />
           </div>
-          {summaryLoading ? <div className="skeleton skeleton-heading" /> : (
+          {summaryLoading ? (
+            <div className="skeleton skeleton-heading" />
+          ) : (
             <>
-              <div className="stat-value">{convertAndFormat(summary?.budget_remaining ?? 0, currency.code)}</div>
+              <div className="stat-value">{convertAndFormat(summary?.budget_remaining ?? 0, "USD")}</div>
               <div className="stat-label">Budget remaining</div>
               <div className="badge badge-primary" style={{ marginTop: 10 }}>
                 {summary?.budget_usage_percent ?? 0}% used
@@ -126,12 +204,22 @@ export default function DashboardPage() {
         </div>
 
         <div className="stat-card animate-in animate-in-delay-4">
-          <div className="stat-icon" style={{ background: topCategory ? `${topCategory.color}22` : "rgba(253,203,110,0.15)", color: topCategory?.color || "var(--accent-warning)" }}>
+          <div
+            className="stat-icon"
+            style={{
+              background: topCategory ? `${topCategory.color}22` : "rgba(253,203,110,0.15)",
+              color: topCategory?.color || "var(--accent-warning)",
+            }}
+          >
             <ShoppingBag size={22} />
           </div>
-          {summaryLoading ? <div className="skeleton skeleton-heading" /> : (
+          {summaryLoading ? (
+            <div className="skeleton skeleton-heading" />
+          ) : (
             <>
-              <div className="stat-value" style={{ fontSize: "var(--font-xl)" }}>{topCategory?.name || "-"}</div>
+              <div className="stat-value" style={{ fontSize: "var(--font-xl)" }}>
+                {topCategory?.name || "-"}
+              </div>
               <div className="stat-label">Top category</div>
               <div className="badge badge-primary" style={{ marginTop: 10 }}>
                 {summary?.over_budget_categories_count ?? 0} over budget
@@ -144,7 +232,20 @@ export default function DashboardPage() {
       <div className="charts-grid">
         <div className="animate-in animate-in-delay-2">
           {monthlyLoading ? (
-            <div className="card"><div className="skeleton" style={{ height: 300 }} /></div>
+            <div className="card">
+              <div className="skeleton" style={{ height: 300 }} />
+            </div>
+          ) : monthlyError ? (
+            <div className="card">
+              <EmptyState
+                title="Monthly chart unavailable"
+                description="Try refreshing to reload your monthly spending totals."
+                actionLabel="Retry"
+                onAction={() => void refetchMonthly()}
+                icon="!"
+                compact
+              />
+            </div>
           ) : (
             <MonthlyBarChart data={monthly} />
           )}
@@ -153,30 +254,62 @@ export default function DashboardPage() {
         <div className="card animate-in animate-in-delay-3">
           <div className="card-header">
             <h3 className="card-title">Budget Health</h3>
-            <a href="/budgets" className="btn btn-ghost btn-sm">Manage</a>
+            <Link href="/budgets" className="btn btn-ghost btn-sm">
+              Manage
+            </Link>
           </div>
           {budgetLoading ? (
-            Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="skeleton" style={{ height: 44, marginBottom: 8 }} />
-            ))
+            <LoadingList count={4} height={44} />
+          ) : budgetError ? (
+            <EmptyState
+              title="Budget overview unavailable"
+              description="Try refreshing to reload your budget usage."
+              actionLabel="Retry"
+              onAction={() => void refetchBudgetOverview()}
+              icon="!"
+              compact
+            />
           ) : budgetOverview.length === 0 ? (
-            <div className="empty-state" style={{ padding: "var(--space-xl)" }}>
-              <p>No budgets yet. Create monthly limits to track overspending.</p>
-            </div>
+            <EmptyState
+              title="No budgets yet"
+              description="Create monthly limits to track overspending."
+              icon="%"
+              compact
+            />
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>
               {budgetOverview.slice(0, 4).map((item) => (
-                <div key={item.budget_id} style={{ padding: "var(--space-sm)", borderRadius: "var(--radius-md)", background: "var(--bg-elevated)" }}>
+                <div
+                  key={item.budget_id}
+                  style={{
+                    padding: "var(--space-sm)",
+                    borderRadius: "var(--radius-md)",
+                    background: "var(--bg-elevated)",
+                  }}
+                >
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12, marginBottom: 8 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <span className="category-dot" style={{ background: item.category_color }} />
                       <strong style={{ fontSize: "var(--font-sm)" }}>{item.category_name}</strong>
                     </div>
-                    <span style={{ color: item.is_over_budget ? "var(--accent-danger)" : "var(--text-secondary)", fontSize: "var(--font-xs)" }}>
+                    <span
+                      style={{
+                        color: item.is_over_budget ? "var(--accent-danger)" : "var(--text-secondary)",
+                        fontSize: "var(--font-xs)",
+                      }}
+                    >
                       {item.usage_percent}%
                     </span>
                   </div>
-                  <div style={{ height: 8, borderRadius: 999, background: "rgba(255,255,255,0.08)", overflow: "hidden", marginBottom: 8 }}>
+                  <div
+                    style={{
+                      height: 8,
+                      borderRadius: 999,
+                      background: "rgba(255,255,255,0.08)",
+                      overflow: "hidden",
+                      marginBottom: 8,
+                    }}
+                  >
                     <div
                       style={{
                         width: `${Math.min(item.usage_percent, 100)}%`,
@@ -185,9 +318,18 @@ export default function DashboardPage() {
                       }}
                     />
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--font-xs)", color: "var(--text-secondary)" }}>
-                    <span>Spent {convertAndFormat(item.spent, currency.code)}</span>
-                    <span>Limit {convertAndFormat(item.amount, currency.code)}</span>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      fontSize: "var(--font-xs)",
+                      color: "var(--text-secondary)",
+                      gap: 12,
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <span>Spent {convertAndFormat(item.spent, "USD")}</span>
+                    <span>Limit {convertAndFormat(item.amount, "USD")}</span>
                   </div>
                 </div>
               ))}
@@ -200,26 +342,49 @@ export default function DashboardPage() {
         <div className="card animate-in animate-in-delay-2">
           <div className="card-header">
             <h3 className="card-title">Recent Income</h3>
-            <a href="/income" className="btn btn-ghost btn-sm">View all</a>
+            <Link href="/income" className="btn btn-ghost btn-sm">
+              View all
+            </Link>
           </div>
           <div className="expense-list">
             {recentIncomesLoading ? (
-              Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="skeleton" style={{ height: 52, marginBottom: 8 }} />
-              ))
+              <LoadingList count={3} height={52} />
+            ) : recentIncomesError ? (
+              <EmptyState
+                title="Recent income unavailable"
+                description="Try refreshing to reload your latest income entries."
+                actionLabel="Retry"
+                onAction={() => void refetchRecentIncomes()}
+                icon="!"
+                compact
+              />
             ) : recentIncomes.length === 0 ? (
-              <div className="empty-state" style={{ padding: "var(--space-xl)" }}>
-                <p>No income recorded yet.</p>
-              </div>
+              <EmptyState
+                title="No income recorded yet"
+                description="Add income to see it here."
+                icon="+"
+                compact
+              />
             ) : (
               recentIncomes.map((income) => (
                 <div key={income.id} className="expense-item">
-                  <div className="stat-icon" style={{ width: 38, height: 38, minWidth: 38, background: "rgba(0,184,148,0.15)", color: "var(--accent-success)" }}>
+                  <div
+                    className="stat-icon"
+                    style={{
+                      width: 38,
+                      height: 38,
+                      minWidth: 38,
+                      background: "rgba(0,184,148,0.15)",
+                      color: "var(--accent-success)",
+                    }}
+                  >
                     <PiggyBank size={16} />
                   </div>
                   <div className="expense-info">
                     <div className="expense-desc">{income.description}</div>
-                    <div className="expense-meta">{income.source} · {formatDateShort(income.income_date)}</div>
+                    <div className="expense-meta">
+                      {income.source} | {formatDateShort(income.income_date)}
+                    </div>
                   </div>
                   <div className="expense-amount" style={{ color: "var(--accent-success)" }}>
                     +{convertAndFormat(income.amount, income.currency_code)}
@@ -233,28 +398,47 @@ export default function DashboardPage() {
         <div className="card animate-in animate-in-delay-3">
           <div className="card-header">
             <h3 className="card-title">Recent Expenses</h3>
-            <a href="/expenses" className="btn btn-ghost btn-sm">View all</a>
+            <Link href="/expenses" className="btn btn-ghost btn-sm">
+              View all
+            </Link>
           </div>
           <div className="expense-list">
             {recentExpensesLoading ? (
-              Array.from({ length: 4 }).map((_, index) => (
-                <div key={index} className="skeleton" style={{ height: 52, marginBottom: 8 }} />
-              ))
+              <LoadingList count={4} height={52} />
+            ) : recentExpensesError ? (
+              <EmptyState
+                title="Recent expenses unavailable"
+                description="Try refreshing to reload your latest expenses."
+                actionLabel="Retry"
+                onAction={() => void refetchRecentExpenses()}
+                icon="!"
+                compact
+              />
             ) : recentExpenses.length === 0 ? (
-              <div className="empty-state" style={{ padding: "var(--space-xl)" }}>
-                <p>No expenses yet. Add your first transaction.</p>
-              </div>
+              <EmptyState
+                title="No expenses yet"
+                description="Add your first transaction to see it here."
+                icon="-"
+                compact
+              />
             ) : (
               recentExpenses.map((expense) => {
-                const category = catMap.get(expense.category_id);
+                const category = categoryMap.get(expense.category_id);
                 return (
                   <div key={expense.id} className="expense-item">
-                    <div className="category-dot" style={{ background: category?.color || "#636e72" }} />
+                    <div
+                      className="category-dot"
+                      style={{ background: category?.color || "#636e72" }}
+                    />
                     <div className="expense-info">
                       <div className="expense-desc">{expense.description}</div>
-                      <div className="expense-meta">{category?.name || "Other"} · {formatDateShort(expense.expense_date)}</div>
+                      <div className="expense-meta">
+                        {category?.name || "Other"} | {formatDateShort(expense.expense_date)}
+                      </div>
                     </div>
-                    <div className="expense-amount">-{convertAndFormat(expense.amount, expense.currency_code)}</div>
+                    <div className="expense-amount">
+                      -{convertAndFormat(expense.amount, expense.currency_code)}
+                    </div>
                   </div>
                 );
               })

@@ -1,6 +1,5 @@
 """Income service - business logic for income management."""
 
-import math
 from datetime import date
 
 from fastapi import status
@@ -9,7 +8,14 @@ from sqlalchemy.orm import Session
 
 from app.models.income import Income
 from app.schemas.income import IncomeCreate, IncomeListResponse, IncomeUpdate
-from app.services.crud_utils import apply_updates, commit_and_refresh, get_or_error
+from app.services.crud_utils import (
+    apply_updates,
+    commit_and_refresh,
+    delete_and_commit,
+    get_or_error,
+    paginate_query,
+)
+from app.services.service_utils import validate_amount_range, validate_date_range
 
 
 class IncomeService:
@@ -28,8 +34,10 @@ class IncomeService:
         sort_order: str = "desc",
     ) -> IncomeListResponse:
         """Return paginated and filtered incomes."""
-        query = db.query(Income).filter(Income.user_id == user_id)
+        validate_date_range(start_date, end_date, start_label="start_date", end_label="end_date")
+        validate_amount_range(min_amount, max_amount)
 
+        query = db.query(Income).filter(Income.user_id == user_id)
         if start_date:
             query = query.filter(Income.income_date >= start_date)
         if end_date:
@@ -39,20 +47,16 @@ class IncomeService:
         if max_amount is not None:
             query = query.filter(Income.amount <= max_amount)
 
-        total = query.count()
         query = query.order_by(
             Income.income_date if sort_order == "asc" else desc(Income.income_date)
         )
-
-        offset = (page - 1) * per_page
-        items = query.offset(offset).limit(per_page).all()
-
+        total, items, total_pages = paginate_query(query, page=page, per_page=per_page)
         return IncomeListResponse(
             items=items,
             total=total,
             page=page,
             per_page=per_page,
-            total_pages=math.ceil(total / per_page) if per_page > 0 else 0,
+            total_pages=total_pages,
         )
 
     @staticmethod
@@ -87,7 +91,7 @@ class IncomeService:
             user_id=user_id,
         )
         db.add(income)
-        commit_and_refresh(db, income)
+        commit_and_refresh(db, income, failure_detail="Failed to create income")
         return income
 
     @staticmethod
@@ -95,12 +99,11 @@ class IncomeService:
         """Update an existing income entry."""
         income = IncomeService.get_by_id(db, income_id, user_id)
         apply_updates(income, data.model_dump(exclude_unset=True))
-        commit_and_refresh(db, income)
+        commit_and_refresh(db, income, failure_detail="Failed to update income")
         return income
 
     @staticmethod
     def delete(db: Session, income_id: int, user_id: int) -> None:
         """Delete an income entry."""
         income = IncomeService.get_by_id(db, income_id, user_id)
-        db.delete(income)
-        db.commit()
+        delete_and_commit(db, income, failure_detail="Failed to delete income")

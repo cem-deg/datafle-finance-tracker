@@ -22,8 +22,8 @@ def list_expenses(
     category_id: int | None = None,
     start_date: date | None = None,
     end_date: date | None = None,
-    min_amount: float | None = None,
-    max_amount: float | None = None,
+    min_amount: float | None = Query(None, ge=0),
+    max_amount: float | None = Query(None, ge=0),
     sort_by: str = Query("date", pattern="^(date|amount)$"),
     sort_order: str = Query("desc", pattern="^(asc|desc)$"),
 ):
@@ -84,3 +84,4 @@ def delete_expense(
 ):
     """Delete an expense."""
     ExpenseService.delete(db, expense_id, current_user.id)
+    return None

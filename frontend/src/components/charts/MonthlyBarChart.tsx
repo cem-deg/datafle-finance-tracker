@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
 } from "recharts";
@@ -43,9 +43,12 @@ function CustomTooltip({
   );
 }
 
-export default function MonthlyBarChart({ data }: Props) {
-  const { currency, convertAndFormat } = useCurrency();
-  const chartData = data.map((d) => ({ ...d, name: getMonthName(d.month) }));
+function MonthlyBarChart({ data }: Props) {
+  const { convertAndFormat } = useCurrency();
+  const chartData = useMemo(
+    () => data.map((d) => ({ ...d, name: getMonthName(d.month) })),
+    [data]
+  );
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [chartSize, setChartSize] = useState({ width: 0, height: 0 });
 
@@ -79,8 +82,8 @@ export default function MonthlyBarChart({ data }: Props) {
           <BarChart width={chartSize.width} height={chartSize.height} data={chartData} barSize={24}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
             <XAxis dataKey="name" tick={{ fill: "#8888a0", fontSize: 12 }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fill: "#8888a0", fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={(v) => convertAndFormat(v, currency.code)} />
-            <Tooltip content={<CustomTooltip convertAndFormat={convertAndFormat} baseCurrency={currency.code} />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
+            <YAxis tick={{ fill: "#8888a0", fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={(v) => convertAndFormat(v, "USD")} />
+            <Tooltip content={<CustomTooltip convertAndFormat={convertAndFormat} baseCurrency="USD" />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
             <Bar dataKey="total" fill="url(#barGradient)" radius={[6, 6, 0, 0]} />
             <defs>
               <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
@@ -96,3 +99,5 @@ export default function MonthlyBarChart({ data }: Props) {
     </div>
   );
 }
+
+export default memo(MonthlyBarChart);

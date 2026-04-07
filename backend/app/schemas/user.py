@@ -1,20 +1,53 @@
 """Pydantic schemas for user authentication."""
 
 from datetime import datetime
-from pydantic import BaseModel, EmailStr
+from typing import Annotated
+
+from pydantic import BaseModel, Field, field_validator
+
+from app.services.service_utils import normalize_email, normalize_optional_text
+
+NameStr = Annotated[str, Field(min_length=2, max_length=100)]
+PasswordStr = Annotated[str, Field(min_length=8, max_length=128)]
 
 
 class UserCreate(BaseModel):
     """Schema for user registration."""
+
     email: str
-    name: str
-    password: str
+    name: NameStr
+    password: PasswordStr
+
+    @field_validator("email")
+    @classmethod
+    def normalize_email_value(cls, value: str) -> str:
+        normalized = normalize_email(value)
+        if "@" not in normalized or "." not in normalized.split("@")[-1]:
+            raise ValueError("Enter a valid email address")
+        return normalized
+
+    @field_validator("name")
+    @classmethod
+    def normalize_name(cls, value: str) -> str:
+        normalized = normalize_optional_text(value)
+        if normalized is None:
+            raise ValueError("Name is required")
+        return normalized
 
 
 class UserLogin(BaseModel):
     """Schema for user login."""
+
     email: str
-    password: str
+    password: PasswordStr
+
+    @field_validator("email")
+    @classmethod
+    def normalize_email_value(cls, value: str) -> str:
+        normalized = normalize_email(value)
+        if "@" not in normalized or "." not in normalized.split("@")[-1]:
+            raise ValueError("Enter a valid email address")
+        return normalized
 
 
 class UserResponse(BaseModel):

@@ -1,66 +1,167 @@
-# Datafle - Smart Finance Tracker
+# Datafle
 
-Modern full-stack personal finance tracker built with Next.js + FastAPI.
+Datafle is a full-stack personal finance tracker built as a portfolio project. It helps users record income and expenses, manage monthly category budgets, review trends, and generate rule-based or AI-assisted insights from their financial activity.
 
-## Current Scope
+The project is designed to feel practical rather than theoretical: it includes authentication, typed frontend/backend contracts, validation, analytics, multi-currency support, and a tested backend API.
 
-- Expense tracking
-- Income tracking
-- Monthly category budgets
-- Dashboard summary with net balance and budget usage
-- Analytics and AI/rule-based insights
+## What The Project Does
 
-## Stack
+Datafle lets a user:
 
-- Frontend: Next.js 16, React 19, TypeScript
-- Backend: FastAPI, SQLAlchemy, Alembic
-- Local quick start database: SQLite
-- Production direction: PostgreSQL
+- create an account and sign in
+- manage personal categories
+- track expenses with dates, categories, and currencies
+- track income from different sources
+- set monthly budgets per category
+- monitor dashboard summaries such as spending, income, and budget usage
+- review analytics like monthly totals, cashflow, trends, and category distribution
+- generate smart insights using either a local rule-based engine or an optional Gemini-backed AI provider
 
-## Git Bash Local Setup
+## Tech Stack
 
-This guide is written only for `Git Bash`.
+### Frontend
 
-## Prerequisites
+- Next.js 16
+- React 19
+- TypeScript
+- Recharts
+- Lucide React
+
+### Backend
+
+- FastAPI
+- SQLAlchemy
+- Alembic
+- Pydantic
+- JWT authentication
+
+### Data / Runtime
+
+- SQLite for quick local development
+- PostgreSQL-ready via SQLAlchemy + Alembic
+- Optional external APIs:
+  - Gemini API for AI insights
+  - Exchange rate API for live currency rates
+
+## Project Structure
+
+```text
+finance-tracker/
+├─ frontend/              # Next.js app
+│  └─ src/
+│     ├─ app/             # Pages
+│     ├─ components/      # Shared UI and charts
+│     ├─ context/         # Auth, theme, currency
+│     ├─ hooks/           # Data and UI hooks
+│     ├─ services/        # API client
+│     ├─ types/           # Shared frontend types
+│     └─ utils/           # Formatting and helper utilities
+├─ backend/               # FastAPI app
+│  ├─ app/
+│  │  ├─ ai/             # Rule-based and AI insight providers
+│  │  ├─ analysis/       # Analytics and prediction logic
+│  │  ├─ models/         # SQLAlchemy models
+│  │  ├─ routers/        # API routes
+│  │  ├─ schemas/        # Pydantic schemas
+│  │  └─ services/       # Business logic and shared helpers
+│  ├─ alembic/           # Database migrations
+│  └─ tests/             # Backend test suite
+└─ README.md
+```
+
+## Main Features
+
+### Authentication
+
+- Users register with email, name, and password.
+- The backend issues a JWT access token.
+- The frontend stores the token in `localStorage` and attaches it to API requests as a bearer token.
+- Protected backend routes resolve the current user from the token and scope queries to that user.
+
+### Income And Expense Tracking
+
+- Expenses belong to the signed-in user and require an owned category.
+- Income entries include amount, source, date, and currency.
+- List endpoints support filtering, sorting, and pagination.
+
+### Budgeting
+
+- Budgets are defined per category and month.
+- Budget overview compares budget limits to spending for the selected month.
+- Duplicate budgets for the same user/category/month are rejected server-side.
+
+### Analytics
+
+- Dashboard summary
+- Monthly spending totals
+- Monthly cashflow
+- Category distribution
+- Daily trends
+- Spending prediction
+
+Analytics normalize mixed-currency data to a base currency before aggregation so totals remain consistent.
+
+### Smart Insights
+
+- Rule-based insights work without any external AI API.
+- AI insights can be enabled by providing a Gemini API key.
+- If AI is unavailable, the project still supports rule-based insights.
+
+## Environment Variables
+
+### Backend
+
+Create `backend/.env`.
+
+Minimum local example:
+
+```env
+DATABASE_URL=sqlite:///./datafle.db
+SECRET_KEY=replace-this-with-a-long-random-secret
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=720
+GEMINI_API_KEY=
+EXCHANGE_API_KEY=
+AUTO_CREATE_TABLES=false
+CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+```
+
+Notes:
+
+- `DATABASE_URL`: SQLite is fine for local development. PostgreSQL is recommended for production-style environments.
+- `SECRET_KEY`: required for JWT signing. Do not use a weak or shared value outside local development.
+- `ACCESS_TOKEN_EXPIRE_MINUTES`: JWT lifetime in minutes.
+- `GEMINI_API_KEY`: optional. Enables AI-generated insights.
+- `EXCHANGE_API_KEY`: optional. Enables live exchange rates. Without it, fallback rates are used.
+- `AUTO_CREATE_TABLES`: should stay `false` when using Alembic migrations.
+- `CORS_ORIGINS`: comma-separated frontend origins allowed to call the API.
+
+### Frontend
+
+Create `frontend/.env.local`.
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
+
+## Local Setup
+
+### Prerequisites
 
 - Node.js 18+
 - Python 3.11+
 
-## 1. Backend Setup
+### 1. Backend Setup
 
-```bash
+```powershell
 cd backend
 python -m venv venv
-source venv/Scripts/activate
-pip install -r requirements.txt
+.\venv\Scripts\python.exe -m pip install -r requirements.txt
+.\venv\Scripts\python.exe -m alembic upgrade head
+.\venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
 ```
 
-Create `backend/.env` from `backend/.env.local.example` with this content:
-
-```env
-DATABASE_URL=sqlite:///./datafle.db
-SECRET_KEY=dev-secret-key
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=1440
-GEMINI_API_KEY=
-EXCHANGE_API_KEY=
-AUTO_CREATE_TABLES=true
-CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
-```
-
-Run migrations:
-
-```bash
-./venv/Scripts/python.exe -m alembic upgrade head
-```
-
-Start backend:
-
-```bash
-./venv/Scripts/python.exe -m uvicorn app.main:app --reload --port 8000
-```
-
-Health check:
+Backend health check:
 
 ```text
 http://localhost:8000/api/health
@@ -72,28 +173,15 @@ Expected response:
 {"status":"healthy","app":"Datafle","version":"1.0.0"}
 ```
 
-## 2. Frontend Setup
+### 2. Frontend Setup
 
-Open a second Git Bash terminal:
+Open a second terminal:
 
-```bash
+```powershell
 cd frontend
 npm install
-```
-
-Create `frontend/.env.local` from `frontend/.env.example`:
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:8000
-```
-
-Start frontend:
-
-```bash
 npm run dev
 ```
-
-This project uses Webpack for local dev on Windows/Git Bash to avoid Turbopack hanging issues.
 
 Open:
 
@@ -101,228 +189,53 @@ Open:
 http://localhost:3000
 ```
 
-## Exact Start Order
+## How To Run The Project Locally
 
-Use this order every time:
+Recommended order:
 
-1. Start backend
-2. Confirm `http://localhost:8000/api/health`
-3. Start frontend
-4. Open `http://localhost:3000`
-5. Register a new user
+1. Start the backend.
+2. Confirm `http://localhost:8000/api/health` responds successfully.
+3. Start the frontend.
+4. Open `http://localhost:3000`.
+5. Register a new account and test the main flows.
 
-## If The App Gets Stuck On Loading
+## Authentication Flow
 
-Check these in order.
+Current authentication behavior:
 
-### A. Backend is not running
+1. The user registers or logs in via `/api/auth/register` or `/api/auth/login`.
+2. The backend returns an access token and user object.
+3. The frontend stores the token in `localStorage`.
+4. The API client sends `Authorization: Bearer <token>` on authenticated requests.
+5. Backend dependencies decode the JWT, load the user, and scope DB access to that user.
 
-Test in browser:
+Security note:
 
-```text
-http://localhost:8000/api/health
-```
+- This is acceptable for a portfolio/demo project, but `localStorage`-based bearer auth is not the strongest production setup. A future hardening step would be secure HTTP-only cookies with refresh/revocation support.
 
-If it does not open, backend is down.
+## How The Main Features Work
 
-### B. `backend/.env` is pointing to PostgreSQL
+### Dashboard
 
-For local quick start, use this:
+The dashboard combines summary metrics, recent transactions, monthly totals, and budget usage. It is intended as the main overview page for a signed-in user.
 
-```env
-DATABASE_URL=sqlite:///./datafle.db
-```
+### Transactions
 
-If `backend/.env` contains a PostgreSQL URL and you do not have PostgreSQL running locally, backend will fail to start.
+Expenses and income are stored as user-owned records. Validation is performed server-side for required fields, supported currencies, ranges, and ownership-sensitive relationships such as category selection.
 
-### C. Old SQLite database is out of sync
+### Budgets
 
-If backend still fails after schema changes:
+Budgets are stored monthly and scoped to a category. Budget usage is derived by comparing the normalized budget amount against spending in the same period.
 
-```bash
-cd backend
-rm -f datafle.db
-./venv/Scripts/python.exe -m alembic upgrade head
-```
+### Currency Handling
 
-Warning:
+Transactions and budgets can be stored in different currencies. Analytics normalize those values to a base currency for comparison and reporting.
 
-- this deletes local data
+### Insights
 
-### D. Frontend cannot reach backend
+Insights are generated from the user’s summary and category patterns. Rule-based mode is always available; AI mode requires configuration and may depend on external services.
 
-Make sure:
-
-- `frontend/.env.local` contains `NEXT_PUBLIC_API_URL=http://localhost:8000`
-- backend is running on port `8000`
-- frontend is running on port `3000`
-
-### E. Frontend server opens but the page never finishes loading
-
-Use the Webpack-based dev server:
-
-```bash
-cd frontend
-npm run dev
-```
-
-The `dev` script is configured as:
-
-```bash
-next dev --webpack
-```
-
-If you were previously running plain `next dev`, stop it and restart with `npm run dev`.
-
-## PostgreSQL Later
-
-When you are ready to move off SQLite, update `backend/.env`:
-
-```env
-DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/datafle
-```
-
-Then run:
-
-```bash
-cd backend
-./venv/Scripts/python.exe -m alembic upgrade head
-```
-
-Important:
-
-- use PostgreSQL before real deployment
-- keep SQLite only for quick local development if needed
-
-### Local PostgreSQL With Docker
-
-If you want to prepare the project for production without installing PostgreSQL manually, use the included Docker Compose file:
-
-```bash
-docker compose -f docker-compose.postgres.yml up -d
-```
-
-Then set `backend/.env` like this:
-
-```env
-DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/datafle
-SECRET_KEY=dev-secret-key
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=1440
-GEMINI_API_KEY=
-EXCHANGE_API_KEY=
-AUTO_CREATE_TABLES=false
-CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
-```
-
-Run migrations:
-
-```bash
-cd backend
-./venv/Scripts/python.exe -m alembic upgrade head
-```
-
-When you are done:
-
-```bash
-docker compose -f docker-compose.postgres.yml down
-```
-
-## Release Prep
-
-Before deployment, separate local and production config clearly.
-
-### Backend env files
-
-- Local template: `backend/.env.local.example`
-- Production template: `backend/.env.production.example`
-
-Recommended flow:
-
-1. keep local development on SQLite with `backend/.env.local.example`
-2. use PostgreSQL for staging/production with `backend/.env.production.example`
-3. set `AUTO_CREATE_TABLES=false` in production
-4. always run Alembic migrations in staging/production
-
-### Frontend env files
-
-- Local template: `frontend/.env.example`
-- Production template: `frontend/.env.production.example`
-
-Recommended flow:
-
-1. local frontend points to `http://localhost:8000`
-2. production frontend points to your deployed backend domain like `https://api.example.com`
-
-## Deployment Readiness Checklist
-
-Complete these before publishing:
-
-1. move backend from SQLite to PostgreSQL
-2. confirm `./venv/Scripts/python.exe -m alembic upgrade head` works on PostgreSQL
-3. make sure `SECRET_KEY` is strong and unique in production
-4. move API keys out of local `.env` and into hosting platform secrets
-5. set production `CORS_ORIGINS` to your real frontend domain only
-6. run backend tests:
-
-```bash
-cd backend
-./venv/Scripts/python.exe -m pytest
-```
-
-7. run frontend checks:
-
-```bash
-cd frontend
-npm run lint
-npm run build
-```
-
-8. test these flows on staging:
-- register
-- login
-- dashboard load
-- income create/edit/delete
-- expense create/edit/delete
-- budget create/edit/delete
-- analytics and insights pages
-- logout and re-login
-
-## Recommended Next Deployment Steps
-
-After the UI cleanup, the next technical order should be:
-
-1. switch backend to PostgreSQL locally
-2. verify migrations on PostgreSQL
-3. prepare deploy config for frontend and backend
-4. deploy to a staging domain
-5. run full manual QA on the live environment
-6. fix any live-only issues before public release
-
-## Useful Commands
-
-### Backend tests
-
-```bash
-cd backend
-./venv/Scripts/python.exe -m pytest
-```
-
-### Frontend lint
-
-```bash
-cd frontend
-npm run lint
-```
-
-### Frontend production build
-
-```bash
-cd frontend
-npm run build
-```
-
-## Main Endpoints
+## API Overview
 
 ### Auth
 
@@ -341,6 +254,7 @@ npm run build
 
 - `GET /api/expenses/`
 - `GET /api/expenses/recent`
+- `GET /api/expenses/{id}`
 - `POST /api/expenses/`
 - `PUT /api/expenses/{id}`
 - `DELETE /api/expenses/{id}`
@@ -349,6 +263,7 @@ npm run build
 
 - `GET /api/incomes/`
 - `GET /api/incomes/recent`
+- `GET /api/incomes/{id}`
 - `POST /api/incomes/`
 - `PUT /api/incomes/{id}`
 - `DELETE /api/incomes/{id}`
@@ -369,7 +284,89 @@ npm run build
 - `GET /api/analytics/trends`
 - `GET /api/analytics/budgets/current`
 - `GET /api/analytics/prediction`
+- `GET /api/analytics/prediction/categories`
+- `GET /api/analytics/exchange-rates`
 
 ### Insights
 
 - `GET /api/insights/`
+
+## Running Tests
+
+### Backend
+
+```powershell
+cd backend
+.\venv\Scripts\python.exe -m pytest
+```
+
+Current backend tests cover:
+
+- auth-sensitive flows
+- permission and ownership rules
+- important validation behavior
+- analytics and summary calculations
+- utility and currency normalization helpers
+
+### Frontend
+
+The project currently uses verification checks instead of a dedicated frontend test runner:
+
+```powershell
+cd frontend
+npm run lint
+npm run build
+```
+
+## Known Limitations
+
+- The frontend currently stores JWTs in `localStorage`.
+- Money values still flow through parts of the application as `float` instead of `Decimal`.
+- Historical currency conversion uses current/fallback exchange rates rather than true historical FX data.
+- SQLite is convenient for local development, but PostgreSQL is the better long-term database target.
+- The frontend does not yet have a dedicated UI test suite.
+- Some analytics still use Pandas in request paths, which is acceptable for a portfolio-sized project but not ideal at larger scale.
+
+## Suggested Future Improvements
+
+- move auth to secure cookie-based sessions or refresh-token flows
+- migrate money handling to `Decimal` end to end
+- add frontend integration tests for key user flows
+- add DB-level uniqueness constraints and more indexing
+- move more analytics work into SQL or cached summaries
+- add subscription or plan concepts if the product scope expands
+- support historical exchange rates for more accurate reporting
+
+## Portfolio Notes
+
+This project demonstrates:
+
+- full-stack product thinking
+- typed API contracts between frontend and backend
+- authentication and user-scoped data access
+- validation and error handling
+- analytics and derived business logic
+- maintainability-focused refactoring
+- performance-minded cleanup
+- practical automated backend testing
+
+## Quick Commands
+
+### Backend
+
+```powershell
+cd backend
+.\venv\Scripts\python.exe -m alembic upgrade head
+.\venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
+.\venv\Scripts\python.exe -m pytest
+```
+
+### Frontend
+
+```powershell
+cd frontend
+npm install
+npm run dev
+npm run lint
+npm run build
+```

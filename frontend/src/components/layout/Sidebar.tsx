@@ -139,11 +139,11 @@ export default function Sidebar() {
               <h3>Theme</h3>
               <div style={{ display: "flex", gap: "var(--space-sm)", justifyContent: "center" }}>
                 <button className={`btn ${theme === "dark" ? "btn-primary" : "btn-secondary"}`}
-                  onClick={() => { toggleTheme(); }} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                  onClick={() => { if (theme !== "dark") toggleTheme(); }} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
                   <Moon size={16} /> Dark
                 </button>
                 <button className={`btn ${theme === "light" ? "btn-primary" : "btn-secondary"}`}
-                  onClick={() => { toggleTheme(); }} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                  onClick={() => { if (theme !== "light") toggleTheme(); }} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
                   <Sun size={16} /> Light
                 </button>
               </div>

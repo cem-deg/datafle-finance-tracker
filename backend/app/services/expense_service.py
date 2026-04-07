@@ -1,16 +1,22 @@
-"""Expense service — business logic for expense management."""
+"""Expense service - business logic for expense management."""
 
-import math
 from datetime import date
 
+from fastapi import status
 from sqlalchemy import desc
 from sqlalchemy.orm import Session, joinedload
-from fastapi import status
 
 from app.models.category import Category
 from app.models.expense import Expense
-from app.schemas.expense import ExpenseCreate, ExpenseUpdate, ExpenseListResponse
-from app.services.crud_utils import apply_updates, commit_and_refresh, get_or_error
+from app.schemas.expense import ExpenseCreate, ExpenseListResponse, ExpenseUpdate
+from app.services.crud_utils import (
+    apply_updates,
+    commit_and_refresh,
+    delete_and_commit,
+    get_or_error,
+    paginate_query,
+)
+from app.services.service_utils import validate_amount_range, validate_date_range
 
 
 class ExpenseService:
@@ -45,13 +51,15 @@ class ExpenseService:
         sort_order: str = "desc",
     ) -> ExpenseListResponse:
         """Return paginated, filtered, and sorted expenses."""
+        validate_date_range(start_date, end_date)
+        validate_amount_range(min_amount, max_amount)
+
         query = (
             db.query(Expense)
             .options(joinedload(Expense.category))
             .filter(Expense.user_id == user_id)
         )
 
-        # Apply filters
         if category_id:
             query = query.filter(Expense.category_id == category_id)
         if start_date:
@@ -63,25 +71,10 @@ class ExpenseService:
         if max_amount is not None:
             query = query.filter(Expense.amount <= max_amount)
 
-        # Count total
-        total = query.count()
+        order_column = Expense.amount if sort_by == "amount" else Expense.expense_date
+        query = query.order_by(order_column if sort_order == "asc" else desc(order_column))
 
-        # Apply sorting
-        if sort_by == "amount":
-            order_col = Expense.amount
-        else:
-            order_col = Expense.expense_date
-
-        if sort_order == "asc":
-            query = query.order_by(order_col)
-        else:
-            query = query.order_by(desc(order_col))
-
-        # Apply pagination
-        offset = (page - 1) * per_page
-        items = query.offset(offset).limit(per_page).all()
-        total_pages = math.ceil(total / per_page) if per_page > 0 else 0
-
+        total, items, total_pages = paginate_query(query, page=page, per_page=per_page)
         return ExpenseListResponse(
             items=items,
             total=total,
@@ -115,8 +108,7 @@ class ExpenseService:
             user_id=user_id,
         )
         db.add(expense)
-        commit_and_refresh(db, expense)
-        # Reload with category relationship
+        commit_and_refresh(db, expense, failure_detail="Failed to create expense")
         return ExpenseService.get_by_id(db, expense.id, user_id)
 
     @staticmethod
@@ -129,13 +121,10 @@ class ExpenseService:
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Expense not found",
         )
-
-        ExpenseService._validate_category_ownership(
-            db, data.category_id, user_id
-        )
+        ExpenseService._validate_category_ownership(db, data.category_id, user_id)
 
         apply_updates(expense, data.model_dump(exclude_unset=True))
-        commit_and_refresh(db, expense)
+        commit_and_refresh(db, expense, failure_detail="Failed to update expense")
         return ExpenseService.get_by_id(db, expense.id, user_id)
 
     @staticmethod
@@ -146,12 +135,11 @@ class ExpenseService:
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Expense not found",
         )
-        db.delete(expense)
-        db.commit()
+        delete_and_commit(db, expense, failure_detail="Failed to delete expense")
 
     @staticmethod
     def get_recent(db: Session, user_id: int, limit: int = 5) -> list[Expense]:
-        """Return the most recent expenses for dashboard."""
+        """Return the most recent expenses for the dashboard."""
         return (
             db.query(Expense)
             .options(joinedload(Expense.category))

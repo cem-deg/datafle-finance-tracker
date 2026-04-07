@@ -8,7 +8,12 @@ from sqlalchemy.orm import Session, joinedload
 from app.models.budget import Budget
 from app.models.category import Category
 from app.schemas.budget import BudgetCreate, BudgetUpdate
-from app.services.crud_utils import apply_updates, commit_and_refresh, get_or_error
+from app.services.crud_utils import (
+    apply_updates,
+    commit_and_refresh,
+    delete_and_commit,
+    get_or_error,
+)
 
 
 class BudgetService:
@@ -61,7 +66,7 @@ class BudgetService:
 
     @staticmethod
     def create(db: Session, data: BudgetCreate, user_id: int) -> Budget:
-        """Create a new budget or replace the existing month/category budget."""
+        """Create a new budget for a month/category pair."""
         BudgetService._ensure_category_belongs_to_user(db, data.category_id, user_id)
         normalized_month = BudgetService._normalize_month_start(data.month_start)
 
@@ -75,20 +80,26 @@ class BudgetService:
             .first()
         )
         if existing:
-            existing.amount = data.amount
-            existing.note = data.note
-            commit_and_refresh(db, existing)
-            return BudgetService.get_by_id(db, existing.id, user_id)
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="A budget already exists for this category and month",
+            )
 
         budget = Budget(
             amount=data.amount,
+            currency_code=data.currency_code,
             month_start=normalized_month,
             category_id=data.category_id,
             note=data.note,
             user_id=user_id,
         )
         db.add(budget)
-        commit_and_refresh(db, budget)
+        commit_and_refresh(
+            db,
+            budget,
+            conflict_detail="A budget already exists for this category and month",
+            failure_detail="Failed to create budget",
+        )
         return BudgetService.get_by_id(db, budget.id, user_id)
 
     @staticmethod
@@ -119,12 +130,16 @@ class BudgetService:
             )
 
         apply_updates(budget, updates)
-        commit_and_refresh(db, budget)
+        commit_and_refresh(
+            db,
+            budget,
+            conflict_detail="A budget already exists for this category and month",
+            failure_detail="Failed to update budget",
+        )
         return BudgetService.get_by_id(db, budget.id, user_id)
 
     @staticmethod
     def delete(db: Session, budget_id: int, user_id: int) -> None:
         """Delete a budget."""
         budget = BudgetService.get_by_id(db, budget_id, user_id)
-        db.delete(budget)
-        db.commit()
+        delete_and_commit(db, budget, failure_detail="Failed to delete budget")

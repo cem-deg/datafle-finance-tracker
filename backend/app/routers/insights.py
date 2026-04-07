@@ -9,6 +9,7 @@ from app.analysis.predictor import Predictor
 from app.ai.rule_based import RuleBasedProvider
 from app.ai.gemini_provider import GeminiProvider
 from app.routers.deps import CurrentUser, DbSession
+from app.schemas.analytics import InsightResponse
 
 router = APIRouter(prefix="/api/insights", tags=["Insights"])
 
@@ -35,7 +36,7 @@ def _build_financial_context(db: Session, user_id: int) -> dict:
     ) or "No data"
 
     pred_summary = "No prediction available"
-    if prediction.get("prediction"):
+    if prediction.get("prediction") is not None:
         pred_summary = (
             f"Predicted: ${prediction['prediction']:.2f} "
             f"(confidence: {prediction['confidence']}, trend: {prediction.get('trend', 'N/A')})"
@@ -51,7 +52,7 @@ def _build_financial_context(db: Session, user_id: int) -> dict:
     }
 
 
-@router.get("/")
+@router.get("/", response_model=InsightResponse)
 def get_insights(
     db: DbSession,
     current_user: CurrentUser,
@@ -64,9 +65,9 @@ def get_insights(
         provider = GeminiProvider()
         if provider.is_available():
             insight_text = provider.generate_insight(context)
-            return {"mode": "ai", "provider": "gemini", "insight": insight_text}
+            return InsightResponse(mode="ai", provider="gemini", insight=insight_text)
 
     # Fallback to rule-based
     provider = RuleBasedProvider()
     insight_text = provider.generate_insight(context)
-    return {"mode": "rule", "provider": "rule_based", "insight": insight_text}
+    return InsightResponse(mode="rule", provider="rule_based", insight=insight_text)

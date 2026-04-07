@@ -403,6 +403,7 @@ img {
   border: none;
   transition: all var(--transition-base);
   white-space: nowrap;
+  min-height: 42px;
 }
 
 .btn-primary {
@@ -414,6 +415,13 @@ img {
 .btn-primary:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(108, 92, 231, 0.45);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .btn-secondary {
@@ -451,6 +459,7 @@ img {
 .btn-sm {
   padding: 6px 14px;
   font-size: var(--font-xs);
+  min-height: 34px;
 }
 
 .btn-icon {
@@ -482,6 +491,7 @@ img {
   color: var(--text-primary);
   font-size: var(--font-md);
   transition: all var(--transition-base);
+  min-height: 48px;
 }
 
 .form-input:focus {
@@ -508,6 +518,7 @@ img {
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding-right: 40px;
+  min-height: 48px;
 }
 
 .form-select:focus {
@@ -520,6 +531,14 @@ img {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-md);
+}
+
+.form-help {
+  display: block;
+  margin-top: 6px;
+  color: var(--text-tertiary);
+  font-size: var(--font-xs);
+  line-height: 1.5;
 }
 
 @media (max-width: 480px) {
@@ -667,16 +686,17 @@ img {
   border-radius: var(--radius-xl);
   padding: var(--space-xl);
   width: 100%;
-  max-width: 480px;
+  max-width: 540px;
   max-height: 90vh;
   overflow-y: auto;
   animation: slideUp 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: var(--shadow-lg);
 }
 
 .modal-title {
   font-size: var(--font-xl);
   font-weight: 700;
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-md);
 }
 
 .modal-actions {
@@ -1005,6 +1025,70 @@ img {
   border-radius: var(--radius-md);
   color: var(--accent-danger);
   font-size: var(--font-sm);
+}
+
+.inline-message {
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  font-size: var(--font-sm);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.inline-message-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.5;
+}
+
+.inline-message-icon {
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.inline-message-dismiss {
+  background: transparent;
+  border: none;
+  color: inherit;
+  opacity: 0.7;
+  padding: 0;
+  min-height: auto;
+}
+
+.inline-message-dismiss:hover {
+  opacity: 1;
+}
+
+.inline-message-error {
+  background: rgba(255, 107, 107, 0.1);
+  border-color: rgba(255, 107, 107, 0.2);
+  color: var(--accent-danger);
+}
+
+.inline-message-success {
+  background: rgba(0, 184, 148, 0.12);
+  border-color: rgba(0, 184, 148, 0.24);
+  color: var(--accent-success);
+}
+
+.inline-message-info {
+  background: rgba(124, 106, 239, 0.12);
+  border-color: rgba(124, 106, 239, 0.24);
+  color: var(--accent-primary-light);
+}
+
+.modal-message {
+  margin-bottom: var(--space-md);
+}
+
+.page-feedback {
+  margin-bottom: var(--space-md);
+  display: grid;
+  gap: var(--space-sm);
 }
 
 .premium-auth-page {
@@ -1384,6 +1468,7 @@ img {
   height: 32px;
   border-radius: var(--radius-sm);
   border: 2px solid transparent;
+  background: transparent;
   cursor: pointer;
   transition: all var(--transition-fast);
 }
@@ -1402,12 +1487,26 @@ img {
   text-align: center;
   padding: var(--space-3xl) var(--space-lg);
   color: var(--text-tertiary);
+  border: 1px dashed var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+}
+
+.empty-state-compact {
+  padding: var(--space-xl);
 }
 
 .empty-state .empty-icon {
-  font-size: 3rem;
-  margin-bottom: var(--space-md);
-  opacity: 0.5;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto var(--space-md);
+  border-radius: var(--radius-full);
+  display: grid;
+  place-items: center;
+  font-size: 1.4rem;
+  opacity: 0.9;
+  background: rgba(124, 106, 239, 0.12);
+  color: var(--accent-primary-light);
 }
 
 .empty-state h3 {
@@ -1418,8 +1517,20 @@ img {
 
 .empty-state p {
   font-size: var(--font-sm);
-  max-width: 300px;
+  max-width: 360px;
   margin: 0 auto var(--space-lg);
+  line-height: 1.6;
+}
+
+.empty-note {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  margin: calc(var(--space-sm) * -1) auto var(--space-lg);
+  max-width: 380px;
+}
+
+.empty-state .btn {
+  margin-inline: auto;
 }
 
 /* ─── Skeleton Loader ────────────────────────────────────────── */
@@ -1455,6 +1566,7 @@ img {
   justify-content: center;
   gap: var(--space-sm);
   margin-top: var(--space-xl);
+  flex-wrap: wrap;
 }
 
 .pagination-btn {
@@ -1498,6 +1610,7 @@ img {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .filter-bar .form-input,
@@ -2750,14 +2863,18 @@ img {
   .expense-item {
     flex-wrap: wrap;
     padding: var(--space-sm) var(--space-md);
+    gap: var(--space-sm);
   }
 
   .expense-item .expense-actions {
     opacity: 1;
+    width: 100%;
+    justify-content: flex-end;
   }
 
   .expense-item .expense-amount {
     font-size: var(--font-sm);
+    margin-left: auto;
   }
 
   .modal {
@@ -2767,6 +2884,14 @@ img {
 
   .modal-overlay {
     padding: var(--space-sm);
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .modal-actions .btn {
+    width: 100%;
   }
 
   .hero-title {

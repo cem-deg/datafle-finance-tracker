@@ -1,12 +1,10 @@
-"""ML-based expense predictor using scikit-learn Linear Regression."""
-
-from datetime import date, timedelta
+"""ML-based expense predictor using numpy linear regression."""
 
 import numpy as np
 import pandas as pd
 from sqlalchemy.orm import Session
 
-from app.models.expense import Expense
+from app.analysis.aggregator import Aggregator
 
 
 class Predictor:
@@ -15,23 +13,15 @@ class Predictor:
     @staticmethod
     def _load_monthly_data(db: Session, user_id: int) -> pd.DataFrame:
         """Load and aggregate expenses by month for ML training."""
-        expenses = (
-            db.query(Expense.amount, Expense.expense_date)
-            .filter(Expense.user_id == user_id)
-            .all()
-        )
+        df = Aggregator._load_expenses_df(db, user_id)
+        if df.empty:
+            return df.reindex(columns=["month_num", "total"])
 
-        if not expenses:
-            return pd.DataFrame(columns=["month_num", "total"])
-
-        df = pd.DataFrame(expenses, columns=["amount", "expense_date"])
-        df["expense_date"] = pd.to_datetime(df["expense_date"])
-        df["amount"] = pd.to_numeric(df["amount"])
         df["month"] = df["expense_date"].dt.to_period("M")
-        monthly = df.groupby("month")["amount"].sum().reset_index()
+        monthly = df.groupby("month")["amount_base"].sum().reset_index()
         monthly = monthly.sort_values("month")
         monthly["month_num"] = range(len(monthly))
-        monthly["total"] = monthly["amount"]
+        monthly["total"] = monthly["amount_base"]
 
         return monthly[["month_num", "total"]]
 
@@ -61,7 +51,7 @@ class Predictor:
         prediction = slope * next_month_num + intercept
         prediction = max(prediction, 0)  # Can't predict negative spending
 
-        # R² score for confidence
+        # R-squared score for confidence
         y_pred = np.polyval(coefficients, X)
         ss_res = np.sum((y - y_pred) ** 2)
         ss_tot = np.sum((y - np.mean(y)) ** 2)
@@ -95,28 +85,20 @@ class Predictor:
     @staticmethod
     def predict_by_category(db: Session, user_id: int) -> list[dict]:
         """Predict next month's spending per category."""
-        expenses = (
-            db.query(Expense.amount, Expense.expense_date, Expense.category_id)
-            .filter(Expense.user_id == user_id)
-            .all()
-        )
-
-        if not expenses:
+        df = Aggregator._load_expenses_df(db, user_id)
+        if df.empty:
             return []
 
-        df = pd.DataFrame(expenses, columns=["amount", "expense_date", "category_id"])
-        df["expense_date"] = pd.to_datetime(df["expense_date"])
-        df["amount"] = pd.to_numeric(df["amount"])
         df["month"] = df["expense_date"].dt.to_period("M")
 
         predictions = []
         for cat_id in df["category_id"].unique():
             cat_df = df[df["category_id"] == cat_id]
-            monthly = cat_df.groupby("month")["amount"].sum().reset_index()
+            monthly = cat_df.groupby("month")["amount_base"].sum().reset_index()
             monthly = monthly.sort_values("month")
 
             if len(monthly) < 2:
-                avg = float(monthly["amount"].mean())
+                avg = float(monthly["amount_base"].mean())
                 predictions.append({
                     "category_id": int(cat_id),
                     "prediction": round(avg, 2),
@@ -125,7 +107,7 @@ class Predictor:
                 continue
 
             X = np.arange(len(monthly))
-            y = monthly["amount"].values
+            y = monthly["amount_base"].values
             coefficients = np.polyfit(X, y, 1)
             next_val = np.polyval(coefficients, len(monthly))
             next_val = max(float(next_val), 0)

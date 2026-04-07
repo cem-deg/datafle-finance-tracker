@@ -20,7 +20,7 @@ class GeminiProvider(BaseAIProvider):
 
     def generate_insight(self, financial_data: dict) -> str:
         if not self.is_available():
-            return "AI insights unavailable — Gemini API key not configured."
+            return "AI insights unavailable - Gemini API key not configured."
 
         prompt = self._build_prompt(financial_data)
 
@@ -30,8 +30,8 @@ class GeminiProvider(BaseAIProvider):
                 contents=prompt,
             )
             return response.text
-        except Exception as e:
-            return f"AI insight generation failed: {str(e)}"
+        except Exception as exc:
+            return f"AI insight generation failed: {str(exc)}"
 
     @staticmethod
     def _build_prompt(data: dict) -> str:
@@ -61,8 +61,8 @@ Keep your response concise (under 300 words). Write in English.
 {data.get('prediction_summary', 'No prediction available')}
 
 Provide insights in the following format:
-1. **Overall Assessment** — How is the user doing financially this month?
-2. **Category Analysis** — Which categories need attention?
-3. **Trend Analysis** — Is spending going up or down?
-4. **Actionable Tip** — One specific thing the user can do to improve.
-5. **Prediction Commentary** — Comment on the ML prediction if available."""
+1. **Overall Assessment** - How is the user doing financially this month?
+2. **Category Analysis** - Which categories need attention?
+3. **Trend Analysis** - Is spending going up or down?
+4. **Actionable Tip** - One specific thing the user can do to improve.
+5. **Prediction Commentary** - Comment on the ML prediction if available."""

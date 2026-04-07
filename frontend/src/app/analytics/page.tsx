@@ -1,90 +1,173 @@
 "use client";
 
+import { BrainCircuit, Target, TrendingDown, TrendingUp } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
-import { useMonthlyTotals, useCategoryDistribution, useTrends, useCategories, usePrediction } from "@/hooks/useData";
 import MonthlyBarChart from "@/components/charts/MonthlyBarChart";
 import CategoryPieChart from "@/components/charts/CategoryPieChart";
 import TrendLineChart from "@/components/charts/TrendLineChart";
+import EmptyState from "@/components/ui/EmptyState";
+import PageFeedback from "@/components/ui/PageFeedback";
+import PageHeader from "@/components/ui/PageHeader";
+import {
+  useCategoryDistribution,
+  useCategories,
+  useMonthlyTotals,
+  usePrediction,
+  useTrends,
+} from "@/hooks/useData";
 import { useCurrency } from "@/context/CurrencyContext";
-import { BrainCircuit, TrendingUp, TrendingDown, Target } from "lucide-react";
 
 export default function AnalyticsPage() {
-  const { data: monthly, loading: mLoading } = useMonthlyTotals(12);
-  const { data: catDist, loading: cLoading } = useCategoryDistribution();
-  const { data: trends, loading: tLoading } = useTrends(30);
-  const { categories } = useCategories();
-  const { prediction, loading: pLoading } = usePrediction();
-  const { currency, convertAndFormat } = useCurrency();
+  const {
+    data: monthly,
+    loading: monthlyLoading,
+    error: monthlyError,
+    refetch: refetchMonthly,
+  } = useMonthlyTotals(12);
+  const { data: categoryDistribution, loading: categoryLoading, error: categoryError } =
+    useCategoryDistribution();
+  const { data: trends, loading: trendsLoading, error: trendsError } = useTrends(30);
+  const { categories, error: categoriesError } = useCategories();
+  const { prediction, loading: predictionLoading, error: predictionError } = usePrediction();
+  const { convertAndFormat } = useCurrency();
+
+  const pageErrors = [
+    predictionError,
+    monthlyError,
+    categoryError,
+    categoriesError,
+    trendsError,
+  ].filter(Boolean) as string[];
 
   return (
     <AppShell>
-      <div className="page-header animate-in">
-        <h1>Analytics</h1>
-        <p>Deep dive into your spending patterns</p>
-      </div>
+      <PageHeader title="Analytics" description="Deep dive into your spending patterns" />
 
-      {/* Prediction Card */}
-      <div className="stat-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", marginBottom: "var(--space-xl)" }}>
+      <PageFeedback errorMessages={pageErrors} />
+
+      <div
+        className="stat-grid"
+        style={{
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          marginBottom: "var(--space-xl)",
+        }}
+      >
         <div className="stat-card animate-in animate-in-delay-1">
-          <div className="stat-icon" style={{ background: "rgba(124,106,239,0.15)", color: "var(--accent-primary-light)" }}>
+          <div
+            className="stat-icon"
+            style={{
+              background: "rgba(124,106,239,0.15)",
+              color: "var(--accent-primary-light)",
+            }}
+          >
             <BrainCircuit size={22} />
           </div>
-          {pLoading ? (
+          {predictionLoading ? (
             <div className="skeleton skeleton-heading" />
-          ) : prediction?.prediction ? (
+          ) : prediction?.prediction != null ? (
             <>
-              <div className="stat-value">{convertAndFormat(prediction.prediction, currency.code)}</div>
+              <div className="stat-value">
+                {convertAndFormat(prediction.prediction, "USD")}
+              </div>
               <div className="stat-label">Predicted next month</div>
-              <div className={`stat-change ${prediction.trend === "increasing" ? "negative" : "positive"}`}>
-                {prediction.trend === "increasing" ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                {prediction.trend} · {prediction.confidence} confidence
+              <div
+                className={`stat-change ${
+                  prediction.trend === "increasing" ? "negative" : "positive"
+                }`}
+              >
+                {prediction.trend === "increasing" ? (
+                  <TrendingUp size={14} />
+                ) : (
+                  <TrendingDown size={14} />
+                )}
+                {prediction.trend ?? "stable"} | {prediction.confidence} confidence
               </div>
             </>
           ) : (
             <>
-              <div className="stat-value" style={{ fontSize: "var(--font-lg)" }}>Need more data</div>
-              <div className="stat-label">{prediction?.message || "Add expenses to get predictions"}</div>
+              <div className="stat-value" style={{ fontSize: "var(--font-lg)" }}>
+                Need more data
+              </div>
+              <div className="stat-label">
+                {prediction?.message || "Add expenses to get predictions"}
+              </div>
             </>
           )}
         </div>
 
         <div className="stat-card animate-in animate-in-delay-2">
-          <div className="stat-icon" style={{ background: "rgba(0,210,211,0.15)", color: "var(--accent-secondary)" }}>
+          <div
+            className="stat-icon"
+            style={{ background: "rgba(0,210,211,0.15)", color: "var(--accent-secondary)" }}
+          >
             <Target size={22} />
           </div>
-          {pLoading ? (
+          {predictionLoading ? (
             <div className="skeleton skeleton-heading" />
           ) : (
             <>
               <div className="stat-value">{prediction?.data_points ?? 0}</div>
               <div className="stat-label">Months of data</div>
               <div className="badge badge-primary" style={{ marginTop: 8 }}>
-                R² = {prediction?.r_squared?.toFixed(3) ?? "—"}
+                R2 = {prediction?.r_squared?.toFixed(3) ?? "-"}
               </div>
             </>
           )}
         </div>
       </div>
 
-      {/* Charts Grid */}
       <div className="charts-grid animate-in animate-in-delay-2">
-        {mLoading ? (
-          <div className="card"><div className="skeleton" style={{ height: 300 }} /></div>
+        {monthlyLoading ? (
+          <div className="card">
+            <div className="skeleton" style={{ height: 300 }} />
+          </div>
+        ) : monthlyError ? (
+          <div className="card">
+            <EmptyState
+              title="Monthly totals unavailable"
+              description="Try reloading the analytics page."
+              actionLabel="Retry"
+              onAction={() => void refetchMonthly()}
+              icon="!"
+              compact
+            />
+          </div>
         ) : (
           <MonthlyBarChart data={monthly} />
         )}
 
-        {cLoading ? (
-          <div className="card"><div className="skeleton" style={{ height: 300 }} /></div>
+        {categoryLoading ? (
+          <div className="card">
+            <div className="skeleton" style={{ height: 300 }} />
+          </div>
+        ) : categoryError || categoriesError ? (
+          <div className="card">
+            <EmptyState
+              title="Category analytics unavailable"
+              description="Category data could not be loaded right now."
+              icon="!"
+              compact
+            />
+          </div>
         ) : (
-          <CategoryPieChart data={catDist} categories={categories} />
+          <CategoryPieChart data={categoryDistribution} categories={categories} />
         )}
       </div>
 
-      {/* Trend Chart - Full Width */}
       <div className="animate-in animate-in-delay-3">
-        {tLoading ? (
-          <div className="card"><div className="skeleton" style={{ height: 300 }} /></div>
+        {trendsLoading ? (
+          <div className="card">
+            <div className="skeleton" style={{ height: 300 }} />
+          </div>
+        ) : trendsError ? (
+          <div className="card">
+            <EmptyState
+              title="Trend chart unavailable"
+              description="Trend data could not be loaded right now."
+              icon="!"
+              compact
+            />
+          </div>
         ) : (
           <TrendLineChart data={trends} />
         )}

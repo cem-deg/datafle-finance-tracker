@@ -24,8 +24,8 @@ def list_incomes(
     per_page: int = Query(20, ge=1, le=100),
     start_date: date | None = None,
     end_date: date | None = None,
-    min_amount: float | None = None,
-    max_amount: float | None = None,
+    min_amount: float | None = Query(None, ge=0),
+    max_amount: float | None = Query(None, ge=0),
     sort_order: str = Query("desc", pattern="^(asc|desc)$"),
 ):
     """Return paginated and filtered incomes."""
@@ -50,6 +50,16 @@ def recent_incomes(
 ):
     """Return recent incomes for the dashboard."""
     return IncomeService.get_recent(db, current_user.id, limit)
+
+
+@router.get("/{income_id}", response_model=IncomeResponse)
+def get_income(
+    income_id: int,
+    db: DbSession,
+    current_user: CurrentUser,
+):
+    """Return a single income by ID."""
+    return IncomeService.get_by_id(db, income_id, current_user.id)
 
 
 @router.post("/", response_model=IncomeResponse, status_code=201)
@@ -81,3 +91,4 @@ def delete_income(
 ):
     """Delete an income."""
     IncomeService.delete(db, income_id, current_user.id)
+    return None

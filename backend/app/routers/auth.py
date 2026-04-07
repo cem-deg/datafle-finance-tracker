@@ -5,7 +5,6 @@ from fastapi import APIRouter
 from app.routers.deps import CurrentUser, DbSession
 from app.schemas.user import UserCreate, UserLogin, Token, UserResponse
 from app.services.auth_service import AuthService
-from app.services.category_service import CategoryService
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
@@ -14,8 +13,6 @@ router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 def register(user_data: UserCreate, db: DbSession):
     """Register a new user and return a JWT token."""
     user = AuthService.register(db, user_data)
-    # Seed default categories for the new user
-    CategoryService.seed_defaults(db, user)
     token = AuthService.create_access_token(data={"sub": str(user.id)})
     return Token(access_token=token, user=UserResponse.model_validate(user))
 

@@ -3,7 +3,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "Datafle — Smart Finance Tracker",
+  title: "Datafle - Smart Finance Tracker",
   description:
     "Track your expenses, analyze spending patterns, and get AI-powered financial insights with Datafle.",
   manifest: "/manifest.json",

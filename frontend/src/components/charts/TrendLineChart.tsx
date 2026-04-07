@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useMemo } from "react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Area,
@@ -43,12 +44,16 @@ function CustomTooltip({
   );
 }
 
-export default function TrendLineChart({ data }: Props) {
-  const { currency, convertAndFormat } = useCurrency();
-  const chartData = data.map((d) => ({
-    ...d,
-    name: formatDateShort(d.date),
-  }));
+function TrendLineChart({ data }: Props) {
+  const { convertAndFormat } = useCurrency();
+  const chartData = useMemo(
+    () =>
+      data.map((d) => ({
+        ...d,
+        name: formatDateShort(d.date),
+      })),
+    [data]
+  );
 
   return (
     <div className="card">
@@ -67,8 +72,8 @@ export default function TrendLineChart({ data }: Props) {
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
             <XAxis dataKey="name" tick={{ fill: "#8888a0", fontSize: 11 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
-            <YAxis tick={{ fill: "#8888a0", fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={(v) => convertAndFormat(v, currency.code)} />
-            <Tooltip content={<CustomTooltip convertAndFormat={convertAndFormat} baseCurrency={currency.code} />} />
+            <YAxis tick={{ fill: "#8888a0", fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={(v) => convertAndFormat(v, "USD")} />
+            <Tooltip content={<CustomTooltip convertAndFormat={convertAndFormat} baseCurrency="USD" />} />
             <Area type="monotone" dataKey="total" fill="url(#lineGradient)" stroke="none" />
             <Line type="monotone" dataKey="total" stroke="#00d2d3" strokeWidth={2.5} dot={false} activeDot={{ r: 5, fill: "#00d2d3", stroke: "var(--bg-primary)", strokeWidth: 2 }} />
           </LineChart>
@@ -77,3 +82,5 @@ export default function TrendLineChart({ data }: Props) {
     </div>
   );
 }
+
+export default memo(TrendLineChart);

@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useMemo } from "react";
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
 } from "recharts";
@@ -45,19 +46,20 @@ function CustomTooltip({
   );
 }
 
-export default function CategoryPieChart({ data, categories }: Props) {
-  const { currency, convertAndFormat } = useCurrency();
-  const catMap = new Map(categories.map((c) => [c.id, c]));
-
-  const chartData = data.map((d) => {
-    const cat = catMap.get(d.category_id);
-    return {
-      name: cat?.name || "Unknown",
-      value: d.amount,
-      percentage: d.percentage,
-      color: cat?.color || FALLBACK_COLORS[d.category_id % FALLBACK_COLORS.length],
-    };
-  });
+function CategoryPieChart({ data, categories }: Props) {
+  const { convertAndFormat } = useCurrency();
+  const chartData = useMemo(() => {
+    const catMap = new Map(categories.map((category) => [category.id, category]));
+    return data.map((entry) => {
+      const category = catMap.get(entry.category_id);
+      return {
+        name: category?.name || "Unknown",
+        value: entry.amount,
+        percentage: entry.percentage,
+        color: category?.color || FALLBACK_COLORS[entry.category_id % FALLBACK_COLORS.length],
+      };
+    });
+  }, [categories, data]);
 
   return (
     <div className="card">
@@ -82,7 +84,7 @@ export default function CategoryPieChart({ data, categories }: Props) {
                   <Cell key={i} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip content={<CustomTooltip convertAndFormat={convertAndFormat} baseCurrency={currency.code} />} />
+              <Tooltip content={<CustomTooltip convertAndFormat={convertAndFormat} baseCurrency="USD" />} />
             </PieChart>
           </ResponsiveContainer>
         </div>
@@ -99,3 +101,5 @@ export default function CategoryPieChart({ data, categories }: Props) {
     </div>
   );
 }
+
+export default memo(CategoryPieChart);

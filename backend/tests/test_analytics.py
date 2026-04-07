@@ -135,3 +135,74 @@ def test_summary_includes_income_and_budget_metrics(client: TestClient):
     overview = budget_overview_response.json()
     assert len(overview) == 1
     assert overview[0]["spent"] == 450.0
+
+
+def test_summary_normalizes_mixed_currency_expenses_and_budgets(client: TestClient):
+    payload = register_user(client)
+    token = payload["access_token"]
+    categories = client.get(
+        "/api/categories/",
+        headers=auth_headers(token),
+    ).json()
+    category_id = categories[0]["id"]
+
+    create_usd_expense = client.post(
+        "/api/expenses/",
+        headers=auth_headers(token),
+        json={
+            "amount": 100.0,
+            "description": "USD expense",
+            "category_id": category_id,
+            "expense_date": "2026-04-01",
+            "currency_code": "USD",
+        },
+    )
+    assert create_usd_expense.status_code == 201
+
+    create_eur_expense = client.post(
+        "/api/expenses/",
+        headers=auth_headers(token),
+        json={
+            "amount": 92.0,
+            "description": "EUR expense",
+            "category_id": category_id,
+            "expense_date": "2026-04-02",
+            "currency_code": "EUR",
+        },
+    )
+    assert create_eur_expense.status_code == 201
+
+    create_budget = client.post(
+        "/api/budgets/",
+        headers=auth_headers(token),
+        json={
+            "amount": 184.0,
+            "currency_code": "EUR",
+            "category_id": category_id,
+            "month_start": "2026-04-01",
+            "note": "EUR budget",
+        },
+    )
+    assert create_budget.status_code == 201
+
+    summary_response = client.get(
+        "/api/analytics/summary",
+        headers=auth_headers(token),
+    )
+    assert summary_response.status_code == 200
+
+    summary = summary_response.json()
+    assert summary["total_this_month"] == 200.0
+    assert summary["total_budget_this_month"] == 200.0
+    assert summary["budget_remaining"] == 0.0
+    assert summary["budget_usage_percent"] == 100.0
+
+
+def test_exchange_rates_response_normalizes_base_currency(client: TestClient):
+    response = client.get("/api/analytics/exchange-rates?base_currency=eur")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["base"] == "EUR"
+    assert isinstance(payload["rates"], dict)
+    assert isinstance(payload["cached"], bool)

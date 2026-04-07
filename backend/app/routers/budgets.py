@@ -50,3 +50,4 @@ def delete_budget(
 ):
     """Delete a budget."""
     BudgetService.delete(db, budget_id, current_user.id)
+    return None
