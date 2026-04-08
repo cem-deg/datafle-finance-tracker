@@ -1,6 +1,7 @@
 """Pydantic schemas for incomes."""
 
 from datetime import date, datetime
+from decimal import Decimal
 from typing import Annotated
 
 from pydantic import BaseModel, Field, field_validator
@@ -11,7 +12,7 @@ from app.services.service_utils import (
     normalize_optional_text,
 )
 
-AmountValue = Annotated[float, Field(gt=0, le=1_000_000_000)]
+AmountValue = Annotated[Decimal, Field(gt=0, le=1_000_000_000, max_digits=12, decimal_places=2)]
 DescriptionText = Annotated[str, Field(min_length=2, max_length=255)]
 SourceText = Annotated[str, Field(min_length=2, max_length=120)]
 
@@ -76,7 +77,7 @@ class IncomeResponse(BaseModel):
     """Schema for income data returned to client."""
 
     id: int
-    amount: float
+    amount: Decimal
     description: str
     income_date: date
     source: str
@@ -84,7 +85,10 @@ class IncomeResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    model_config = {"from_attributes": True}
+    model_config = {
+        "from_attributes": True,
+        "json_encoders": {Decimal: lambda value: float(value)},
+    }
 
 
 class IncomeListResponse(BaseModel):

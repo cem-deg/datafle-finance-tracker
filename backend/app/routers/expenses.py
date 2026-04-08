@@ -1,6 +1,7 @@
 """Expense API endpoints."""
 
 from datetime import date
+from decimal import Decimal
 
 from fastapi import APIRouter, Query
 
@@ -22,8 +23,8 @@ def list_expenses(
     category_id: int | None = None,
     start_date: date | None = None,
     end_date: date | None = None,
-    min_amount: float | None = Query(None, ge=0),
-    max_amount: float | None = Query(None, ge=0),
+    min_amount: Decimal | None = Query(None, ge=0),
+    max_amount: Decimal | None = Query(None, ge=0),
     sort_by: str = Query("date", pattern="^(date|amount)$"),
     sort_order: str = Query("desc", pattern="^(asc|desc)$"),
 ):

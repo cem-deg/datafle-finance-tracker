@@ -1,6 +1,7 @@
 """Expense model for tracking user spending."""
 
 from datetime import date, datetime, timezone
+from decimal import Decimal
 
 from sqlalchemy import (
     Numeric, String, Date, DateTime, Integer, ForeignKey, Text,
@@ -16,7 +17,7 @@ class Expense(Base):
     __tablename__ = "expenses"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    amount: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
+    amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     expense_date: Mapped[date] = mapped_column(Date, nullable=False)
     user_id: Mapped[int] = mapped_column(

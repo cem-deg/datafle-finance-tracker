@@ -1,6 +1,7 @@
 """Income service - business logic for income management."""
 
 from datetime import date
+from decimal import Decimal
 
 from fastapi import status
 from sqlalchemy import desc
@@ -29,8 +30,8 @@ class IncomeService:
         per_page: int = 20,
         start_date: date | None = None,
         end_date: date | None = None,
-        min_amount: float | None = None,
-        max_amount: float | None = None,
+        min_amount: Decimal | None = None,
+        max_amount: Decimal | None = None,
         sort_order: str = "desc",
     ) -> IncomeListResponse:
         """Return paginated and filtered incomes."""

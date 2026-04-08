@@ -153,12 +153,13 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 
 ### 1. Backend Setup
 
-```powershell
+```git bash
 cd backend
-python -m venv venv
-.\venv\Scripts\python.exe -m pip install -r requirements.txt
-.\venv\Scripts\python.exe -m alembic upgrade head
-.\venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
+py -m venv venv
+source venv/Scripts/activate
+pip install -r requirements.txt
+alembic upgrade head
+uvicorn app.main:app --reload --port 8000
 ```
 
 Backend health check:

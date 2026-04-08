@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import date
+from decimal import Decimal
 
 from fastapi import HTTPException, status
 
@@ -63,8 +64,8 @@ def validate_date_range(
 
 
 def validate_amount_range(
-    min_amount: float | None,
-    max_amount: float | None,
+    min_amount: Decimal | None,
+    max_amount: Decimal | None,
 ) -> None:
     """Raise a 400 error when an amount range is invalid."""
     if (

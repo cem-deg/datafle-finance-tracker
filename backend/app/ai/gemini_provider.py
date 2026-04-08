@@ -1,6 +1,6 @@
 """Google Gemini AI provider for personalized financial insights."""
 
-from google import genai
+import google.generativeai as genai
 
 from app.ai.base_provider import BaseAIProvider
 from app.config import settings
@@ -11,12 +11,13 @@ class GeminiProvider(BaseAIProvider):
 
     def __init__(self):
         self._api_key = settings.GEMINI_API_KEY
-        self._client = None
+        self._model = None
         if self._api_key:
-            self._client = genai.Client(api_key=self._api_key)
+            genai.configure(api_key=self._api_key)
+            self._model = genai.GenerativeModel("gemini-2.0-flash")
 
     def is_available(self) -> bool:
-        return bool(self._api_key and self._client)
+        return bool(self._api_key and self._model)
 
     def generate_insight(self, financial_data: dict) -> str:
         if not self.is_available():
@@ -25,10 +26,7 @@ class GeminiProvider(BaseAIProvider):
         prompt = self._build_prompt(financial_data)
 
         try:
-            response = self._client.models.generate_content(
-                model="gemini-2.0-flash",
-                contents=prompt,
-            )
+            response = self._model.generate_content(prompt)
             return response.text
         except Exception as exc:
             return f"AI insight generation failed: {str(exc)}"

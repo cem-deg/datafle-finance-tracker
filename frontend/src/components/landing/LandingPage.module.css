@@ -711,6 +711,21 @@
   margin-bottom: 1rem;
 }
 
+.panelIconOverview {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.panelIconInsight {
+  background: var(--color-secondary-soft);
+  color: var(--color-secondary);
+}
+
+.panelIconControl {
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+}
+
 .panelCard h3,
 .valueCard h3,
 .workflowCard h3,
@@ -1106,6 +1121,32 @@
 [data-theme="light"] .pricingCard p,
 [data-theme="light"] .footer {
   color: rgba(20, 32, 51, 0.82);
+}
+
+[data-theme="light"] .kicker,
+[data-theme="light"] .phoneEyebrow,
+[data-theme="light"] .phoneChartHeader span,
+[data-theme="light"] .phoneCardTitle,
+[data-theme="light"] .phoneMiniStat span,
+[data-theme="light"] .phoneNavPill,
+[data-theme="light"] .comparisonLabel,
+[data-theme="light"] .barGroup span,
+[data-theme="light"] .trustHeading,
+[data-theme="light"] .pricingLabel,
+[data-theme="light"] .mockupFloating span,
+[data-theme="light"] .workflowStep {
+  color: rgba(20, 32, 51, 0.68);
+}
+
+[data-theme="light"] .proofChip,
+[data-theme="light"] .heroChip,
+[data-theme="light"] .mockupStat,
+[data-theme="light"] .workflowStep,
+[data-theme="light"] .phoneNavPill,
+[data-theme="light"] .trustVisual,
+[data-theme="light"] .phoneMiniStat {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(15, 23, 42, 0.08);
 }
 
 [data-theme="light"] .metricCard,

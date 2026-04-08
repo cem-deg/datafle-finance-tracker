@@ -36,6 +36,9 @@ class Settings:
     )
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
     EXCHANGE_API_KEY: str = os.getenv("EXCHANGE_API_KEY", "")
+    ENABLE_LIVE_EXCHANGE_RATES: bool = _parse_bool(
+        os.getenv("ENABLE_LIVE_EXCHANGE_RATES"), default=False
+    )
     AUTO_CREATE_TABLES: bool = _parse_bool(
         os.getenv("AUTO_CREATE_TABLES"), default=False
     )

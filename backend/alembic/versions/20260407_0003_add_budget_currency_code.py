@@ -16,11 +16,39 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.add_column(
-        "budgets",
-        sa.Column("currency_code", sa.String(length=3), nullable=False, server_default="USD"),
-    )
-    op.alter_column("budgets", "currency_code", server_default=None)
+    bind = op.get_bind()
+
+    if bind.dialect.name == "sqlite":
+        with op.batch_alter_table("budgets", recreate="always") as batch_op:
+            batch_op.add_column(
+                sa.Column(
+                    "currency_code",
+                    sa.String(length=3),
+                    nullable=False,
+                    server_default="USD",
+                )
+            )
+            batch_op.alter_column(
+                "currency_code",
+                existing_type=sa.String(length=3),
+                server_default=None,
+            )
+    else:
+        op.add_column(
+            "budgets",
+            sa.Column(
+                "currency_code",
+                sa.String(length=3),
+                nullable=False,
+                server_default="USD",
+            ),
+        )
+        op.alter_column(
+            "budgets",
+            "currency_code",
+            existing_type=sa.String(length=3),
+            server_default=None,
+        )
 
 
 def downgrade() -> None:

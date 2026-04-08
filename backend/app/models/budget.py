@@ -1,6 +1,7 @@
 """Budget model for monthly category limits."""
 
 from datetime import date, datetime, timezone
+from decimal import Decimal
 
 from sqlalchemy import Date, DateTime, ForeignKey, Integer, Numeric, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -17,7 +18,7 @@ class Budget(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    amount: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
+    amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     currency_code: Mapped[str] = mapped_column(String(3), nullable=False, default="USD")
     month_start: Mapped[date] = mapped_column(Date, nullable=False)
     note: Mapped[str | None] = mapped_column(String(255), nullable=True)

@@ -1,6 +1,7 @@
 """Pydantic schemas for budgets."""
 
 from datetime import date, datetime
+from decimal import Decimal
 from typing import Annotated
 
 from pydantic import BaseModel, Field, field_validator
@@ -13,7 +14,7 @@ from app.services.service_utils import (
 
 from app.schemas.category import CategoryResponse
 
-AmountValue = Annotated[float, Field(gt=0, le=1_000_000_000)]
+AmountValue = Annotated[Decimal, Field(gt=0, le=1_000_000_000, max_digits=12, decimal_places=2)]
 NoteText = Annotated[str, Field(min_length=2, max_length=255)]
 
 
@@ -69,7 +70,7 @@ class BudgetResponse(BaseModel):
     """Schema for budget data returned to client."""
 
     id: int
-    amount: float
+    amount: Decimal
     currency_code: str
     month_start: date
     category_id: int
@@ -78,4 +79,7 @@ class BudgetResponse(BaseModel):
     updated_at: datetime
     category: CategoryResponse
 
-    model_config = {"from_attributes": True}
+    model_config = {
+        "from_attributes": True,
+        "json_encoders": {Decimal: lambda value: float(value)},
+    }

@@ -1,6 +1,7 @@
 """Income API endpoints."""
 
 from datetime import date
+from decimal import Decimal
 
 from fastapi import APIRouter, Query
 
@@ -24,8 +25,8 @@ def list_incomes(
     per_page: int = Query(20, ge=1, le=100),
     start_date: date | None = None,
     end_date: date | None = None,
-    min_amount: float | None = Query(None, ge=0),
-    max_amount: float | None = Query(None, ge=0),
+    min_amount: Decimal | None = Query(None, ge=0),
+    max_amount: Decimal | None = Query(None, ge=0),
     sort_order: str = Query("desc", pattern="^(asc|desc)$"),
 ):
     """Return paginated and filtered incomes."""

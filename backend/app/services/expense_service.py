@@ -1,6 +1,7 @@
 """Expense service - business logic for expense management."""
 
 from datetime import date
+from decimal import Decimal
 
 from fastapi import status
 from sqlalchemy import desc
@@ -45,8 +46,8 @@ class ExpenseService:
         category_id: int | None = None,
         start_date: date | None = None,
         end_date: date | None = None,
-        min_amount: float | None = None,
-        max_amount: float | None = None,
+        min_amount: Decimal | None = None,
+        max_amount: Decimal | None = None,
         sort_by: str = "date",
         sort_order: str = "desc",
     ) -> ExpenseListResponse:

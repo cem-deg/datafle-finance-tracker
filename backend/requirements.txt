@@ -14,3 +14,4 @@ alembic
 requests
 pytest
 psycopg[binary]
+httpx

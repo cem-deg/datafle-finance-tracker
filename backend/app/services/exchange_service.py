@@ -55,7 +55,7 @@ class ExchangeRateService:
         # Try to fetch from API
         api_key = settings.EXCHANGE_API_KEY
 
-        if api_key:
+        if api_key and settings.ENABLE_LIVE_EXCHANGE_RATES:
             rates = cls._fetch_from_api(base_currency, api_key)
             if rates:
                 cls._cached_rates[base_currency] = rates
