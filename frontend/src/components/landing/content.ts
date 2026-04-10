@@ -1,5 +1,7 @@
 export type FeatureIconKey = "overview" | "insight" | "control";
 export type ValueIconKey = "signal" | "premium" | "security";
+export type TrustStripIconKey = "overview" | "budget" | "clarity";
+export type ValueShowcaseTheme = "expenses" | "budgets" | "awareness";
 
 export interface FeaturePanel {
   title: string;
@@ -46,6 +48,18 @@ export interface PricingPlan {
   description: string;
   points: string[];
   highlight: boolean;
+}
+
+export interface TrustStripItem {
+  title: string;
+  text: string;
+  icon: TrustStripIconKey;
+}
+
+export interface ValueShowcaseItem {
+  title: string;
+  text: string;
+  theme: ValueShowcaseTheme;
 }
 
 export const FEATURE_PANELS: FeaturePanel[] = [
@@ -112,6 +126,42 @@ export const TRUST_METRICS: TrustMetric[] = [
   { value: "3x", label: "stronger first-screen product impression" },
   { value: "<60s", label: "to understand balance, budgets, and spending pressure" },
   { value: "1", label: "clear workspace for income, expenses, and growth" },
+];
+
+export const TRUST_STRIP_ITEMS: TrustStripItem[] = [
+  {
+    title: "All core numbers together",
+    text: "Income, spending, and balance stay in one view.",
+    icon: "overview",
+  },
+  {
+    title: "Budget pressure, early",
+    text: "See category drift before it becomes overspending.",
+    icon: "budget",
+  },
+  {
+    title: "Clean signals, not noise",
+    text: "Readable insights and a calm daily workflow.",
+    icon: "clarity",
+  },
+];
+
+export const VALUE_SHOWCASE_ITEMS: ValueShowcaseItem[] = [
+  {
+    title: "Expense Tracking",
+    text: "Capture every outflow in one clear view.",
+    theme: "expenses",
+  },
+  {
+    title: "Budget Control",
+    text: "See limits, usage, and room left instantly.",
+    theme: "budgets",
+  },
+  {
+    title: "Financial Awareness",
+    text: "Read the trend before it becomes pressure.",
+    theme: "awareness",
+  },
 ];
 
 export const READINESS_POINTS: string[] = [
