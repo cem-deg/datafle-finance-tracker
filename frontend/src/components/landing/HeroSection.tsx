@@ -35,10 +35,7 @@ export default function HeroSection({ heroParallax, phoneActivity }: HeroSection
       <div className={`${styles.heroOrb} ${styles.orbThree}`} />
 
       <div className={styles.heroGrid}>
-        <div
-          className={`${styles.heroCopy} ${isVisible ? styles.heroRevealed : ""}`}
-          style={{ transform: `translate3d(0, ${heroParallax * -0.1 + (isVisible ? 0 : 26)}px, 0)` }}
-        >
+        <div className={`${styles.heroCopy} ${isVisible ? styles.heroRevealed : ""}`}>
           <div className={styles.heroEyebrow}>
             <span className={styles.heroEyebrowIcon}>
               <Sparkles size={14} strokeWidth={2.2} />

@@ -1,25 +1,22 @@
-import Link from "next/link";
 import {
-  CheckCircle2,
   Gauge,
   LayoutDashboard,
   Sparkles,
 } from "lucide-react";
 
 import ScrollReveal from "./ScrollReveal";
+import LandingFooter from "./LandingFooter";
 import LandingHowItWorksSection from "./LandingHowItWorksSection";
-import LandingProductSpotlightSection from "./LandingProductSpotlightSection";
+import LandingPricingTeaserSection from "./LandingPricingTeaserSection";
 import type { TrustStripItem } from "./content";
 import LandingValueShowcaseSection from "./LandingValueShowcaseSection";
 import styles from "./LandingPage.module.css";
 
 interface LandingSectionsProps {
-  mockupParallax?: number;
   trustStripItems: TrustStripItem[];
 }
 
 export default function LandingSections({
-  mockupParallax = 0,
   trustStripItems,
 }: LandingSectionsProps) {
   const trustStripIcons = {
@@ -54,44 +51,8 @@ export default function LandingSections({
 
       <LandingValueShowcaseSection />
       <LandingHowItWorksSection />
-
-      <LandingProductSpotlightSection mockupParallax={mockupParallax} />
-
-      <section className="features-section" id="pricing">
-        <ScrollReveal>
-          <div className="section-header">
-            <h2>Start without friction</h2>
-            <p>Core tracking, budgets, analytics, and insights are available from day one.</p>
-          </div>
-          <div className="feature-card landing-plan-card">
-            <h3>Free plan</h3>
-            <p>Track expenses and income, manage budgets, and view analytics and insights with no paywall.</p>
-            <p className="mt-md">
-              <CheckCircle2 size={16} /> Unlimited entries and categories
-            </p>
-            <p className="mt-sm">
-              <CheckCircle2 size={16} /> Budget and dashboard modules included
-            </p>
-            <p className="mt-sm">
-              <CheckCircle2 size={16} /> Rule-based and AI insight modes
-            </p>
-            <div className="hero-actions mt-lg">
-              <Link href="/register" className="btn btn-primary">
-                Create account
-              </Link>
-              <Link href="/login" className="btn btn-secondary">
-                Sign in
-              </Link>
-            </div>
-          </div>
-        </ScrollReveal>
-      </section>
-
-      <footer className="landing-footer">
-        <ScrollReveal>
-          <p>&copy; {new Date().getFullYear()} Datafle. Precision, polish, and control for modern personal finance.</p>
-        </ScrollReveal>
-      </footer>
+      <LandingPricingTeaserSection />
+      <LandingFooter />
     </>
   );
 }

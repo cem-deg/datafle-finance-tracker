@@ -27,7 +27,5 @@ export default function LandingPage() {
   if (isLoading || user) return null;
 
   const heroParallax = Math.min(scrollY * 0.12, 28);
-  const mockupParallax = Math.min(scrollY * 0.08, 24);
-
-  return <LandingPageContent heroParallax={heroParallax} mockupParallax={mockupParallax} />;
+  return <LandingPageContent heroParallax={heroParallax} />;
 }
