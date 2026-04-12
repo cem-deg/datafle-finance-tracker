@@ -1004,6 +1004,14 @@
 
 /* === Light-mode overrides === */
 
+[data-theme="dark"] .savingStepsHeading {
+  color: rgba(248, 250, 252, 0.96);
+}
+
+[data-theme="dark"] .savingStepsIntro {
+  color: rgba(226, 232, 240, 0.82);
+}
+
 [data-theme="light"] .savingStepsHeading {
   color: #142033;
 }

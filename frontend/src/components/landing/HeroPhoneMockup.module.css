@@ -310,10 +310,35 @@
 
 /* ─── [data-theme="light"] — split from LandingPage.module.css L3089 ── */
 
+[data-theme="dark"] .heroPhoneScreen {
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.1), transparent 34%),
+    linear-gradient(180deg, rgba(203, 213, 225, 0.48) 0%, rgba(148, 163, 184, 0.28) 100%);
+}
+
+[data-theme="dark"] .heroPhoneBalanceCard,
+[data-theme="dark"] .heroPhoneMiniCard,
+[data-theme="dark"] .heroPhoneChartCard {
+  background:
+    linear-gradient(180deg, rgba(241, 245, 249, 0.18), rgba(148, 163, 184, 0.08) 42%, rgba(15, 23, 42, 0.06) 100%),
+    rgba(148, 163, 184, 0.16);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+[data-theme="dark"] .heroPhoneChart {
+  background:
+    linear-gradient(180deg, rgba(241, 245, 249, 0.16), rgba(148, 163, 184, 0.08)),
+    rgba(148, 163, 184, 0.14);
+}
+
+[data-theme="dark"] .heroPhoneTabBar {
+  background: rgba(203, 213, 225, 0.28);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
 [data-theme="light"] .heroPhoneBalanceCard,
 [data-theme="light"] .heroPhoneMiniCard,
-[data-theme="light"] .heroPhoneChartCard,
-[data-theme="light"] .heroPhoneActivityCard {
+[data-theme="light"] .heroPhoneChartCard {
   background: var(--landing-glass-surface-soft);
   border-color: var(--landing-glass-border-soft);
   box-shadow: var(--landing-glass-shadow-soft);
@@ -354,16 +379,14 @@
 /* ─── @media (max-width: 480px) — from LandingPage.module.css L3374 ── */
 
 @media (max-width: 480px) {
-  .heroPhoneCardHeader,
-  .heroPhoneActivityRow {
+  .heroPhoneCardHeader {
     align-items: flex-start;
     flex-direction: column;
   }
 
   .heroPhoneBalanceCard,
   .heroPhoneMiniCard,
-  .heroPhoneChartCard,
-  .heroPhoneActivityCard {
+  .heroPhoneChartCard {
     border-radius: 20px;
   }
 

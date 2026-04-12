@@ -227,6 +227,18 @@
   opacity: 0.92;
 }
 
+[data-theme="dark"] .pricingTeaserEyebrow {
+  color: rgba(226, 232, 240, 0.82);
+}
+
+[data-theme="dark"] .pricingTeaserTitle {
+  color: rgba(248, 250, 252, 0.96);
+}
+
+[data-theme="dark"] .pricingTeaserSubtitle {
+  color: rgba(226, 232, 240, 0.82);
+}
+
 @media (max-width: 768px) {
   .pricingTeaserSection {
     padding-left: var(--space-md);
