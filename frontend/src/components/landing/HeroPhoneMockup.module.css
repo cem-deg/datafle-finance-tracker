@@ -1,0 +1,373 @@
+.heroPhoneMockup {
+  position: absolute;
+  left: 40px; /* Biraz daha sola */
+  right: auto;
+  top: 230px; /* 20px daha aşağı kaydırıldı */
+  bottom: auto; 
+  width: 250px; /* İç oranları ve genişliği korunur */
+  z-index: 2;
+  transform: scale(0.75); /* Telefon daha da küçültüldü */
+  transform-origin: top left;
+}
+
+.heroPhoneSideButton {
+  position: absolute;
+  top: 118px;
+  left: -3px;
+  width: 4px;
+  height: 44px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #f0f4fa 0%, #c4ced9 100%);
+  box-shadow:
+    0 0 0 1px rgba(100, 116, 139, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.heroPhoneSideButtonLower {
+  top: 176px;
+  height: 64px;
+}
+
+.heroPhoneFrame {
+  position: relative;
+  padding: 9px;
+  border-radius: 38px;
+  background:
+    linear-gradient(180deg, rgba(71, 85, 105, 0.92), rgba(31, 41, 55, 0.96)),
+    #1f2937;
+  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.24);
+}
+
+.heroPhoneFrame::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  pointer-events: none;
+}
+
+.heroPhoneNotch {
+  position: absolute;
+  top: 18px; /* İkonlarla dikey eksende eşit hizaya gelecek şekilde aşağı indirildi */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 76px; /* % yerine px ile çakışmayı önledik */
+  height: 22px;
+  border-radius: 999px;
+  background: #020304;
+  z-index: 2;
+}
+
+.heroPhoneScreen {
+  position: relative;
+  min-height: 500px; /* Telefon ekranını dev gibi uzattık (gerçek oran) */
+  border-radius: 28px;
+  padding: 3.2rem 0.65rem 0.65rem;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.18), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(226, 232, 240, 0.74) 100%);
+}
+
+.heroPhoneStatusBar {
+  position: absolute;
+  top: 14px;
+  left: 18px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: rgba(20, 32, 51, 0.88);
+  font-size: 0.68rem;
+  z-index: 10;
+}
+
+.heroPhoneStatusIcons {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.heroPhoneBattery {
+  width: 18px;
+  height: 10px;
+  padding: 1px;
+  border: 1.5px solid currentColor;
+  border-radius: 3px;
+  position: relative;
+}
+
+.heroPhoneBattery::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  right: -3px;
+  width: 2px;
+  height: 4px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.heroPhoneBattery span {
+  display: block;
+  width: 76%;
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #10b981 0%, #00a3a3 100%);
+}
+
+.heroPhoneBalanceCard {
+  background: var(--landing-glass-surface-soft);
+  border: 1px solid var(--landing-glass-border-soft);
+  box-shadow: var(--landing-glass-shadow-soft);
+}
+
+.heroPhoneBalanceCard {
+  padding: 0.58rem;
+  border-radius: 22px;
+}
+
+.heroPhoneBalanceCard span {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--landing-text-muted);
+}
+
+.heroPhoneBalanceCard strong {
+  display: block;
+  margin: 0.18rem 0 0.12rem;
+  font-size: 1.3rem;
+  color: var(--landing-text-strong);
+  letter-spacing: -0.04em;
+}
+
+.heroPhoneBalanceCard p {
+  margin: 0;
+  font-size: 0.66rem;
+  color: var(--landing-text-muted);
+}
+
+.heroPhoneCompactStats {
+  display: flex;
+  align-items: center;
+  gap: 0.38rem;
+  margin: 0.38rem 0;
+}
+
+.heroPhoneMiniCard {
+  background: var(--landing-glass-surface-soft);
+  border: 1px solid var(--landing-glass-border-soft);
+  box-shadow: var(--landing-glass-shadow-soft);
+}
+
+.heroPhoneMiniCard {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 18px;
+}
+
+.heroPhoneMiniCard span {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--landing-text-muted);
+}
+
+.heroPhoneMiniCard strong {
+  display: block;
+  margin-top: 0.14rem;
+  font-size: 0.78rem;
+  color: var(--landing-text-strong);
+  letter-spacing: -0.04em;
+}
+
+.heroPhoneChartCard {
+  background: var(--landing-glass-surface-soft);
+  border: 1px solid var(--landing-glass-border-soft);
+  box-shadow: var(--landing-glass-shadow-soft);
+}
+
+.heroPhoneChartCard {
+  padding: 0.58rem;
+  border-radius: 22px;
+}
+
+.heroPhoneChartCard {
+  margin-bottom: 0.38rem;
+}
+
+.heroPhoneCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.heroPhoneCardHeader span {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--landing-text-muted);
+}
+
+.heroPhoneCardHeader strong {
+  color: var(--landing-text-strong);
+  letter-spacing: -0.04em;
+}
+
+.heroPhoneLiveBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.68rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(239, 199, 98, 0.18);
+  color: #8d632d;
+  white-space: nowrap;
+}
+
+.heroPhoneChart {
+  position: relative;
+  height: 68px;
+  margin-top: 0.42rem;
+  border-radius: 18px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(226, 232, 240, 0.12)),
+    rgba(255, 255, 255, 0.18);
+}
+
+.heroPhoneChart::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(20, 32, 51, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(20, 32, 51, 0.04) 1px, transparent 1px);
+  background-size: 100% 24px, 40px 100%;
+}
+
+.heroPhoneChartLine {
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  height: 2px;
+  border-radius: 999px;
+  animation: chartDrift 4.8s ease-in-out infinite;
+}
+
+.heroPhoneChartLineOne {
+  top: 34%;
+  background: linear-gradient(90deg, transparent 0%, #d4a74d 20%, #53718e 72%, transparent 100%);
+}
+
+.heroPhoneChartLineTwo {
+  top: 62%;
+  background: linear-gradient(90deg, transparent 0%, #8d632d 18%, #d4a74d 65%, transparent 100%);
+  animation-delay: -1.25s;
+}
+
+.heroPhoneTabBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  margin-top: 0.34rem;
+  padding: 0.28rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.48);
+  border: 1px solid rgba(20, 32, 51, 0.06);
+}
+
+.heroPhoneTabBar span {
+  flex: 1;
+  text-align: center;
+  padding: 0.3rem 0.18rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  color: rgba(20, 32, 51, 0.56);
+}
+
+.heroPhoneTabActive {
+  background: linear-gradient(135deg, rgba(239, 199, 98, 0.22), rgba(83, 113, 142, 0.14));
+  color: #162033 !important;
+  font-weight: 700;
+}
+
+/* ─── @media (max-width: 768px) — from LandingPage.module.css L1184 ── */
+
+@media (max-width: 768px) {
+  .heroPhoneMockup {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: 220px;
+    transform: none;
+  }
+}
+
+/* ─── [data-theme="light"] — split from LandingPage.module.css L3089 ── */
+
+[data-theme="light"] .heroPhoneBalanceCard,
+[data-theme="light"] .heroPhoneMiniCard,
+[data-theme="light"] .heroPhoneChartCard,
+[data-theme="light"] .heroPhoneActivityCard {
+  background: var(--landing-glass-surface-soft);
+  border-color: var(--landing-glass-border-soft);
+  box-shadow: var(--landing-glass-shadow-soft);
+}
+
+/* ─── @media (max-width: 900px) — from LandingPage.module.css L3132 ── */
+
+@media (max-width: 900px) {
+  .heroPhoneMockup {
+    right: 8px;
+    transform: scale(0.94);
+    transform-origin: top right;
+  }
+}
+
+/* ─── @media (max-width: 768px) — from LandingPage.module.css L3201 ── */
+
+@media (max-width: 768px) {
+  .heroPhoneMockup {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    width: min(100%, 540px);
+    margin: 0 auto;
+    transform: none;
+  }
+
+  .heroPhoneMockup {
+    width: min(100%, 320px);
+  }
+
+  .heroPhoneFrame {
+    max-width: 100%;
+  }
+}
+
+/* ─── @media (max-width: 480px) — from LandingPage.module.css L3374 ── */
+
+@media (max-width: 480px) {
+  .heroPhoneCardHeader,
+  .heroPhoneActivityRow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .heroPhoneBalanceCard,
+  .heroPhoneMiniCard,
+  .heroPhoneChartCard,
+  .heroPhoneActivityCard {
+    border-radius: 20px;
+  }
+
+  .heroPhoneScreen {
+    min-height: 520px;
+  }
+}

@@ -80,3 +80,52 @@ merged
 
 ### Notes
 FAQ is no longer an orphan page and now aligns with the static page system. Future improvement: consider scroll-margin-top if deep linking is added.
+
+### Task Title
+Extract How It Works section into dedicated module (complete extraction)
+
+### Date
+2026-04-12
+
+### Summary
+Completed full extraction of the "How It Works" (savingSteps) section from LandingPage.module.css into a dedicated HowItWorks.module.css file. The process was executed in phased steps (base, light-mode, responsive, and final switch) to minimize risk and preserve behavior.
+
+### Changed Files
+- src/components/landing/HowItWorks.module.css
+- src/components/landing/LandingHowItWorksSection.tsx
+- src/components/landing/LandingPage.module.css
+
+### Claude Notes
+Performed a controlled, phased extraction:
+- Moved all .savingSteps* base styles
+- Extracted all light-mode overrides with surgical splitting of mixed selector blocks
+- Extracted responsive rules and prefers-reduced-motion logic
+- Moved all related keyframes (savingStepsStageIn, savingStepsConfettiBurst, savingStepsConfettiAura, moneyFloat)
+- Switched component import to HowItWorks.module.css
+- Removed all remaining savingSteps-related styles and keyframes from LandingPage.module.css
+
+Confirmed zero remaining savingSteps references in LandingPage.module.css.
+
+### Gemini Review
+
+**Critical Issues**
+- none
+
+**Medium Issues**
+- none
+
+**Minor Issues**
+- none
+
+**Safe to Merge**
+Yes
+
+### Decision
+merged
+
+### Notes
+- Section is now fully modular and decoupled from LandingPage.module.css
+- All animation systems (IntersectionObserver, stagger reveal, confetti, reduced-motion) preserved
+- No dual-import bridge required (unlike ValueShowcase)
+- Extraction significantly reduces complexity and size of LandingPage.module.css
+- Future work: continue phased extraction for remaining landing sections (e.g., mockups)

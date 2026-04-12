@@ -2,7 +2,7 @@
 
 import { TrendingUp } from "lucide-react";
 
-import styles from "./LandingPage.module.css";
+import styles from "./HeroDashboardMockup.module.css";
 
 export default function HeroDashboardMockup() {
   return (

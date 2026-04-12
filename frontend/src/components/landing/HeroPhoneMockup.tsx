@@ -3,7 +3,7 @@
 import { Signal, Wifi } from "lucide-react";
 
 import type { PhoneActivityItem } from "./content";
-import styles from "./LandingPage.module.css";
+import styles from "./HeroPhoneMockup.module.css";
 
 interface HeroPhoneMockupProps {
   phoneActivity: PhoneActivityItem[];

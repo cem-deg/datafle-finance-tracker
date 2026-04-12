@@ -1,0 +1,405 @@
+.heroDashboardMockup {
+  position: absolute;
+  right: -160px; /* Biraz daha sağa kaydırıldı */
+  left: auto;
+  top: 0px; 
+  width: 720px;
+  height: 450px;
+  z-index: 1;
+  overflow: hidden;
+  padding: 1.15rem;
+  border-radius: 32px;
+  background: var(--landing-glass-surface-strong);
+  border: 1px solid var(--landing-glass-border);
+  box-shadow: var(--landing-glass-shadow-strong);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  transform: perspective(1200px) rotateX(3deg);
+}
+
+.heroDashboardChrome {
+  display: flex;
+  gap: 0.38rem;
+  margin-bottom: 0.65rem;
+}
+
+.heroDashboardChrome span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(148, 163, 184, 0.45);
+}
+
+.heroDashboardChrome span:first-child {
+  background: rgba(239, 199, 98, 0.9);
+}
+
+.heroDashboardChrome span:nth-child(2) {
+  background: rgba(246, 173, 85, 0.72);
+}
+
+.heroDashboardChrome span:nth-child(3) {
+  background: rgba(83, 113, 142, 0.42);
+}
+
+.heroDashboardHeader {
+  margin-bottom: 0.65rem;
+}
+
+.heroDashboardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.heroDashboardLabel {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--landing-text-muted);
+}
+
+.heroDashboardHeader h3 {
+  margin: 0.16rem 0 0;
+  font-size: 1.38rem;
+}
+
+.heroDashboardHeader h3 {
+  color: var(--landing-text-strong);
+  letter-spacing: -0.04em;
+}
+
+.heroDashboardStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.68rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(239, 199, 98, 0.18);
+  color: #8d632d;
+  white-space: nowrap;
+}
+
+.heroDashboardMetrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.56rem;
+}
+
+.heroDashboardMetricCard {
+  background: var(--landing-glass-surface-soft);
+  border: 1px solid var(--landing-glass-border-soft);
+  box-shadow: var(--landing-glass-shadow-soft);
+}
+
+.heroDashboardMetricCard {
+  padding: 0.64rem 0.72rem;
+  border-radius: 22px;
+}
+
+.heroDashboardMetricCard strong {
+  display: block;
+  margin-top: 0.14rem;
+  font-size: 1.08rem;
+}
+
+.heroDashboardMetricCard strong {
+  color: var(--landing-text-strong);
+  letter-spacing: -0.04em;
+}
+
+.heroDashboardMetricCard small {
+  display: block;
+  margin-top: 0.18rem;
+  font-size: 0.67rem;
+  line-height: 1.28;
+  color: rgba(20, 32, 51, 0.56);
+}
+
+.heroDashboardBody {
+  display: grid;
+  grid-template-columns: minmax(130px, 0.42fr) minmax(0, 1.58fr);
+  gap: 0.56rem;
+  margin-bottom: 0.56rem;
+}
+
+.heroDashboardPrimary {
+  background: var(--landing-glass-surface-soft);
+  border: 1px solid var(--landing-glass-border-soft);
+  box-shadow: var(--landing-glass-shadow-soft);
+}
+
+.heroDashboardPrimary {
+  padding: 0.68rem;
+  border-radius: 24px;
+}
+
+.heroDashboardPrimary {
+  background: var(--landing-glass-surface-soft);
+}
+
+.heroDashboardSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.heroDashboardSectionHeader span {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--landing-text-muted);
+}
+
+.heroDashboardSectionHeader strong {
+  color: var(--landing-text-strong);
+  letter-spacing: -0.04em;
+}
+
+.heroDashboardPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.68rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(239, 199, 98, 0.18);
+  color: #8d632d;
+  white-space: nowrap;
+}
+
+.heroDashboardChart {
+  position: relative;
+  height: 108px;
+  margin-top: 0.46rem;
+  border-radius: 20px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(226, 232, 240, 0.12)),
+    rgba(255, 255, 255, 0.18);
+}
+
+.heroDashboardChart::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(20, 32, 51, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(20, 32, 51, 0.04) 1px, transparent 1px);
+  background-size: 100% 24px, 40px 100%;
+}
+
+.heroDashboardChartLine {
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  height: 2px;
+  border-radius: 999px;
+  animation: chartDrift 4.8s ease-in-out infinite;
+}
+
+.heroDashboardChartLineOne {
+  top: 24%;
+  background: linear-gradient(90deg, transparent 0%, #d4a74d 20%, #243a58 76%, transparent 100%);
+}
+
+.heroDashboardChartLineTwo {
+  top: 49%;
+  background: linear-gradient(90deg, transparent 0%, #7d5a3f 18%, #d4a74d 68%, transparent 100%);
+  animation-delay: -1.2s;
+}
+
+.heroDashboardChartLineThree {
+  top: 72%;
+  background: linear-gradient(90deg, transparent 0%, #54718f 16%, #8da4bb 70%, transparent 100%);
+  animation-delay: -2.1s;
+}
+
+.heroDashboardSummaryRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.46rem;
+  margin-top: 0.46rem;
+}
+
+.heroDashboardSummaryCard {
+  padding: 0.5rem 0.58rem;
+  border-radius: 18px;
+  background: rgba(246, 249, 252, 0.96);
+  border: 1px solid rgba(20, 32, 51, 0.06);
+}
+
+.heroDashboardSummaryCard strong {
+  display: block;
+  margin-top: 0.12rem;
+  font-size: 0.86rem;
+}
+
+.heroDashboardSummaryCard strong {
+  color: var(--landing-text-strong);
+  letter-spacing: -0.04em;
+}
+
+.heroDashboardSidebarRail {
+  display: grid;
+  gap: 0.62rem;
+  align-content: start;
+}
+
+.heroDashboardGlassColumn {
+  display: grid;
+  gap: 0.48rem;
+  height: 100%;
+}
+
+.heroDashboardGlassSurface {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.56);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0.18)),
+    rgba(245, 248, 251, 0.68);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 12px 28px rgba(15, 23, 42, 0.04);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.heroDashboardGlassSurface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.62), transparent 44%),
+    radial-gradient(circle at top right, rgba(239, 199, 98, 0.14), transparent 34%);
+  pointer-events: none;
+}
+
+.heroDashboardGlassSurface {
+  min-height: 68px;
+}
+
+.heroDashboardGlassSurfaceTall {
+  min-height: 136px;
+}
+
+/* ─── @media (max-width: 768px) — from LandingPage.module.css L1184 ── */
+
+@media (max-width: 768px) {
+  .heroDashboardMockup {
+    position: relative;
+    right: auto;
+    left: auto;
+    bottom: auto;
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    min-height: 340px;
+    transform: none;
+  }
+}
+
+/* ─── [data-theme="light"] — split from LandingPage.module.css L3089 ── */
+
+[data-theme="light"] .heroDashboardMockup,
+[data-theme="light"] .heroDashboardMetricCard,
+[data-theme="light"] .heroDashboardPrimary,
+[data-theme="light"] .heroDashboardInsightCard,
+[data-theme="light"] .heroDashboardAccountsCard,
+[data-theme="light"] .heroDashboardTableCard {
+  background: var(--landing-glass-surface-soft);
+  border-color: var(--landing-glass-border-soft);
+  box-shadow: var(--landing-glass-shadow-soft);
+}
+
+/* ─── [data-theme="light"] — split from LandingPage.module.css L3111 ── */
+
+[data-theme="light"] .heroDashboardMockup {
+  background: var(--landing-glass-surface);
+  border-color: var(--landing-glass-border);
+  box-shadow: var(--landing-glass-shadow);
+}
+
+/* ─── @media (max-width: 900px) — from LandingPage.module.css L3132 ── */
+
+@media (max-width: 900px) {
+  .heroDashboardMockup {
+    width: min(100%, 560px);
+  }
+
+  .heroDashboardMetrics,
+  .heroDashboardSummaryRow,
+  .heroDashboardBody {
+    grid-template-columns: 1fr;
+  }
+
+  .heroDashboardShell {
+    grid-template-columns: 132px minmax(0, 1fr);
+  }
+
+  .heroDashboardSurface {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── @media (max-width: 768px) — from LandingPage.module.css L3201 ── */
+
+@media (max-width: 768px) {
+  .heroDashboardMockup {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    width: min(100%, 540px);
+    margin: 0 auto;
+    transform: none;
+  }
+
+  .heroDashboardShell {
+    grid-template-columns: 1fr;
+  }
+
+  .heroDashboardSidebar {
+    grid-template-columns: 1fr;
+    padding: 0;
+  }
+
+  .heroDashboardSurface {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── @media (max-width: 480px) — from LandingPage.module.css L3374 ── */
+
+@media (max-width: 480px) {
+  .heroDashboardMockup {
+    padding: 0.85rem;
+    border-radius: 26px;
+  }
+
+  .heroDashboardHeader,
+  .heroDashboardSectionHeader,
+  .heroDashboardTableHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .heroDashboardHeader h3 {
+    font-size: 1.35rem;
+  }
+
+  .heroDashboardMetricCard,
+  .heroDashboardPrimary,
+  .heroDashboardInsightCard,
+  .heroDashboardAccountsCard,
+  .heroDashboardTableCard {
+    border-radius: 20px;
+  }
+
+}

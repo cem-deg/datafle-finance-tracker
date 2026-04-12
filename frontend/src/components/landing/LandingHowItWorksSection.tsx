@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from "react";
 
-import styles from "./LandingPage.module.css";
+import styles from "./HowItWorks.module.css";
 
 type SavingStep = {
   step: string;
