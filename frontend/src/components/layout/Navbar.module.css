@@ -493,19 +493,138 @@
   }
 }
 
-[data-theme="dark"] .navbar,
-[data-theme="dark"] .mobilePanel {
+[data-theme="dark"] .navbar {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03) 42%, rgba(255, 255, 255, 0.01) 100%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(148, 163, 184, 0.04) 52%, rgba(100, 116, 139, 0.02) 100%),
+    rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
   box-shadow:
-    0 24px 56px rgba(0, 0, 0, 0.22),
-    0 1px 0 rgba(255, 255, 255, 0.64) inset,
-    0 -14px 24px rgba(148, 163, 184, 0.1) inset;
+    0 24px 56px rgba(0, 0, 0, 0.32),
+    0 1px 0 rgba(255, 255, 255, 0.1) inset,
+    0 -14px 24px rgba(0, 0, 0, 0.12) inset;
+}
+
+[data-theme="dark"] .navbar::before {
+  opacity: 0.12;
 }
 
 [data-theme="dark"] .navbarScrolled {
   box-shadow:
-    0 28px 60px rgba(0, 0, 0, 0.24),
-    0 1px 0 rgba(255, 255, 255, 0.68) inset,
-    0 -14px 24px rgba(148, 163, 184, 0.12) inset;
+    0 28px 60px rgba(0, 0, 0, 0.38),
+    0 1px 0 rgba(255, 255, 255, 0.12) inset,
+    0 -14px 24px rgba(0, 0, 0, 0.14) inset;
+}
+
+[data-theme="dark"] .mobilePanel {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03) 42%, rgba(255, 255, 255, 0.01) 100%),
+    linear-gradient(155deg, rgba(255, 255, 255, 0.06), rgba(148, 163, 184, 0.04)),
+    rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.36),
+    0 1px 0 rgba(255, 255, 255, 0.1) inset;
+}
+
+[data-theme="dark"] .logo {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04)),
+    rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .logoCopy strong {
+  color: rgba(226, 232, 240, 0.9);
+}
+
+[data-theme="dark"] .navLink {
+  color: rgba(203, 213, 225, 0.82);
+}
+
+[data-theme="dark"] .navLink:hover {
+  color: rgba(226, 232, 240, 0.96);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
+    rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="dark"] .iconButton,
+[data-theme="dark"] .menuButton {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04)),
+    rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(203, 213, 225, 0.88);
+}
+
+[data-theme="dark"] .iconButton:hover,
+[data-theme="dark"] .menuButton:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06)),
+    rgba(255, 255, 255, 0.06);
+  color: rgba(226, 232, 240, 0.96);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+[data-theme="dark"] .signInLink {
+  color: rgba(203, 213, 225, 0.84);
+}
+
+[data-theme="dark"] .signInLink:hover {
+  color: rgba(226, 232, 240, 0.96);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
+    rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="dark"] .mobileEyebrow {
+  color: rgba(148, 163, 184, 0.68);
+}
+
+[data-theme="dark"] .mobileBrand {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
+    rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .mobileBrand strong {
+  color: rgba(226, 232, 240, 0.92);
+}
+
+[data-theme="dark"] .mobileBrand p {
+  color: rgba(148, 163, 184, 0.74);
+}
+
+[data-theme="dark"] .mobileLink {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
+    rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(203, 213, 225, 0.9);
+}
+
+[data-theme="dark"] .mobileLink:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05)),
+    rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .mobileThemeButton,
+[data-theme="dark"] .mobileSignIn {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
+    rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(203, 213, 225, 0.88);
+}
+
+[data-theme="dark"] .mobileThemeButton:hover,
+[data-theme="dark"] .mobileSignIn:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05)),
+    rgba(255, 255, 255, 0.05);
 }
 
 @media (max-width: 959px) {

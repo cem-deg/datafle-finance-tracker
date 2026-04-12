@@ -1,7 +1,6 @@
 import Link from "next/link";
 
-import Navbar from "@/components/layout/Navbar";
-import { APP_NAME } from "@/utils/constants";
+import StaticPageShell from "./StaticPageShell";
 
 import styles from "./StaticInfoPage.module.css";
 
@@ -37,9 +36,7 @@ export default function StaticInfoPage({
   secondaryCta,
 }: StaticInfoPageProps) {
   return (
-    <>
-      <Navbar />
-
+    <StaticPageShell>
       <main className={styles.page}>
         <div className={styles.shell}>
           <section className={styles.hero}>
@@ -86,15 +83,13 @@ export default function StaticInfoPage({
             ))}
           </div>
 
-          <footer className={styles.footer}>
-            <p>
-              {APP_NAME} is designed to make personal finance feel calmer, clearer, and more
-              controlled.
-            </p>
-            {note ? <p className={styles.note}>{note}</p> : null}
-          </footer>
+          {note ? (
+            <footer className={styles.footer}>
+              <p className={styles.note}>{note}</p>
+            </footer>
+          ) : null}
         </div>
       </main>
-    </>
+    </StaticPageShell>
   );
 }

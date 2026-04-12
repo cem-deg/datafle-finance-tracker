@@ -10,7 +10,7 @@ import LandingHowItWorksSection from "./LandingHowItWorksSection";
 import LandingPricingTeaserSection from "./LandingPricingTeaserSection";
 import type { TrustStripItem } from "./content";
 import LandingValueShowcaseSection from "./LandingValueShowcaseSection";
-import styles from "./LandingPage.module.css";
+import styles from "./TrustStrip.module.css";
 
 interface LandingSectionsProps {
   trustStripItems: TrustStripItem[];

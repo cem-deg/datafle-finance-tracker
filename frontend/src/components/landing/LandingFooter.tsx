@@ -3,7 +3,7 @@ import Link from "next/link";
 import { APP_NAME } from "@/utils/constants";
 
 import ScrollReveal from "./ScrollReveal";
-import styles from "./LandingPage.module.css";
+import styles from "./LandingFooter.module.css";
 
 const FOOTER_NAV_GROUPS = [
   {

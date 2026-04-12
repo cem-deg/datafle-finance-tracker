@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, type CSSProperties } from "react";
-import Navbar from "@/components/layout/Navbar";
+import StaticPageShell from "@/components/static/StaticPageShell";
 import { ChevronDown } from "lucide-react";
+
+import styles from "./FAQ.module.css";
 
 const FAQ_DATA = [
   {
@@ -51,9 +53,8 @@ export default function FAQPage() {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
 
   return (
-    <>
-      <Navbar />
-      <div className="faq-page">
+    <StaticPageShell>
+      <div className={styles.page}>
         <div className="section-header animate-in section-heading-tight">
           <h2>Frequently Asked Questions</h2>
           <p>Find answers to common questions about Datafle</p>
@@ -62,11 +63,11 @@ export default function FAQPage() {
         {FAQ_DATA.map((item, i) => (
           <section
             key={i}
-            className={`faq-item animate-in animate-delay ${openIdx === i ? "open" : ""}`}
+            className={`${styles.item} ${openIdx === i ? styles.itemOpen : ""} animate-in animate-delay`}
             style={{ "--delay": `${i * 50}ms` } as CSSProperties}
           >
             <button
-              className="faq-question"
+              className={styles.question}
               onClick={() => setOpenIdx(openIdx === i ? null : i)}
               type="button"
               aria-expanded={openIdx === i}
@@ -77,7 +78,7 @@ export default function FAQPage() {
               <ChevronDown size={18} />
             </button>
             <div
-              className="faq-answer"
+              className={styles.answer}
               id={`faq-answer-${i}`}
               role="region"
               aria-labelledby={`faq-question-${i}`}
@@ -87,6 +88,6 @@ export default function FAQPage() {
           </section>
         ))}
       </div>
-    </>
+    </StaticPageShell>
   );
 }

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 
 import ScrollReveal from "./ScrollReveal";
-import styles from "./LandingPage.module.css";
+import styles from "./PricingTeaser.module.css";
 
 type PricingTeaserPlan = {
   name: string;

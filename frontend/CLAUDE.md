@@ -74,3 +74,11 @@ After each task, ALWAYS include:
 - Do NOT guess
 - Ask for clarification
 - Suggest 1-2 possible approaches instead
+
+---
+
+## Inspection Approach
+
+- Prefer targeted inspection over full-file reading
+- Start from the component and directly related selectors
+- Expand only when required by responsive rules, light-mode overrides, shared selectors, keyframes, or JS/CSS coupling

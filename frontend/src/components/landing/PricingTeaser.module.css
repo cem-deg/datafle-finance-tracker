@@ -1,0 +1,259 @@
+.pricingTeaserSection {
+  position: relative;
+  padding: 0.18rem var(--space-xl) 3rem;
+}
+
+.pricingTeaserGlow {
+  position: absolute;
+  inset: 1rem 18% 1.2rem;
+  border-radius: 44px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 28%, rgba(214, 181, 111, 0.1), transparent 28%),
+    radial-gradient(circle at 82% 22%, rgba(148, 163, 184, 0.08), transparent 26%);
+  filter: blur(28px);
+  opacity: 0.6;
+}
+
+.pricingTeaserInner {
+  position: relative;
+  z-index: 1;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.pricingTeaserHeader {
+  position: relative;
+  z-index: 1;
+  max-width: 560px;
+  margin-bottom: 1.05rem;
+}
+
+.pricingTeaserEyebrow {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0.35rem 0.72rem;
+  border-radius: 999px;
+  background: var(--landing-glass-surface-soft);
+  border: 1px solid var(--landing-glass-border-soft);
+  box-shadow: var(--landing-glass-shadow-soft);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--landing-text-soft);
+}
+
+.pricingTeaserTitle {
+  margin: 0.64rem 0 0;
+  font-size: clamp(1.82rem, 2.5vw, 2.45rem);
+  line-height: 1.02;
+  letter-spacing: -0.05em;
+  color: var(--landing-text-strong);
+  text-wrap: balance;
+}
+
+.pricingTeaserSubtitle {
+  margin: 0.46rem 0 0;
+  max-width: 42ch;
+  font-size: 0.88rem;
+  line-height: 1.56;
+  color: var(--landing-text-soft);
+}
+
+.pricingTeaserGrid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.82rem;
+}
+
+.pricingTeaserCardReveal {
+  height: 100%;
+}
+
+.pricingTeaserCard {
+  position: relative;
+  display: grid;
+  gap: 0.82rem;
+  height: 100%;
+  min-height: 100%;
+  padding: 0.95rem;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    var(--landing-glass-surface-soft);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 10px 22px rgba(15, 23, 42, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  backdrop-filter: blur(20px) saturate(170%);
+  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  transition:
+    transform 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.pricingTeaserCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--landing-glass-border);
+  box-shadow:
+    0 14px 28px rgba(15, 23, 42, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.pricingTeaserCardHighlighted {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 12px 24px rgba(15, 23, 42, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.02) inset,
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.pricingTeaserCardHighlighted:hover {
+  box-shadow:
+    0 16px 30px rgba(15, 23, 42, 0.11),
+    0 0 18px rgba(214, 181, 111, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.pricingTeaserCardGlow {
+  position: absolute;
+  inset: -14% auto auto 26%;
+  width: 160px;
+  height: 160px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(214, 181, 111, 0.11) 0%, transparent 72%);
+  filter: blur(24px);
+  pointer-events: none;
+}
+
+.pricingTeaserCardHeader,
+.pricingTeaserFeatureList,
+.pricingTeaserActions {
+  position: relative;
+  z-index: 1;
+}
+
+.pricingTeaserCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.82rem;
+}
+
+.pricingTeaserCardTitle {
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  color: var(--landing-text-strong);
+}
+
+.pricingTeaserCardText {
+  margin: 0.24rem 0 0;
+  max-width: 26ch;
+  font-size: 0.84rem;
+  line-height: 1.48;
+  color: var(--landing-text-soft);
+  opacity: 0.9;
+}
+
+.pricingTeaserBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0.22rem 0.52rem;
+  border-radius: 999px;
+  background: rgba(214, 181, 111, 0.08);
+  border: 1px solid rgba(214, 181, 111, 0.14);
+  color: var(--landing-text-soft);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.pricingTeaserFeatureList {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.pricingTeaserFeature {
+  display: flex;
+  align-items: center;
+  gap: 0.58rem;
+  min-width: 0;
+  color: var(--landing-text-soft);
+  font-size: 0.82rem;
+  line-height: 1.38;
+}
+
+.pricingTeaserFeatureIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--landing-glass-surface-soft);
+  border: 1px solid var(--landing-glass-border-soft);
+  color: var(--landing-text);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.pricingTeaserActions {
+  margin-top: 0.05rem;
+}
+
+.pricingTeaserButton {
+  min-width: 128px;
+  padding-inline: 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 999px;
+}
+
+.pricingTeaserActions :global(.btn-primary) {
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.1), 0 1px 0 rgba(255, 255, 255, 0.2) inset;
+}
+
+.pricingTeaserActions :global(.btn-secondary) {
+  opacity: 0.92;
+}
+
+@media (max-width: 768px) {
+  .pricingTeaserSection {
+    padding-left: var(--space-md);
+    padding-right: var(--space-md);
+    padding-top: 0.08rem;
+    padding-bottom: 2.6rem;
+  }
+
+  .pricingTeaserGrid {
+    grid-template-columns: 1fr;
+    gap: 0.72rem;
+  }
+
+  .pricingTeaserCard {
+    padding: 0.9rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .pricingTeaserCardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pricingTeaserActions :global(.btn) {
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
+  }
+}

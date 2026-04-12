@@ -6,7 +6,8 @@ import {
 
 import { VALUE_SHOWCASE_ITEMS } from "./content";
 import ScrollReveal from "./ScrollReveal";
-import styles from "./LandingPage.module.css";
+import styles from "./ValueShowcase.module.css";
+import landingStyles from "./LandingPage.module.css";
 
 const iconMap = {
   expenses: ReceiptText,
@@ -145,14 +146,14 @@ export default function LandingValueShowcaseSection() {
             </h2>
           </div>
 
-          <div className={styles.valueShowcaseGrid}>
+          <div className={landingStyles.valueShowcaseGrid}>
             {VALUE_SHOWCASE_ITEMS.map((item) => {
               const Icon = iconMap[item.theme];
 
               return (
                 <article
                   key={item.title}
-                  className={`${styles.valueShowcaseCard} ${cardClassMap[item.theme]}`}
+                  className={`${landingStyles.valueShowcaseCard} ${cardClassMap[item.theme]}`}
                 >
                   <div className={styles.valueShowcaseCardHeader}>
                     <span className={styles.valueShowcaseCardIcon} aria-hidden="true">
