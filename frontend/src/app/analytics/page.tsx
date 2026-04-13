@@ -31,6 +31,10 @@ export default function AnalyticsPage() {
   const { categories, error: categoriesError } = useCategories();
   const { prediction, loading: predictionLoading, error: predictionError } = usePrediction();
   const { convertAndFormat } = useCurrency();
+  const monthlyBaseCurrency = monthly[0]?.base_currency ?? "USD";
+  const categoryDistributionBaseCurrency = categoryDistribution[0]?.base_currency ?? "USD";
+  const trendsBaseCurrency = trends[0]?.base_currency ?? "USD";
+  const predictionBaseCurrency = prediction?.base_currency ?? "USD";
 
   const pageErrors = [
     predictionError,
@@ -58,7 +62,7 @@ export default function AnalyticsPage() {
           loading={predictionLoading}
           value={
             prediction?.prediction != null
-              ? convertAndFormat(prediction.prediction, "USD")
+              ? convertAndFormat(prediction.prediction, predictionBaseCurrency)
               : "Need more data"
           }
           valueClassName={prediction?.prediction != null ? "" : "stat-value-compact"}
@@ -115,7 +119,7 @@ export default function AnalyticsPage() {
             compact
           />
         ) : (
-          <MonthlyBarChart data={monthly} />
+          <MonthlyBarChart data={monthly} baseCurrency={monthlyBaseCurrency} />
         )}
 
         {categoryLoading ? (
@@ -139,7 +143,11 @@ export default function AnalyticsPage() {
             compact
           />
         ) : (
-          <CategoryPieChart data={categoryDistribution} categories={categories} />
+          <CategoryPieChart
+            data={categoryDistribution}
+            categories={categories}
+            baseCurrency={categoryDistributionBaseCurrency}
+          />
         )}
       </div>
 
@@ -165,7 +173,7 @@ export default function AnalyticsPage() {
             compact
           />
         ) : (
-          <TrendLineChart data={trends} />
+          <TrendLineChart data={trends} baseCurrency={trendsBaseCurrency} />
         )}
       </div>
     </AppShell>

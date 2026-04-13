@@ -2,9 +2,11 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import ExpensesPage from "./page";
 
 const createExpenseMock = vi.fn();
+const updateExpenseMock = vi.fn();
 const refetchExpensesMock = vi.fn();
 const useExpensesMock = vi.fn();
 const useCategoriesMock = vi.fn();
+const currencyMock = { code: "USD" };
 
 vi.mock("@/components/layout/AppShell", () => ({
   default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -21,7 +23,7 @@ vi.mock("@/hooks/useData", () => ({
 
 vi.mock("@/context/CurrencyContext", () => ({
   useCurrency: () => ({
-    currency: { code: "USD" },
+    currency: currencyMock,
     convertAndFormat: (amount: number) => `$${amount.toFixed(2)}`,
   }),
 }));
@@ -29,7 +31,7 @@ vi.mock("@/context/CurrencyContext", () => ({
 vi.mock("@/services/api", () => ({
   expenseApi: {
     create: (...args: unknown[]) => createExpenseMock(...args),
-    update: vi.fn(),
+    update: (...args: unknown[]) => updateExpenseMock(...args),
     delete: vi.fn(),
   },
 }));
@@ -37,9 +39,11 @@ vi.mock("@/services/api", () => ({
 describe("ExpensesPage", () => {
   beforeEach(() => {
     createExpenseMock.mockReset();
+    updateExpenseMock.mockReset();
     refetchExpensesMock.mockReset();
     useExpensesMock.mockReset();
     useCategoriesMock.mockReset();
+    currencyMock.code = "USD";
 
     useExpensesMock.mockReturnValue({
       data: { items: [], total_pages: 0 },
@@ -104,5 +108,50 @@ describe("ExpensesPage", () => {
       });
     });
     expect(refetchExpensesMock).toHaveBeenCalled();
+  });
+
+  it("preserves the stored currency when editing after the display currency changes", async () => {
+    updateExpenseMock.mockResolvedValue({ id: 1 });
+    currencyMock.code = "TRY";
+
+    useExpensesMock.mockReturnValue({
+      data: {
+        items: [
+          {
+            id: 1,
+            amount: 100,
+            description: "Coffee",
+            category_id: 1,
+            expense_date: "2026-04-08",
+            currency_code: "USD",
+          },
+        ],
+        total_pages: 1,
+      },
+      loading: false,
+      error: null,
+      refetch: refetchExpensesMock,
+    });
+
+    render(<ExpensesPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: /edit expense coffee/i }));
+    const dialog = screen.getByRole("dialog", { name: /edit expense/i });
+    const modal = within(dialog);
+
+    expect(modal.getByLabelText("Amount (USD)")).toHaveValue("100");
+
+    fireEvent.change(modal.getByLabelText("Description"), { target: { value: "Coffee beans" } });
+    fireEvent.click(modal.getByRole("button", { name: /^update$/i }));
+
+    await waitFor(() => {
+      expect(updateExpenseMock).toHaveBeenCalledWith(1, {
+        amount: 100,
+        description: "Coffee beans",
+        category_id: 1,
+        expense_date: "2026-04-08",
+        currency_code: "USD",
+      });
+    });
   });
 });

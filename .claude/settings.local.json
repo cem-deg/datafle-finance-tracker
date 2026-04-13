@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(npx tsc:*)",
+      "Bash(node -e \"const l = require\\('./node_modules/lucide-react'\\); console.log\\(['Gauge','Activity','TrendingUp','Shield','BarChart2','HeartPulse'].filter\\(k => k in l\\).join\\(', '\\)\\)\")",
+      "Bash(node -e \"const l = require\\('./node_modules/lucide-react'\\); const icons = ['Gauge','Activity','TrendingUp','Shield','BarChart2','HeartPulse']; icons.forEach\\(i => console.log\\(i, i in l\\)\\)\")"
     ]
   }
 }

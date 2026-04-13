@@ -21,6 +21,22 @@ from app.schemas.analytics import (
 from app.services.exchange_service import exchange_service
 
 router = APIRouter(prefix="/api/analytics", tags=["Analytics"])
+ANALYTICS_BASE_CURRENCY = "USD"
+
+
+def _with_base_currency(payload: dict | list[dict]) -> dict | list[dict]:
+    if isinstance(payload, list):
+        return [
+            {
+                **item,
+                "base_currency": ANALYTICS_BASE_CURRENCY,
+            }
+            for item in payload
+        ]
+    return {
+        **payload,
+        "base_currency": ANALYTICS_BASE_CURRENCY,
+    }
 
 
 @router.get("/summary", response_model=DashboardSummaryResponse)
@@ -29,7 +45,7 @@ def get_summary(
     current_user: CurrentUser,
 ):
     """Dashboard summary with key financial metrics."""
-    return Aggregator.summary(db, current_user.id)
+    return _with_base_currency(Aggregator.summary(db, current_user.id))
 
 
 @router.get("/monthly", response_model=list[MonthlyTotalResponse])
@@ -39,7 +55,7 @@ def monthly_totals(
     months: int = Query(12, ge=1, le=24),
 ):
     """Monthly spending totals for chart display."""
-    return Aggregator.monthly_totals(db, current_user.id, months)
+    return _with_base_currency(Aggregator.monthly_totals(db, current_user.id, months))
 
 
 @router.get("/cashflow", response_model=list[CashflowPointResponse])
@@ -49,7 +65,7 @@ def monthly_cashflow(
     months: int = Query(12, ge=1, le=24),
 ):
     """Monthly income, expense, and net totals."""
-    return Aggregator.monthly_cashflow(db, current_user.id, months)
+    return _with_base_currency(Aggregator.monthly_cashflow(db, current_user.id, months))
 
 
 @router.get(
@@ -63,7 +79,9 @@ def category_distribution(
     end_date: date | None = None,
 ):
     """Category spending distribution for pie chart."""
-    return Aggregator.category_distribution(db, current_user.id, start_date, end_date)
+    return _with_base_currency(
+        Aggregator.category_distribution(db, current_user.id, start_date, end_date)
+    )
 
 
 @router.get("/trends", response_model=list[DailyTrendResponse])
@@ -73,7 +91,7 @@ def spending_trends(
     days: int = Query(30, ge=7, le=365),
 ):
     """Daily spending trend for line chart."""
-    return Aggregator.daily_trend(db, current_user.id, days)
+    return _with_base_currency(Aggregator.daily_trend(db, current_user.id, days))
 
 
 @router.get("/budgets/current", response_model=list[BudgetOverviewItemResponse])
@@ -83,7 +101,7 @@ def current_budget_overview(
     month_start: date | None = None,
 ):
     """Budget usage overview for the selected month."""
-    return Aggregator.budget_overview(db, current_user.id, month_start)
+    return _with_base_currency(Aggregator.budget_overview(db, current_user.id, month_start))
 
 
 @router.get("/prediction", response_model=PredictionResponse)
@@ -92,7 +110,7 @@ def get_prediction(
     current_user: CurrentUser,
 ):
     """ML-based next month spending prediction."""
-    return Predictor.predict_next_month(db, current_user.id)
+    return _with_base_currency(Predictor.predict_next_month(db, current_user.id))
 
 
 @router.get("/prediction/categories", response_model=list[CategoryPredictionResponse])
@@ -101,7 +119,7 @@ def get_category_predictions(
     current_user: CurrentUser,
 ):
     """ML-based per-category spending predictions."""
-    return Predictor.predict_by_category(db, current_user.id)
+    return _with_base_currency(Predictor.predict_by_category(db, current_user.id))
 
 
 @router.get("/exchange-rates", response_model=ExchangeRatesResponse)

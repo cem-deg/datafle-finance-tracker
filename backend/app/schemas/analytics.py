@@ -1,11 +1,16 @@
 """Pydantic schemas for analytics and derived finance responses."""
 
 from datetime import date
+from typing import Literal
 
 from pydantic import BaseModel
 
 
-class DashboardSummaryResponse(BaseModel):
+class UsdBaseCurrencyResponse(BaseModel):
+    base_currency: Literal["USD"] = "USD"
+
+
+class DashboardSummaryResponse(UsdBaseCurrencyResponse):
     total_this_month: float
     total_income_this_month: float
     net_balance_this_month: float
@@ -21,30 +26,30 @@ class DashboardSummaryResponse(BaseModel):
     over_budget_categories_count: int
 
 
-class MonthlyTotalResponse(BaseModel):
+class MonthlyTotalResponse(UsdBaseCurrencyResponse):
     month: str
     total: float
 
 
-class CashflowPointResponse(BaseModel):
+class CashflowPointResponse(UsdBaseCurrencyResponse):
     month: str
     income: float
     expenses: float
     net: float
 
 
-class CategoryDistributionResponse(BaseModel):
+class CategoryDistributionResponse(UsdBaseCurrencyResponse):
     category_id: int
     amount: float
     percentage: float
 
 
-class DailyTrendResponse(BaseModel):
+class DailyTrendResponse(UsdBaseCurrencyResponse):
     date: str
     total: float
 
 
-class BudgetOverviewItemResponse(BaseModel):
+class BudgetOverviewItemResponse(UsdBaseCurrencyResponse):
     budget_id: int
     category_id: int
     category_name: str
@@ -58,7 +63,7 @@ class BudgetOverviewItemResponse(BaseModel):
     note: str | None = None
 
 
-class PredictionResponse(BaseModel):
+class PredictionResponse(UsdBaseCurrencyResponse):
     prediction: float | None
     confidence: str
     r_squared: float | None = None
@@ -68,7 +73,7 @@ class PredictionResponse(BaseModel):
     message: str
 
 
-class CategoryPredictionResponse(BaseModel):
+class CategoryPredictionResponse(UsdBaseCurrencyResponse):
     category_id: int
     prediction: float
     confidence: str

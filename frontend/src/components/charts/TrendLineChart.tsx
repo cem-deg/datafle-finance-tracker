@@ -11,6 +11,7 @@ import type { DailyTrend } from "@/types";
 
 interface Props {
   data: DailyTrend[];
+  baseCurrency: string;
 }
 
 function CustomTooltip({
@@ -38,7 +39,7 @@ function CustomTooltip({
   );
 }
 
-function TrendLineChart({ data }: Props) {
+function TrendLineChart({ data, baseCurrency }: Props) {
   const { convertAndFormat } = useCurrency();
   const chartData = useMemo(
     () =>
@@ -66,8 +67,8 @@ function TrendLineChart({ data }: Props) {
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
             <XAxis dataKey="name" tick={{ fill: "var(--text-secondary)", fontSize: 11 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
-            <YAxis tick={{ fill: "var(--text-secondary)", fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={(v) => convertAndFormat(v, "USD")} />
-            <Tooltip content={<CustomTooltip convertAndFormat={convertAndFormat} baseCurrency="USD" />} />
+            <YAxis tick={{ fill: "var(--text-secondary)", fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={(v) => convertAndFormat(v, baseCurrency)} />
+            <Tooltip content={<CustomTooltip convertAndFormat={convertAndFormat} baseCurrency={baseCurrency} />} />
             <Area type="monotone" dataKey="total" fill="url(#lineGradient)" stroke="none" />
             <Line type="monotone" dataKey="total" stroke="var(--chart-2)" strokeWidth={2.5} dot={false} activeDot={{ r: 5, fill: "var(--chart-2)", stroke: "var(--bg-primary)", strokeWidth: 2 }} />
           </LineChart>

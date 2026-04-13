@@ -26,34 +26,36 @@ interface IncomeFormState {
   description: string;
   source: string;
   incomeDate: string;
+  currencyCode: string;
 }
 
-const initialFormState = (): IncomeFormState => ({
+const initialFormState = (currencyCode: string): IncomeFormState => ({
   amount: "",
   description: "",
   source: "Salary",
   incomeDate: getLocalDateInputValue(),
+  currencyCode,
 });
 
 export default function IncomePage() {
+  const { currency, convertAndFormat } = useCurrency();
   const [page, setPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [form, setForm] = useState<IncomeFormState>(initialFormState);
+  const [form, setForm] = useState<IncomeFormState>(() => initialFormState(currency.code));
   const [formError, setFormError] = useState("");
   const [pageMessage, setPageMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   useFlashMessage(pageMessage, setPageMessage);
 
   const { data, loading, error, refetch } = useIncomes({ page, per_page: 15 });
-  const { currency, convertAndFormat } = useCurrency();
 
   function updateForm<K extends keyof IncomeFormState>(field: K, value: IncomeFormState[K]) {
     setForm((current) => ({ ...current, [field]: value }));
   }
 
   function resetForm() {
-    setForm(initialFormState());
+    setForm(initialFormState(currency.code));
     setEditingId(null);
     setFormError("");
   }
@@ -74,6 +76,7 @@ export default function IncomePage() {
     description: string;
     source: string;
     income_date: string;
+    currency_code: string;
   }) {
     setEditingId(income.id);
     setForm({
@@ -81,6 +84,7 @@ export default function IncomePage() {
       description: income.description,
       source: income.source,
       incomeDate: income.income_date,
+      currencyCode: income.currency_code,
     });
     setFormError("");
     setShowModal(true);
@@ -110,7 +114,7 @@ export default function IncomePage() {
         description,
         source,
         income_date: form.incomeDate,
-        currency_code: currency.code,
+        currency_code: form.currencyCode,
       };
 
       if (editingId) {
@@ -233,9 +237,9 @@ export default function IncomePage() {
           <form onSubmit={handleSubmit} className="form-shell">
             <div className="form-row">
               <FormField
-                label={`Amount (${currency.code})`}
+                label={`Amount (${form.currencyCode})`}
                 htmlFor="income-amount"
-                help="Enter the amount received in your selected currency."
+                help="Both commas and periods are accepted."
                 helpId="income-amount-help"
               >
                 <input

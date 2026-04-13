@@ -26,22 +26,25 @@ interface ExpenseFormState {
   description: string;
   categoryId: string;
   expenseDate: string;
+  currencyCode: string;
 }
 
-const initialFormState = (): ExpenseFormState => ({
+const initialFormState = (currencyCode: string): ExpenseFormState => ({
   amount: "",
   description: "",
   categoryId: "",
   expenseDate: getLocalDateInputValue(),
+  currencyCode,
 });
 
 export default function ExpensesPage() {
+  const { currency, convertAndFormat } = useCurrency();
   const [page, setPage] = useState(1);
   const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [form, setForm] = useState<ExpenseFormState>(initialFormState);
+  const [form, setForm] = useState<ExpenseFormState>(() => initialFormState(currency.code));
   const [formError, setFormError] = useState("");
   const [pageMessage, setPageMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -56,7 +59,6 @@ export default function ExpensesPage() {
     loading: categoriesLoading,
     error: categoriesError,
   } = useCategories();
-  const { currency, convertAndFormat } = useCurrency();
 
   const categoryMap = useMemo(
     () => new Map(categories.map((category) => [category.id, category])),
@@ -76,7 +78,7 @@ export default function ExpensesPage() {
   }
 
   function resetForm() {
-    setForm(initialFormState());
+    setForm(initialFormState(currency.code));
     setFormError("");
     setEditingId(null);
   }
@@ -97,6 +99,7 @@ export default function ExpensesPage() {
     description: string;
     category_id: number;
     expense_date: string;
+    currency_code: string;
   }) {
     setEditingId(expense.id);
     setForm({
@@ -104,6 +107,7 @@ export default function ExpensesPage() {
       description: expense.description,
       categoryId: String(expense.category_id),
       expenseDate: expense.expense_date,
+      currencyCode: expense.currency_code,
     });
     setFormError("");
     setShowModal(true);
@@ -132,7 +136,7 @@ export default function ExpensesPage() {
         description,
         category_id: Number.parseInt(form.categoryId, 10),
         expense_date: form.expenseDate,
-        currency_code: currency.code,
+        currency_code: form.currencyCode,
       };
 
       if (editingId) {
@@ -299,9 +303,9 @@ export default function ExpensesPage() {
           <form onSubmit={handleSubmit} className="form-shell">
             <div className="form-row">
               <FormField
-                label={`Amount (${currency.code})`}
+                label={`Amount (${form.currencyCode})`}
                 htmlFor="exp-amount"
-                help="Use your selected currency. Both commas and periods are accepted."
+                help="Both commas and periods are accepted."
                 helpId="exp-amount-help"
               >
                 <input

@@ -10,7 +10,13 @@ import { useAuth } from "@/context/AuthContext";
 import Sidebar from "./Sidebar";
 import MobileNav from "./MobileNav";
 
-export default function AppShell({ children }: { children: React.ReactNode }) {
+export default function AppShell({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
 
@@ -34,7 +40,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   if (!user) return null;
 
   return (
-    <div className="app-layout">
+    <div className={`app-layout ${className}`.trim()}>
       <Sidebar />
       <main className="main-content">{children}</main>
       <MobileNav />

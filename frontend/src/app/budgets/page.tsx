@@ -66,6 +66,7 @@ export default function BudgetsPage() {
     error: categoriesError,
   } = useCategories();
   const { currency, convertAndFormat } = useCurrency();
+  const overviewBaseCurrency = overview[0]?.base_currency ?? "USD";
 
   const usedCategoryIds = useMemo(
     () => new Set(budgets.filter((budget) => budget.id !== editingId).map((budget) => budget.category_id)),
@@ -280,10 +281,13 @@ export default function BudgetsPage() {
               renderIcon={(item) => <Target size={14} style={{ color: item.category_color }} />}
               renderMeta={(item) => (
                 <>
-                  <span>Spent {convertAndFormat(item.spent, "USD")}</span>
+                  <span>Spent {convertAndFormat(item.spent, item.base_currency || overviewBaseCurrency)}</span>
                   <span>
                     {item.is_over_budget ? "Over by" : "Remaining"}{" "}
-                    {convertAndFormat(Math.abs(item.remaining ?? 0), "USD")}
+                    {convertAndFormat(
+                      Math.abs(item.remaining ?? 0),
+                      item.base_currency || overviewBaseCurrency
+                    )}
                   </span>
                 </>
               )}

@@ -10,6 +10,7 @@ import type { MonthlyTotal } from "@/types";
 
 interface Props {
   data: MonthlyTotal[];
+  baseCurrency: string;
   title?: string;
   periodLabel?: string;
 }
@@ -41,6 +42,7 @@ function CustomTooltip({
 
 function MonthlyBarChart({
   data,
+  baseCurrency,
   title = "Monthly Spending",
   periodLabel,
 }: Props) {
@@ -85,8 +87,8 @@ function MonthlyBarChart({
           <BarChart width={chartSize.width} height={chartSize.height} data={chartData} barSize={24}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
             <XAxis dataKey="name" tick={{ fill: "var(--text-secondary)", fontSize: 12 }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fill: "var(--text-secondary)", fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={(v) => convertAndFormat(v, "USD")} />
-            <Tooltip content={<CustomTooltip convertAndFormat={convertAndFormat} baseCurrency="USD" />} cursor={{ fill: "var(--chart-cursor)" }} />
+            <YAxis tick={{ fill: "var(--text-secondary)", fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={(v) => convertAndFormat(v, baseCurrency)} />
+            <Tooltip content={<CustomTooltip convertAndFormat={convertAndFormat} baseCurrency={baseCurrency} />} cursor={{ fill: "var(--chart-cursor)" }} />
             <Bar dataKey="total" fill="url(#barGradient)" radius={[6, 6, 0, 0]} />
             <defs>
               <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">

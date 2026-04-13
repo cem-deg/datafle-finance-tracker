@@ -6,6 +6,7 @@ interface BudgetUsageItem {
   budget_id: number;
   category_name: string;
   category_color: string;
+  base_currency?: string;
   usage_percent: number;
   is_over_budget: boolean;
   spent: number;

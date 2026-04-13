@@ -61,6 +61,7 @@ def test_summary_endpoint_returns_expected_metrics(client: TestClient):
     assert summary_response.status_code == 200
 
     summary = summary_response.json()
+    assert summary["base_currency"] == "USD"
     assert summary["total_this_month"] == 150.0
     assert summary["total_last_month"] == 80.0
     assert summary["total_transactions"] == 2
@@ -121,6 +122,7 @@ def test_summary_includes_income_and_budget_metrics(client: TestClient):
     assert summary_response.status_code == 200
     summary = summary_response.json()
 
+    assert summary["base_currency"] == "USD"
     assert summary["total_income_this_month"] == 3000.0
     assert summary["net_balance_this_month"] == 2550.0
     assert summary["total_budget_this_month"] == 500.0
@@ -134,6 +136,7 @@ def test_summary_includes_income_and_budget_metrics(client: TestClient):
     assert budget_overview_response.status_code == 200
     overview = budget_overview_response.json()
     assert len(overview) == 1
+    assert overview[0]["base_currency"] == "USD"
     assert overview[0]["spent"] == 450.0
 
 
@@ -192,6 +195,7 @@ def test_summary_normalizes_mixed_currency_expenses_and_budgets(client: TestClie
     assert summary_response.status_code == 200
 
     summary = summary_response.json()
+    assert summary["base_currency"] == "USD"
     assert summary["total_this_month"] == 200.0
     assert summary["total_budget_this_month"] == 200.0
     assert summary["budget_remaining"] == 0.0

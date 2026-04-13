@@ -35,6 +35,7 @@ describe("DashboardPage", () => {
   beforeEach(() => {
     useSummaryMock.mockReturnValue({
       summary: {
+        base_currency: "USD",
         total_income_this_month: 4200,
         net_balance_this_month: 1800,
         total_this_month: 2400,
@@ -79,7 +80,7 @@ describe("DashboardPage", () => {
       refetch: vi.fn(),
     });
     useMonthlyTotalsMock.mockReturnValue({
-      data: [{ month: "2026-04", total: 2400 }],
+      data: [{ month: "2026-04", total: 2400, base_currency: "USD" }],
       loading: false,
       error: null,
       refetch: vi.fn(),
@@ -104,6 +105,7 @@ describe("DashboardPage", () => {
           amount: 500,
           spent: 420,
           remaining: 80,
+          base_currency: "USD",
           usage_percent: 84,
           is_over_budget: false,
           month_start: "2026-04-01",

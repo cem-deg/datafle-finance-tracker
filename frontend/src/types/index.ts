@@ -146,7 +146,11 @@ export interface BudgetUpdate {
   note?: string;
 }
 
-export interface BudgetOverviewItem {
+interface AnalyticsMoneyBase {
+  base_currency: string;
+}
+
+export interface BudgetOverviewItem extends AnalyticsMoneyBase {
   budget_id: number;
   category_id: number;
   category_name: string;
@@ -160,7 +164,7 @@ export interface BudgetOverviewItem {
   note?: string | null;
 }
 
-export interface DashboardSummary {
+export interface DashboardSummary extends AnalyticsMoneyBase {
   total_this_month: number;
   total_income_this_month: number;
   net_balance_this_month: number;
@@ -176,30 +180,30 @@ export interface DashboardSummary {
   over_budget_categories_count: number;
 }
 
-export interface MonthlyTotal {
+export interface MonthlyTotal extends AnalyticsMoneyBase {
   month: string;
   total: number;
 }
 
-export interface CashflowPoint {
+export interface CashflowPoint extends AnalyticsMoneyBase {
   month: string;
   income: number;
   expenses: number;
   net: number;
 }
 
-export interface CategoryDistribution {
+export interface CategoryDistribution extends AnalyticsMoneyBase {
   category_id: number;
   amount: number;
   percentage: number;
 }
 
-export interface DailyTrend {
+export interface DailyTrend extends AnalyticsMoneyBase {
   date: string;
   total: number;
 }
 
-export interface Prediction {
+export interface Prediction extends AnalyticsMoneyBase {
   prediction: number | null;
   confidence: string;
   r_squared?: number;
@@ -209,7 +213,7 @@ export interface Prediction {
   message: string;
 }
 
-export interface CategoryPrediction {
+export interface CategoryPrediction extends AnalyticsMoneyBase {
   category_id: number;
   prediction: number;
   confidence: string;

@@ -11,6 +11,7 @@ import type { CategoryDistribution, Category } from "@/types";
 interface Props {
   data: CategoryDistribution[];
   categories: Category[];
+  baseCurrency: string;
 }
 
 const FALLBACK_COLORS = CATEGORY_COLORS;
@@ -38,7 +39,7 @@ function CustomTooltip({
   );
 }
 
-function CategoryPieChart({ data, categories }: Props) {
+function CategoryPieChart({ data, categories, baseCurrency }: Props) {
   const { convertAndFormat } = useCurrency();
   const chartData = useMemo(() => {
     const catMap = new Map(categories.map((category) => [category.id, category]));
@@ -76,7 +77,7 @@ function CategoryPieChart({ data, categories }: Props) {
                   <Cell key={i} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip content={<CustomTooltip convertAndFormat={convertAndFormat} baseCurrency="USD" />} />
+              <Tooltip content={<CustomTooltip convertAndFormat={convertAndFormat} baseCurrency={baseCurrency} />} />
             </PieChart>
           </ResponsiveContainer>
         </div>

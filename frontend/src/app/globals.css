@@ -350,6 +350,21 @@ img {
   z-index: 1;
 }
 
+.app-layout.app-layout-dashboard {
+  background:
+    radial-gradient(circle at 20% 12%, rgba(76, 110, 245, 0.07), transparent 36%),
+    radial-gradient(circle at 80% 14%, rgba(47, 143, 131, 0.05), transparent 28%),
+    radial-gradient(circle at 50% 88%, rgba(47, 100, 180, 0.04), transparent 40%),
+    linear-gradient(165deg, #0d1528 0%, #0b1220 46%, #080e1a 100%);
+}
+
+[data-theme="light"] .app-layout.app-layout-dashboard {
+  background:
+    radial-gradient(circle at 20% 12%, rgba(54, 95, 214, 0.05), transparent 36%),
+    radial-gradient(circle at 80% 14%, rgba(47, 143, 131, 0.04), transparent 28%),
+    linear-gradient(165deg, #edf2f8 0%, #f4f7fb 46%, #eef3f9 100%);
+}
+
 .main-content {
   flex: 1;
   margin-left: var(--sidebar-width);
@@ -972,7 +987,7 @@ img {
 .dashboard-shell {
   display: flex;
   flex-direction: column;
-  gap: var(--section-gap);
+  gap: var(--space-2xl);
 }
 
 .dashboard-section {
@@ -982,7 +997,7 @@ img {
 
 .dashboard-kpi-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.35fr) repeat(2, minmax(0, 1fr));
   gap: var(--stack-gap-md);
 }
 
@@ -1235,12 +1250,18 @@ img {
   top: 0;
   bottom: 0;
   width: var(--sidebar-width);
-  background: var(--bg-secondary);
-  border-right: 1px solid var(--glass-border);
+  background: rgba(8, 14, 26, 0.84);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  border-right: 1px solid rgba(var(--rgb-border), 0.35);
   display: flex;
   flex-direction: column;
   z-index: 100;
   transition: transform var(--transition-base);
+}
+[data-theme="light"] .sidebar {
+  background: rgba(248, 250, 252, 0.88);
+  border-right-color: rgba(var(--rgb-border), 0.55);
 }
 
 .sidebar-logo {
@@ -3795,5 +3816,109 @@ img {
   .sidebar-profile-actions .btn,
   .settings-theme-row .btn {
     width: 100%;
+  }
+}
+
+/* ─── Dashboard Visual Polish ───────────────────────────────── */
+
+/* Card surfaces: inset top highlight + lighter border + richer backdrop */
+.dashboard-shell .card,
+.dashboard-shell .stat-card {
+  border-color: rgba(88, 108, 140, 0.52);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+}
+
+/* Preserve glow on hover while keeping the inset highlight */
+.dashboard-shell .card:hover,
+.dashboard-shell .stat-card:hover {
+  border-color: var(--glass-border-hover);
+  box-shadow: var(--shadow-glow), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+/* Primary KPI card: elevated surface + stronger inset highlight */
+.dashboard-kpi-card-primary {
+  border-color: rgba(105, 130, 168, 0.65);
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Primary KPI card: accent line permanently visible at rest */
+.dashboard-kpi-card-primary::before {
+  opacity: 0.6;
+}
+
+/* Section intros: more breathing room + display font for structural labels */
+.dashboard-shell .section-intro {
+  margin-bottom: var(--space-lg);
+}
+
+.dashboard-shell .section-intro-title {
+  font-family: var(--font-display);
+}
+
+/* Panel card titles: slightly larger for cleaner visual hierarchy */
+.dashboard-shell .card-title {
+  font-size: var(--font-lg);
+}
+
+/* Expense / income rows: lightweight list feel, not nested glass cards */
+.dashboard-shell .expense-list .expense-item {
+  background: transparent;
+  border-color: rgba(var(--rgb-border), 0.35);
+  border-radius: var(--radius-sm);
+}
+
+.dashboard-shell .expense-list .expense-item:hover {
+  background: rgba(var(--rgb-surface-elevated), 0.5);
+  border-color: rgba(var(--rgb-border), 0.55);
+}
+
+/* Budget Health rows: remove opaque nested box */
+.dashboard-shell .progress-list .progress-card {
+  background: transparent;
+}
+
+/* ─── Dashboard Mobile Refinements ──────────────────────────── */
+@media (max-width: 768px) {
+  /* Tighter section rhythm — sections feel connected, not separate pages */
+  .dashboard-shell {
+    gap: var(--space-lg);
+  }
+
+  /* Reduce card mass — less padding per card on mobile */
+  .dashboard-shell .stat-card,
+  .dashboard-shell .card {
+    padding: var(--card-padding-compact);
+  }
+
+  /* Smaller section headings — product dashboard, not marketing page */
+  .dashboard-shell .section-intro-title {
+    font-size: var(--font-lg);
+  }
+
+  /* KPI hierarchy: primary spans full row, secondary 3 form 2-col grid */
+  .dashboard-kpi-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .dashboard-kpi-card-primary {
+    grid-column: 1 / -1;
+  }
+
+  /* Secondary section: more compressed heading to signal lower priority */
+  .dashboard-section-secondary .section-intro-title {
+    font-size: var(--font-md);
+  }
+}
+
+@media (max-width: 480px) {
+  /* Small phones: 2-col KPI is too cramped — revert to single column */
+  .dashboard-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-kpi-card-primary {
+    grid-column: unset;
   }
 }

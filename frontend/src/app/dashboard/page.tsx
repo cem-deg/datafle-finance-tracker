@@ -7,9 +7,9 @@ import {
   ArrowUpRight,
   CreditCard,
   DollarSign,
+  Gauge,
   Minus,
   PiggyBank,
-  ShoppingBag,
   Target,
 } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
@@ -105,8 +105,14 @@ export default function DashboardPage() {
     () => new Map(categories.map((category) => [category.id, category])),
     [categories]
   );
-  const topCategory = summary?.top_category_id ? categoryMap.get(summary.top_category_id) : null;
+  const summaryBaseCurrency = summary?.base_currency ?? "USD";
+  const monthlyBaseCurrency = monthly[0]?.base_currency ?? "USD";
+  const budgetOverviewBaseCurrency = budgetOverview[0]?.base_currency ?? "USD";
   const spendingUp = (summary?.month_change_percent ?? 0) > 0;
+  const healthScore = Math.max(0, Math.min(100, Math.round(70 - (summary?.month_change_percent ?? 0) * 0.5)));
+  const healthSignalLabel = healthScore >= 70 ? "On track" : healthScore >= 40 ? "Watch spending" : "Overspending";
+  const healthIconClass = healthScore >= 70 ? "metric-icon-success" : healthScore >= 40 ? "metric-icon-warning" : "metric-icon-danger";
+  const healthBadgeClass = healthScore >= 70 ? "badge-success" : healthScore >= 40 ? "badge-warning" : "badge-danger";
   const hasDashboardErrors = useMemo(
     () =>
       [
@@ -128,7 +134,7 @@ export default function DashboardPage() {
   );
 
   return (
-    <AppShell>
+    <AppShell className="app-layout-dashboard">
       <div className="dashboard-shell">
         <PageHeader
           title="Dashboard"
@@ -137,35 +143,21 @@ export default function DashboardPage() {
 
         <PageFeedback errorMessages={hasDashboardErrors} />
 
+        {/* ── Section 1: Primary summary ───────────────────────── */}
         <section className="dashboard-section">
           <SectionIntro
             eyebrow="Overview"
             title="This month at a glance"
-            description="The key numbers you are most likely to act on first."
           />
 
           <div className="dashboard-kpi-grid">
             <StatCard
               className="dashboard-kpi-card dashboard-kpi-card-primary animate-in animate-in-delay-1"
-              icon={<DollarSign size={22} />}
-              iconClassName="metric-icon-success"
-              label="Income this month"
-              loading={summaryLoading}
-              value={convertAndFormat(summary?.total_income_this_month ?? 0, "USD")}
-              meta={
-                <div className="badge badge-primary mt-sm">
-                  Net {convertAndFormat(summary?.net_balance_this_month ?? 0, "USD")}
-                </div>
-              }
-            />
-
-            <StatCard
-              className="dashboard-kpi-card animate-in animate-in-delay-2"
               icon={<CreditCard size={22} />}
               iconClassName="metric-icon-danger"
               label="Spent this month"
               loading={summaryLoading}
-              value={convertAndFormat(summary?.total_this_month ?? 0, "USD")}
+              value={convertAndFormat(summary?.total_this_month ?? 0, summaryBaseCurrency)}
               meta={
                 <div className={`stat-change ${spendingUp ? "negative" : "positive"}`}>
                   {spendingUp ? (
@@ -181,12 +173,12 @@ export default function DashboardPage() {
             />
 
             <StatCard
-              className="dashboard-kpi-card animate-in animate-in-delay-3"
+              className="dashboard-kpi-card animate-in animate-in-delay-2"
               icon={<Target size={22} />}
               iconClassName="metric-icon"
               label="Budget remaining"
               loading={summaryLoading}
-              value={convertAndFormat(summary?.budget_remaining ?? 0, "USD")}
+              value={convertAndFormat(summary?.budget_remaining ?? 0, summaryBaseCurrency)}
               meta={
                 <div className="badge badge-primary mt-sm">
                   {summary?.budget_usage_percent ?? 0}% used
@@ -195,69 +187,34 @@ export default function DashboardPage() {
             />
 
             <StatCard
-              className="dashboard-kpi-card animate-in animate-in-delay-4"
-              icon={<ShoppingBag size={22} />}
-              iconStyle={{
-                background: topCategory ? `${topCategory.color}22` : "rgba(253,203,110,0.15)",
-                color: topCategory?.color || "var(--accent-warning)",
-              }}
-              label="Top category"
+              className="dashboard-kpi-card animate-in animate-in-delay-3"
+              icon={<Gauge size={22} />}
+              iconClassName={healthIconClass}
+              label="Financial Health"
               loading={summaryLoading}
-              value={topCategory?.name || "-"}
+              value={healthSignalLabel}
               valueClassName="stat-value-compact"
               meta={
-                <div className="badge badge-primary mt-sm">
-                  {summary?.over_budget_categories_count ?? 0} over budget
+                <div className={`badge ${healthBadgeClass} mt-sm`}>
+                  Score {healthScore}
                 </div>
               }
             />
           </div>
         </section>
 
+        {/* ── Section 2: Budget health + recent expenses ───────── */}
         <section className="dashboard-section">
           <SectionIntro
-            eyebrow="Analysis"
-            title="Trends and budget health"
-            description="Monthly momentum and the categories that need attention right now."
+            eyebrow="Spending"
+            title="Budget health and recent expenses"
           />
 
-          <div className="dashboard-primary-grid">
-            <div className="dashboard-panel animate-in animate-in-delay-2">
-              {monthlyLoading ? (
-                <StateSurface type="loading" framed />
-              ) : monthlyError ? (
-                <StateSurface
-                  type="error"
-                  framed
-                  title="Monthly chart unavailable"
-                  description="Try refreshing to reload your monthly spending totals."
-                  actionLabel="Retry"
-                  onAction={() => void refetchMonthly()}
-                  icon="!"
-                  compact
-                />
-              ) : monthly.length === 0 ? (
-                <StateSurface
-                  type="empty"
-                  framed
-                  title="No monthly activity yet"
-                  description="Add a few transactions to start seeing your spending trend."
-                  icon="~"
-                  compact
-                />
-              ) : (
-                <MonthlyBarChart
-                  data={monthly}
-                  title="Spending trend"
-                  periodLabel="Last 6 months"
-                />
-              )}
-            </div>
-
+          <div className="dashboard-activity-grid">
             <PanelCard
-              className="dashboard-panel animate-in animate-in-delay-3"
+              className="dashboard-panel animate-in animate-in-delay-1"
               title="Budget Health"
-              subtitle="Top categories compared with their current limits"
+              subtitle="Top categories vs. current limits"
               action={
                 <Link href="/budgets" className="btn btn-ghost btn-sm">
                   Manage
@@ -290,24 +247,129 @@ export default function DashboardPage() {
                   )}
                   renderMeta={(item) => (
                     <>
-                      <span>Spent {convertAndFormat(item.spent, "USD")}</span>
-                      <span>Limit {convertAndFormat(item.amount, "USD")}</span>
+                      <span>Spent {convertAndFormat(item.spent, item.base_currency || budgetOverviewBaseCurrency)}</span>
+                      <span>Limit {convertAndFormat(item.amount, item.base_currency || budgetOverviewBaseCurrency)}</span>
                     </>
                   )}
                 />
               )}
             </PanelCard>
+
+            <PanelCard
+              className="dashboard-panel animate-in animate-in-delay-2"
+              title="Recent Expenses"
+              subtitle="Latest 4 transactions"
+              action={
+                <Link href="/expenses" className="btn btn-ghost btn-sm">
+                  View all
+                </Link>
+              }
+              bodyClassName="expense-list"
+            >
+              {recentExpensesLoading ? (
+                <LoadingList count={4} height={52} />
+              ) : recentExpensesError ? (
+                <EmptyState
+                  title="Recent expenses unavailable"
+                  description="Try refreshing to reload your latest expenses."
+                  actionLabel="Retry"
+                  onAction={() => void refetchRecentExpenses()}
+                  icon="!"
+                  compact
+                />
+              ) : recentExpenses.length === 0 ? (
+                <EmptyState
+                  title="No expenses yet"
+                  description="Add your first transaction to see it here."
+                  icon="-"
+                  compact
+                />
+              ) : (
+                recentExpenses.map((expense) => {
+                  const category = categoryMap.get(expense.category_id);
+                  return (
+                    <RecordRow
+                      key={expense.id}
+                      leading={
+                        <div
+                          className="category-dot"
+                          style={{ background: category?.color || "var(--color-muted)" }}
+                        />
+                      }
+                      title={expense.description}
+                      meta={`${category?.name || "Other"} | ${formatDateShort(expense.expense_date)}`}
+                      amount={`-${convertAndFormat(expense.amount, expense.currency_code)}`}
+                    />
+                  );
+                })
+              )}
+            </PanelCard>
           </div>
         </section>
 
-        <section className="dashboard-section">
+        {/* ── Section 3: Spending trend (context) ──────────────── */}
+        <section className="dashboard-section dashboard-section-secondary">
           <SectionIntro
-            eyebrow="Activity"
-            title="Latest transactions"
-            description="Recent money in and money out, laid out side by side for faster scanning."
+            eyebrow="Trends"
+            title="Spending trend"
+          />
+
+          <div className="dashboard-panel animate-in animate-in-delay-1">
+            {monthlyLoading ? (
+              <StateSurface type="loading" framed />
+            ) : monthlyError ? (
+              <StateSurface
+                type="error"
+                framed
+                title="Monthly chart unavailable"
+                description="Try refreshing to reload your monthly spending totals."
+                actionLabel="Retry"
+                onAction={() => void refetchMonthly()}
+                icon="!"
+                compact
+              />
+            ) : monthly.length === 0 ? (
+              <StateSurface
+                type="empty"
+                framed
+                title="No monthly activity yet"
+                description="Add a few transactions to start seeing your spending trend."
+                icon="~"
+                compact
+              />
+            ) : (
+              <MonthlyBarChart
+                data={monthly}
+                baseCurrency={monthlyBaseCurrency}
+                title="Spending trend"
+                periodLabel="Last 6 months"
+              />
+            )}
+          </div>
+        </section>
+
+        {/* ── Section 4: Income overview (below fold) ──────────── */}
+        <section className="dashboard-section dashboard-section-secondary">
+          <SectionIntro
+            eyebrow="Income"
+            title="Income overview"
           />
 
           <div className="dashboard-activity-grid">
+            <StatCard
+              className="dashboard-kpi-card animate-in animate-in-delay-1"
+              icon={<DollarSign size={22} />}
+              iconClassName="metric-icon-success"
+              label="Income this month"
+              loading={summaryLoading}
+              value={convertAndFormat(summary?.total_income_this_month ?? 0, summaryBaseCurrency)}
+              meta={
+                <div className="badge badge-primary mt-sm">
+                  Net {convertAndFormat(summary?.net_balance_this_month ?? 0, summaryBaseCurrency)}
+                </div>
+              }
+            />
+
             <PanelCard
               className="dashboard-panel animate-in animate-in-delay-2"
               title="Recent Income"
@@ -319,90 +381,40 @@ export default function DashboardPage() {
               }
               bodyClassName="expense-list"
             >
-            {recentIncomesLoading ? (
-              <LoadingList count={3} height={52} />
-            ) : recentIncomesError ? (
-              <EmptyState
-                title="Recent income unavailable"
-                description="Try refreshing to reload your latest income entries."
-                actionLabel="Retry"
-                onAction={() => void refetchRecentIncomes()}
-                icon="!"
-                compact
-              />
-            ) : recentIncomes.length === 0 ? (
-              <EmptyState
-                title="No income recorded yet"
-                description="Add income to see it here."
-                icon="+"
-                compact
-              />
-            ) : (
-              recentIncomes.map((income) => (
-                <RecordRow
-                  key={income.id}
-                  leading={
-                    <div className="stat-icon metric-icon-success metric-icon-sm">
-                      <PiggyBank size={16} />
-                    </div>
-                  }
-                  title={income.description}
-                  meta={`${income.source} | ${formatDateShort(income.income_date)}`}
-                  amount={`+${convertAndFormat(income.amount, income.currency_code)}`}
-                  amountClassName="amount-positive"
+              {recentIncomesLoading ? (
+                <LoadingList count={3} height={52} />
+              ) : recentIncomesError ? (
+                <EmptyState
+                  title="Recent income unavailable"
+                  description="Try refreshing to reload your latest income entries."
+                  actionLabel="Retry"
+                  onAction={() => void refetchRecentIncomes()}
+                  icon="!"
+                  compact
                 />
-              ))
-            )}
-            </PanelCard>
-
-            <PanelCard
-              className="dashboard-panel animate-in animate-in-delay-3"
-              title="Recent Expenses"
-              subtitle="Latest 4 transactions"
-              action={
-                <Link href="/expenses" className="btn btn-ghost btn-sm">
-                  View all
-                </Link>
-              }
-              bodyClassName="expense-list"
-            >
-            {recentExpensesLoading ? (
-              <LoadingList count={4} height={52} />
-            ) : recentExpensesError ? (
-              <EmptyState
-                title="Recent expenses unavailable"
-                description="Try refreshing to reload your latest expenses."
-                actionLabel="Retry"
-                onAction={() => void refetchRecentExpenses()}
-                icon="!"
-                compact
-              />
-            ) : recentExpenses.length === 0 ? (
-              <EmptyState
-                title="No expenses yet"
-                description="Add your first transaction to see it here."
-                icon="-"
-                compact
-              />
-            ) : (
-              recentExpenses.map((expense) => {
-                const category = categoryMap.get(expense.category_id);
-                return (
+              ) : recentIncomes.length === 0 ? (
+                <EmptyState
+                  title="No income recorded yet"
+                  description="Add income to see it here."
+                  icon="+"
+                  compact
+                />
+              ) : (
+                recentIncomes.map((income) => (
                   <RecordRow
-                    key={expense.id}
+                    key={income.id}
                     leading={
-                      <div
-                        className="category-dot"
-                        style={{ background: category?.color || "var(--color-muted)" }}
-                      />
+                      <div className="stat-icon metric-icon-success metric-icon-sm">
+                        <PiggyBank size={16} />
+                      </div>
                     }
-                    title={expense.description}
-                    meta={`${category?.name || "Other"} | ${formatDateShort(expense.expense_date)}`}
-                    amount={`-${convertAndFormat(expense.amount, expense.currency_code)}`}
+                    title={income.description}
+                    meta={`${income.source} | ${formatDateShort(income.income_date)}`}
+                    amount={`+${convertAndFormat(income.amount, income.currency_code)}`}
+                    amountClassName="amount-positive"
                   />
-                );
-              })
-            )}
+                ))
+              )}
             </PanelCard>
           </div>
         </section>

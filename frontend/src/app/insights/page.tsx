@@ -83,6 +83,8 @@ export default function InsightsPage() {
   const { categories, error: categoriesError } = useCategories();
   const { data: monthly, error: monthlyError } = useMonthlyTotals(3);
   const { convertAndFormat } = useCurrency();
+  const summaryBaseCurrency = summary?.base_currency ?? "USD";
+  const categoryDistributionBaseCurrency = categoryDistribution[0]?.base_currency ?? "USD";
 
   async function fetchInsights(nextMode: "rule" | "ai") {
     setError(null);
@@ -164,7 +166,7 @@ export default function InsightsPage() {
           title: `${topCategory.name} is ${sortedCategories[0].percentage}% of spending`,
           desc: `Reducing ${topCategory.name} by 15% could save you ${convertAndFormat(
             savingsTarget,
-            "USD"
+            categoryDistributionBaseCurrency
           )} this month.`,
         });
       }
@@ -178,7 +180,7 @@ export default function InsightsPage() {
         title: "High Average Transaction",
         desc: `Your average transaction is ${convertAndFormat(
           summary?.avg_per_transaction ?? 0,
-          "USD"
+          summaryBaseCurrency
         )}. Splitting larger purchases could help track spending better.`,
       });
     }
@@ -197,7 +199,16 @@ export default function InsightsPage() {
     }
 
     return nextAlerts;
-  }, [categoryMap, change, convertAndFormat, monthly, sortedCategories, summary?.avg_per_transaction]);
+  }, [
+    categoryDistributionBaseCurrency,
+    categoryMap,
+    change,
+    convertAndFormat,
+    monthly,
+    sortedCategories,
+    summary?.avg_per_transaction,
+    summaryBaseCurrency,
+  ]);
   const savingsOpportunities = useMemo(
     () =>
       sortedCategories.slice(0, 3).map((item) => ({
@@ -284,7 +295,7 @@ export default function InsightsPage() {
                 </div>
                 <div className="progress-card-percent amount-positive">
                   <ArrowDown size={12} />{" "}
-                  {convertAndFormat(opportunity.potential, "USD")}
+                  {convertAndFormat(opportunity.potential, categoryDistributionBaseCurrency)}
                 </div>
               </div>
             ))

@@ -159,6 +159,7 @@ def test_cashflow_and_trends_normalize_mixed_currency_amounts(client: TestClient
     )
     assert cashflow_response.status_code == 200
     cashflow = cashflow_response.json()[0]
+    assert cashflow["base_currency"] == "USD"
     assert cashflow["expenses"] == 100.0
     assert cashflow["income"] == 200.0
     assert cashflow["net"] == 100.0
@@ -171,6 +172,7 @@ def test_cashflow_and_trends_normalize_mixed_currency_amounts(client: TestClient
     trend_point = next(
         item for item in trends_response.json() if item["date"] == "2026-04-02"
     )
+    assert trend_point["base_currency"] == "USD"
     assert trend_point["total"] == 100.0
 
 
