@@ -498,7 +498,7 @@
     linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03) 42%, rgba(255, 255, 255, 0.01) 100%),
     linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(148, 163, 184, 0.04) 52%, rgba(100, 116, 139, 0.02) 100%),
     rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--border-default);
   box-shadow:
     0 24px 56px rgba(0, 0, 0, 0.32),
     0 1px 0 rgba(255, 255, 255, 0.1) inset,
@@ -521,7 +521,7 @@
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03) 42%, rgba(255, 255, 255, 0.01) 100%),
     linear-gradient(155deg, rgba(255, 255, 255, 0.06), rgba(148, 163, 184, 0.04)),
     rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--border-default);
   box-shadow:
     0 30px 60px rgba(0, 0, 0, 0.36),
     0 1px 0 rgba(255, 255, 255, 0.1) inset;
@@ -531,7 +531,7 @@
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04)),
     rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--border-default);
 }
 
 [data-theme="dark"] .logoCopy strong {
@@ -554,7 +554,7 @@
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04)),
     rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--border-default);
   color: rgba(203, 213, 225, 0.88);
 }
 
@@ -586,7 +586,7 @@
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
     rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--border-default);
 }
 
 [data-theme="dark"] .mobileBrand strong {
@@ -601,7 +601,7 @@
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
     rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--border-default);
   color: rgba(203, 213, 225, 0.9);
 }
 
@@ -616,7 +616,7 @@
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
     rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--border-default);
   color: rgba(203, 213, 225, 0.88);
 }
 

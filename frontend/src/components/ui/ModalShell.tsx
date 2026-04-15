@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactNode, useEffect, useId, useRef } from "react";
+import styles from "./ModalShell.module.css";
 import { X } from "lucide-react";
 
 interface ModalShellProps {
@@ -27,9 +28,9 @@ export default function ModalShell({ title, onClose, children }: ModalShellProps
   }, [onClose]);
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className={`${styles.modalOverlay} modal-overlay`} onClick={onClose}>
       <div
-        className="modal"
+        className={`${styles.modalShell} modal`}
         onClick={(event) => event.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -37,8 +38,8 @@ export default function ModalShell({ title, onClose, children }: ModalShellProps
         ref={dialogRef}
         tabIndex={-1}
       >
-        <div className="modal-header">
-          <h2 className="modal-title" id={titleId}>
+        <div className={`${styles.modalHeader} modal-header`}>
+          <h2 className={`${styles.modalTitle} modal-title`} id={titleId}>
             {title}
           </h2>
           <button

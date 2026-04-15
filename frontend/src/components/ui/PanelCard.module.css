@@ -1,0 +1,44 @@
+.panelCard {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--card-padding);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: all var(--transition-base);
+  min-width: 0;
+}
+
+.panelCard:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+  box-shadow: var(--shadow-glow);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--stack-gap-sm);
+  margin-bottom: var(--stack-gap-md);
+}
+
+.cardHeading {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.cardTitle {
+  font-size: var(--font-md);
+  font-weight: 700;
+  line-height: var(--line-snug);
+  color: var(--text-primary);
+}
+
+.cardSubtitle {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  line-height: var(--line-base);
+}

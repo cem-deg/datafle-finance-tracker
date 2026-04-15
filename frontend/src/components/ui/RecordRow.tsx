@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import styles from "./RecordRow.module.css";
 
 interface RecordRowProps {
   leading: ReactNode;
@@ -22,14 +23,14 @@ export default function RecordRow({
   className = "",
 }: RecordRowProps) {
   return (
-    <div className={`expense-item ${className}`.trim()}>
+    <div className={`${styles.recordRow} expense-item ${className}`.trim()}>
       {leading}
-      <div className="expense-info">
-        <div className="expense-desc">{title}</div>
-        <div className="expense-meta">{meta}</div>
+      <div className={`${styles.expenseInfo} expense-info`}>
+        <div className={`${styles.expenseDesc} expense-desc`}>{title}</div>
+        <div className={`${styles.expenseMeta} expense-meta`}>{meta}</div>
       </div>
-      <div className={`expense-amount ${amountClassName}`.trim()}>{amount}</div>
-      {actions ? <div className="expense-actions">{actions}</div> : null}
+      <div className={`${styles.expenseAmount} expense-amount ${amountClassName}`.trim()}>{amount}</div>
+      {actions ? <div className={`${styles.expenseActions} expense-actions`}>{actions}</div> : null}
     </div>
   );
 }

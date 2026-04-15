@@ -1,0 +1,63 @@
+.recordRow {
+  display: flex;
+  align-items: center;
+  gap: var(--stack-gap-md);
+  padding: var(--card-padding-compact);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+}
+
+.recordRow:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+}
+
+.recordRow :global(.category-dot) {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.expenseInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.expenseDesc {
+  font-weight: 600;
+  font-size: var(--font-sm);
+  line-height: var(--line-snug);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.expenseMeta {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  line-height: var(--line-base);
+  margin-top: var(--space-2xs);
+}
+
+.expenseAmount {
+  font-weight: 700;
+  font-size: var(--font-sm);
+  line-height: var(--line-snug);
+  white-space: nowrap;
+  color: var(--accent-danger-light);
+}
+
+.expenseActions {
+  display: flex;
+  gap: var(--space-xs);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.recordRow:hover .expenseActions,
+.recordRow:focus-within .expenseActions {
+  opacity: 1;
+}

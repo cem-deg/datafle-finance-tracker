@@ -1,0 +1,132 @@
+/* ═══════════════════════════════════════════════════════════════
+   DATAFLE — Theme Overrides
+   Light-mode token remapping. Import after tokens.css.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Light Theme Override ───────────────────────────────────── */
+[data-theme="light"] {
+  --rgb-background: 244 247 251;
+  --rgb-surface: 255 255 255;
+  --rgb-surface-elevated: 248 250 252;
+  --rgb-surface-hover: 238 243 249;
+  --rgb-border: 194 207 223;
+  --rgb-primary: 54 95 214;
+  --rgb-primary-hover: 45 79 188;
+  --rgb-secondary: 47 143 131;
+  --rgb-success: 47 143 98;
+  --rgb-warning: 183 121 31;
+  --rgb-danger: 201 79 79;
+  --rgb-info: 47 111 214;
+  --rgb-muted: 123 135 151;
+
+  --color-background: #f4f7fb;
+  --color-surface: #ffffff;
+  --color-surface-elevated: #f8fafc;
+  --color-surface-hover: #eef3f9;
+  --color-card: rgba(255, 255, 255, 0.86);
+  --color-card-hover: rgba(248, 250, 252, 0.96);
+  --color-border: #d7e0ec;
+  --color-border-strong: #c2cfdf;
+  --color-primary: #365fd6;
+  --color-primary-hover: #2d4fbc;
+  --color-secondary: #2f8f83;
+  --color-text-primary: #122033;
+  --color-text-secondary: #526174;
+  --color-text-muted: #7b8797;
+  --color-success: #2f8f62;
+  --color-warning: #b7791f;
+  --color-danger: #c94f4f;
+  --color-info: #2f6fd6;
+  --color-muted: #7b8797;
+  --color-inverse: #ffffff;
+
+  --color-primary-soft: rgba(54, 95, 214, 0.12);
+  --color-secondary-soft: rgba(47, 143, 131, 0.12);
+  --color-success-soft: rgba(47, 143, 98, 0.12);
+  --color-warning-soft: rgba(183, 121, 31, 0.14);
+  --color-danger-soft: rgba(201, 79, 79, 0.12);
+  --color-info-soft: rgba(47, 111, 214, 0.12);
+  --color-overlay: rgba(18, 32, 51, 0.18);
+  --color-overlay-strong: rgba(18, 32, 51, 0.28);
+
+  --bg-primary: var(--color-background);
+  --bg-secondary: var(--color-surface);
+  --bg-elevated: var(--color-surface-elevated);
+  --bg-surface: var(--color-surface-hover);
+  --bg-hover: var(--color-surface-hover);
+
+  --accent-primary: var(--color-primary);
+  --accent-primary-dark: var(--color-primary-hover);
+  --accent-secondary: var(--color-secondary);
+  --accent-success: var(--color-success);
+  --accent-danger: var(--color-danger);
+  --accent-warning: var(--color-warning);
+  --accent-info: var(--color-info);
+
+  --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  --gradient-accent: linear-gradient(135deg, var(--color-primary) 0%, var(--color-info) 100%);
+  --gradient-danger: linear-gradient(135deg, var(--color-danger) 0%, color-mix(in srgb, var(--color-danger) 72%, #7f1d1d) 100%);
+  --gradient-surface: linear-gradient(135deg, rgba(54, 95, 214, 0.05) 0%, rgba(47, 143, 131, 0.04) 100%);
+
+  --text-primary: var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+  --text-tertiary: var(--color-text-muted);
+  --text-inverse: var(--color-inverse);
+
+  --glass-bg: var(--color-card);
+  --glass-bg-hover: var(--color-card-hover);
+  --glass-border: rgba(194, 207, 223, 0.9);
+  --glass-border-hover: rgba(159, 176, 197, 0.95);
+
+  /* Semantic surface tokens — light overrides */
+  --surface-card: rgba(255, 255, 255, 0.84);
+  --surface-card-elevated: rgba(255, 255, 255, 0.96);
+
+  /* Semantic border tokens — light overrides (black-on-white scale) */
+  --border-subtle: rgba(0, 0, 0, 0.07);
+  --border-default: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.10);
+
+  /* Surface highlight: inset top-edge glow — light overrides */
+  --highlight-top: rgba(255, 255, 255, 0.90);
+  --highlight-top-hover: rgba(255, 255, 255, 1);
+  --highlight-top-strong: rgba(255, 255, 255, 1);
+
+  --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 10px 24px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 22px 48px rgba(15, 23, 42, 0.12);
+  --shadow-glow: 0 12px 24px rgba(54, 95, 214, 0.1);
+  --shadow-glow-cyan: 0 12px 24px rgba(47, 143, 131, 0.08);
+
+  /* Surface elevation shadows — light overrides */
+  --shadow-surface: 0 8px 22px rgba(0, 0, 0, 0.055), 0 2px 6px rgba(0, 0, 0, 0.025);
+  --shadow-surface-hover: 0 12px 30px rgba(0, 0, 0, 0.07), 0 4px 10px rgba(0, 0, 0, 0.03);
+  --shadow-surface-strong: 0 14px 34px rgba(0, 0, 0, 0.08), 0 6px 14px rgba(0, 0, 0, 0.04);
+
+  --chart-grid: rgba(82, 97, 116, 0.12);
+  --chart-cursor: rgba(82, 97, 116, 0.08);
+  --chart-1: #365fd6;
+  --chart-2: #2f8f83;
+  --chart-3: #2f8f62;
+  --chart-4: #b7791f;
+  --chart-5: #7f6bb2;
+  --chart-6: #2f6fd6;
+  --chart-7: #c17a49;
+  --chart-8: #94a3b8;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: #c2cfdf;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: #9fb0c5;
+}
+
+[data-theme="light"] .form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235a5a78' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}

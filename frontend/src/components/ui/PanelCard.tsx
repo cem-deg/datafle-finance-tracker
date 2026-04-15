@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import styles from "./PanelCard.module.css";
 
 interface PanelCardProps {
   children: ReactNode;
@@ -20,13 +21,13 @@ export default function PanelCard({
   bodyClassName,
 }: PanelCardProps) {
   return (
-    <div className={`card ${className}`.trim()}>
+    <div className={`${styles.panelCard} card ${className}`.trim()}>
       {title || action ? (
-        <div className="card-header">
+        <div className={`${styles.cardHeader} card-header`}>
           {title ? (
-            <div className="card-heading">
-              <h3 className="card-title">{title}</h3>
-              {subtitle ? <p className="card-subtitle">{subtitle}</p> : null}
+            <div className={`${styles.cardHeading} card-heading`}>
+              <h3 className={`${styles.cardTitle} card-title`}>{title}</h3>
+              {subtitle ? <p className={`${styles.cardSubtitle} card-subtitle`}>{subtitle}</p> : null}
             </div>
           ) : (
             <div />

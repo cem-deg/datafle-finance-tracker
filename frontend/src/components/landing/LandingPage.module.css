@@ -64,7 +64,7 @@
   background:
     radial-gradient(circle at top left, rgba(255, 255, 255, 0.8), transparent 30%),
     radial-gradient(circle at 82% 18%, rgba(203, 213, 225, 0.42), transparent 24%),
-    linear-gradient(180deg, #f4f7f9 0%, #e9eef2 42%, #dce4ea 100%);
+    linear-gradient(180deg, #f2f3f5 0%, #edeef1 42%, #e9eaed 100%);
 }
 
 .hero {

@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
+import styles from "./StatCard.module.css";
 
 interface StatCardProps {
   icon: ReactNode;
@@ -26,16 +27,16 @@ export default function StatCard({
   valueClassName = "",
 }: StatCardProps) {
   return (
-    <div className={`stat-card ${className}`.trim()}>
-      <div className={`stat-icon ${iconClassName}`.trim()} style={iconStyle}>
+    <div className={`${styles.statCard} stat-card ${className}`.trim()}>
+      <div className={`${styles.statIcon} stat-icon ${iconClassName}`.trim()} style={iconStyle}>
         {icon}
       </div>
       {loading ? (
         <div className="skeleton skeleton-heading" />
       ) : (
         <>
-          <div className={`stat-value ${valueClassName}`.trim()}>{value}</div>
-          <div className="stat-label">{label}</div>
+          <div className={`${styles.statValue} stat-value ${valueClassName}`.trim()}>{value}</div>
+          <div className={`${styles.statLabel} stat-label`}>{label}</div>
           {meta ? meta : null}
         </>
       )}

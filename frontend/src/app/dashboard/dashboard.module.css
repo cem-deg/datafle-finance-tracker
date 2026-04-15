@@ -1,0 +1,269 @@
+.dashboardRoot {}
+
+/* ===================================================================
+   Dashboard - Owned Style Layer
+   Phase 2: surface migration into unified product family.
+   Phase 3: token enforcement — repeated local values replaced with
+   central semantic tokens from tokens.css / theme.css.
+   Visual direction: graphite/slate, processed glass, neutral base.
+   All selectors are anchored to .dashboardRoot so CSS Modules stay pure
+   while existing global JSX class names continue to work.
+   =================================================================== */
+
+/* -- 1. App layout: dashboard context -------------------------------- */
+
+/* Dark mode: graphite/charcoal base — no template navy, no teal tints */
+/* Hex background colors are intentionally local: environment-specific, not reusable tokens */
+.dashboardRoot:global(.app-layout-dashboard) {
+  background:
+    radial-gradient(circle at 22% 14%, rgba(120, 130, 150, 0.04), transparent 40%),
+    radial-gradient(circle at 78% 18%, rgba(90, 100, 120, 0.03), transparent 35%),
+    linear-gradient(168deg, #11131a 0%, #0f1116 48%, #0c0e13 100%);
+}
+
+/* Light mode: cool neutral gray — not blue-tinted, not warm white */
+:global([data-theme="light"]) .dashboardRoot:global(.app-layout-dashboard) {
+  background:
+    radial-gradient(circle at 22% 14%, rgba(148, 163, 184, 0.05), transparent 40%),
+    radial-gradient(circle at 78% 18%, rgba(100, 116, 139, 0.04), transparent 35%),
+    linear-gradient(168deg, #f2f3f5 0%, #edeef1 48%, #e9eaed 100%);
+}
+
+/* Sidebar in dashboard context: glass panel floating in the environment */
+/* Sidebar bg and border are intentionally local: dashboard-sidebar contextual values */
+:global([data-theme="light"]) .dashboardRoot:global(.app-layout-dashboard) :global(.sidebar) {
+  background: rgba(246, 247, 249, 0.92);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  border-right-color: var(--border-default);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.5);
+}
+
+:global([data-theme="light"]) .dashboardRoot:global(.app-layout-dashboard) :global(.sidebar-logo),
+:global([data-theme="light"]) .dashboardRoot:global(.app-layout-dashboard) :global(.sidebar-footer) {
+  border-color: var(--border-subtle);
+}
+
+/* -- 2. Dashboard shell layout --------------------------------------- */
+
+.dashboardRoot :global(.dashboard-shell) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+
+.dashboardRoot :global(.dashboard-section) {
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboardRoot :global(.dashboard-kpi-grid) {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) repeat(2, minmax(0, 1fr));
+  gap: var(--stack-gap-md);
+}
+
+.dashboardRoot :global(.dashboard-kpi-card) {
+  height: 100%;
+}
+
+.dashboardRoot :global(.dashboard-primary-grid) {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(320px, 1fr);
+  gap: var(--stack-gap-md);
+}
+
+.dashboardRoot :global(.dashboard-activity-grid) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--stack-gap-md);
+}
+
+.dashboardRoot :global(.dashboard-panel) {
+  height: 100%;
+}
+
+.dashboardRoot :global(.dashboard-panel .card-header) {
+  align-items: flex-start;
+}
+
+/* -- 3. Surface polish - dark mode ----------------------------------- */
+
+/* Card surfaces: processed graphite glass, neutral shadows */
+.dashboardRoot :global(.dashboard-shell .card),
+.dashboardRoot :global(.dashboard-shell .stat-card) {
+  background: var(--surface-card);
+  border-color: var(--border-subtle);
+  box-shadow:
+    var(--shadow-surface),
+    inset 0 1px 0 var(--highlight-top);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+}
+
+.dashboardRoot :global(.dashboard-shell .card:hover),
+.dashboardRoot :global(.dashboard-shell .stat-card:hover) {
+  border-color: var(--border-strong);
+  box-shadow:
+    var(--shadow-surface-hover),
+    inset 0 1px 0 var(--highlight-top-hover);
+}
+
+/* Primary KPI card: elevated surface, stronger presence */
+.dashboardRoot :global(.dashboard-kpi-card-primary) {
+  background: var(--surface-card-elevated);
+  border-color: var(--border-default);
+  box-shadow:
+    var(--shadow-surface-strong),
+    inset 0 1px 0 var(--highlight-top-strong);
+}
+
+/* Primary KPI: larger stat value for hierarchy */
+.dashboardRoot :global(.dashboard-kpi-card-primary .stat-value) {
+  font-size: var(--font-3xl);
+}
+
+/* Accent line on primary card: permanently at rest */
+.dashboardRoot :global(.dashboard-kpi-card-primary::before) {
+  opacity: 0.5;
+}
+
+/* Section intros: breathing room + display font for structural labels */
+.dashboardRoot :global(.dashboard-shell .section-intro) {
+  margin-bottom: var(--space-lg);
+}
+
+.dashboardRoot :global(.dashboard-shell .section-intro-title) {
+  font-family: var(--font-display);
+}
+
+/* Panel card titles: slightly larger for cleaner visual hierarchy */
+.dashboardRoot :global(.dashboard-shell .card-title) {
+  font-size: var(--font-lg);
+}
+
+/* Expense / income rows: lightweight list feel inside panel cards */
+.dashboardRoot :global(.dashboard-shell .expense-list .expense-item) {
+  background: transparent;
+  border-color: var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+/* Intentionally local: rgba(255,255,255,0.04) is a very subtle list-row hover,
+   too specific for a reusable token */
+.dashboardRoot :global(.dashboard-shell .expense-list .expense-item:hover) {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--border-default);
+}
+
+/* Budget progress rows: transparent background, not nested glass boxes */
+.dashboardRoot :global(.dashboard-shell .progress-list .progress-card) {
+  background: transparent;
+}
+
+/* -- 4. Surface polish - light mode ---------------------------------- */
+
+:global([data-theme="light"]) .dashboardRoot :global(.dashboard-shell .card) {
+  background: var(--surface-card);
+  border-color: var(--border-default);
+  box-shadow:
+    var(--shadow-surface),
+    inset 0 1px 0 var(--highlight-top),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+}
+
+/* stat-card bg slightly opaque vs card — intentionally local, single use */
+:global([data-theme="light"]) .dashboardRoot :global(.dashboard-shell .stat-card) {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: var(--border-subtle);
+  box-shadow:
+    var(--shadow-surface),
+    inset 0 1px 0 var(--highlight-top),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.04);
+}
+
+:global([data-theme="light"]) .dashboardRoot :global(.dashboard-shell .card:hover),
+:global([data-theme="light"]) .dashboardRoot :global(.dashboard-shell .stat-card:hover) {
+  background: var(--surface-card-elevated);
+  border-color: var(--border-strong);
+  box-shadow:
+    var(--shadow-surface-hover),
+    inset 0 1px 0 var(--highlight-top-hover),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+}
+
+:global([data-theme="light"]) .dashboardRoot :global(.dashboard-kpi-card-primary) {
+  background: var(--surface-card-elevated);
+  border-color: var(--border-strong);
+  box-shadow:
+    var(--shadow-surface-strong),
+    inset 0 1px 0 var(--highlight-top-strong),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06);
+}
+
+:global([data-theme="light"]) .dashboardRoot :global(.dashboard-shell .expense-list .expense-item) {
+  border-color: var(--border-subtle);
+}
+
+/* Intentionally local: rgba(255,255,255,0.6) is a list-row-specific hover bg,
+   not a reusable surface value */
+:global([data-theme="light"]) .dashboardRoot :global(.dashboard-shell .expense-list .expense-item:hover) {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: var(--border-default);
+}
+
+/* -- 5. Responsive ---------------------------------------------------- */
+
+@media (max-width: 1024px) {
+  .dashboardRoot :global(.dashboard-primary-grid),
+  .dashboardRoot :global(.dashboard-activity-grid) {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboardRoot :global(.dashboard-kpi-grid) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  /* Tighter section rhythm on mobile */
+  .dashboardRoot :global(.dashboard-shell) {
+    gap: var(--space-lg);
+  }
+
+  /* Reduce card mass */
+  .dashboardRoot :global(.dashboard-shell .stat-card),
+  .dashboardRoot :global(.dashboard-shell .card) {
+    padding: var(--card-padding-compact);
+  }
+
+  /* Smaller section headings — operational dashboard, not marketing */
+  .dashboardRoot :global(.dashboard-shell .section-intro-title) {
+    font-size: var(--font-lg);
+  }
+
+  /* KPI hierarchy: primary spans full row, secondary pair 2-col */
+  .dashboardRoot :global(.dashboard-kpi-grid) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .dashboardRoot :global(.dashboard-kpi-card-primary) {
+    grid-column: 1 / -1;
+  }
+
+  /* Secondary sections: compressed heading to signal lower priority */
+  .dashboardRoot :global(.dashboard-section-secondary .section-intro-title) {
+    font-size: var(--font-md);
+  }
+}
+
+@media (max-width: 480px) {
+  /* Small phones: 2-col KPI is too cramped — single column */
+  .dashboardRoot :global(.dashboard-kpi-grid) {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboardRoot :global(.dashboard-kpi-card-primary) {
+    grid-column: unset;
+  }
+}

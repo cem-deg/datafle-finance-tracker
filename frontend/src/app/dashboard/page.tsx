@@ -1,5 +1,6 @@
 "use client";
 
+import styles from "./dashboard.module.css";
 import Link from "next/link";
 import { useEffect, useMemo, useRef } from "react";
 import {
@@ -134,7 +135,7 @@ export default function DashboardPage() {
   );
 
   return (
-    <AppShell className="app-layout-dashboard">
+    <AppShell className={`${styles.dashboardRoot} app-layout-dashboard`}>
       <div className="dashboard-shell">
         <PageHeader
           title="Dashboard"
