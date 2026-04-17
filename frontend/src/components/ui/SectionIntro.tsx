@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import styles from "./SectionIntro.module.css";
 
 interface SectionIntroProps {
   eyebrow?: string;
@@ -17,14 +18,18 @@ export default function SectionIntro({
   action,
   className = "",
 }: SectionIntroProps) {
+  const rootClassName = [styles.sectionIntro, "section-intro", className]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div className={`section-intro ${className}`.trim()}>
-      <div className="section-intro-copy">
-        {eyebrow ? <div className="section-intro-eyebrow">{eyebrow}</div> : null}
-        <h2 className="section-intro-title">{title}</h2>
-        {description ? <p className="section-intro-description">{description}</p> : null}
+    <div className={rootClassName}>
+      <div className={styles.copy}>
+        {eyebrow ? <div className={styles.eyebrow}>{eyebrow}</div> : null}
+        <h2 className={`${styles.title} section-intro-title`}>{title}</h2>
+        {description ? <p className={styles.description}>{description}</p> : null}
       </div>
-      {action ? <div className="section-intro-action">{action}</div> : null}
+      {action ? <div className={styles.action}>{action}</div> : null}
     </div>
   );
 }

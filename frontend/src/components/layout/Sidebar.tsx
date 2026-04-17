@@ -13,6 +13,7 @@ import {
   Calendar, Globe, X,
   Banknote, Target,
 } from "lucide-react";
+import styles from "./Sidebar.module.css";
 
 const iconMap: Record<string, React.ReactNode> = {
   "layout-dashboard": <LayoutDashboard size={20} />,
@@ -57,17 +58,21 @@ export default function Sidebar() {
     <>
       <aside className="sidebar" id="sidebar">
         <div className="sidebar-logo">
-          <div className="logo-icon"><TrendingUp size={18} /></div>
+          <div className={styles.logoIcon}><TrendingUp size={18} /></div>
           <h1>{APP_NAME}</h1>
         </div>
 
-        <nav className="sidebar-nav">
+        <nav className={styles.sidebarNav}>
           {NAV_ITEMS.map((item) => {
             const isActive = item.href === "/dashboard"
               ? pathname === "/dashboard" || pathname === "/"
               : pathname.startsWith(item.href);
             return (
-              <Link key={item.href} href={item.href} className={`sidebar-link ${isActive ? "active" : ""}`}>
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`${styles.sidebarLink} ${isActive ? styles.active : ""}`.trim()}
+              >
                 {iconMap[item.icon]}
                 <span>{item.label}</span>
               </Link>
@@ -76,7 +81,7 @@ export default function Sidebar() {
         </nav>
 
         {/* Theme Toggle */}
-        <div className="sidebar-theme-toggle-wrap">
+        <div className={styles.themeToggleWrap}>
           <button className="theme-toggle btn-full" onClick={toggleTheme} title="Toggle theme" id="theme-toggle-sidebar" type="button">
             {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
             {theme === "dark" ? "Light Mode" : "Dark Mode"}
@@ -85,36 +90,36 @@ export default function Sidebar() {
 
         {/* Profile Section */}
         <div className="sidebar-footer">
-          <div className="profile-panel">
+          <div className={styles.profilePanel}>
             <button
-              className="sidebar-user sidebar-profile-trigger"
+              className={`${styles.sidebarUser} ${styles.profileTrigger}`}
               onClick={() => setProfileExpanded(!profileExpanded)}
               type="button"
               aria-expanded={profileExpanded}
               aria-controls="sidebar-profile-details"
             >
-              <div className="avatar">{initial}</div>
-              <div className="user-info">
-                <div className="user-name">{user?.name || "User"}</div>
-                <div className="user-email">{user?.email || ""}</div>
+              <div className={styles.avatar}>{initial}</div>
+              <div className={styles.userInfo}>
+                <div className={styles.userName}>{user?.name || "User"}</div>
+                <div className={styles.userEmail}>{user?.email || ""}</div>
               </div>
               <ChevronDown
                 size={16}
-                className={`sidebar-profile-chevron ${profileExpanded ? "open" : ""}`}
+                className={`${styles.profileChevron} ${profileExpanded ? styles.profileChevronOpen : ""}`.trim()}
               />
             </button>
 
             {profileExpanded && (
-              <div className="profile-expanded" id="sidebar-profile-details">
-                <div className="profile-detail">
+              <div className={styles.profileExpanded} id="sidebar-profile-details">
+                <div className={styles.profileDetail}>
                   <Calendar size={14} />
                   <span>Member since {memberSince}</span>
                 </div>
-                <div className="profile-detail">
+                <div className={styles.profileDetail}>
                   <Globe size={14} />
                   <span>{currency.flag} {currency.code}</span>
                 </div>
-                <div className="sidebar-profile-actions">
+                <div className={styles.profileActions}>
                   <button
                     className="btn btn-ghost btn-sm btn-equal"
                     onClick={() => setShowSettings(true)}
@@ -148,35 +153,35 @@ export default function Sidebar() {
             aria-labelledby={settingsTitleId}
             tabIndex={-1}
           >
-            <div className="sidebar-settings-header">
+            <div className={styles.settingsHeader}>
               <h2 className="modal-title" id={settingsTitleId}>Settings</h2>
               <button className="btn btn-ghost btn-icon" onClick={() => setShowSettings(false)} type="button" aria-label="Close settings"><X size={20} /></button>
             </div>
 
-            <div className="settings-section">
+            <div className={styles.settingsSection}>
               <h3>Currency</h3>
-              <p className="settings-help">
+              <p className={styles.settingsHelp}>
                 Select your preferred currency for displaying amounts
               </p>
-              <div className="currency-grid">
+              <div className={styles.currencyGrid}>
                 {SUPPORTED_CURRENCIES.map((c) => (
                   <button
                     key={c.code}
                     type="button"
-                    className={`currency-option ${currency.code === c.code ? "selected" : ""}`}
+                    className={`${styles.currencyOption} ${currency.code === c.code ? styles.currencyOptionSelected : ""}`.trim()}
                     onClick={() => setCurrency(c.code)}
                     aria-pressed={currency.code === c.code}
                   >
-                    <span className="currency-flag">{c.flag}</span>
+                    <span className={styles.currencyFlag}>{c.flag}</span>
                     <span>{c.code}</span>
                   </button>
                 ))}
               </div>
             </div>
 
-            <div className="settings-section">
+            <div className={styles.settingsSection}>
               <h3>Theme</h3>
-              <div className="settings-theme-row">
+              <div className={styles.settingsThemeRow}>
                 <button
                   className={`btn btn-equal ${theme === "dark" ? "btn-primary" : "btn-secondary"}`}
                   onClick={() => { if (theme !== "dark") toggleTheme(); }}

@@ -1,0 +1,35 @@
+.loadingShell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  position: relative;
+  z-index: 1;
+}
+
+.appLayout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+.mainContent {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  padding: var(--space-lg);
+  padding-bottom: var(--space-3xl);
+  transition: margin-left var(--transition-base);
+  min-height: 100vh;
+  min-width: 0;
+  overflow-x: clip;
+}
+
+@media (max-width: 768px) {
+  .mainContent {
+    margin-left: 0;
+    padding: var(--space-md);
+    padding-bottom: calc(var(--mobile-nav-height) + var(--space-xl));
+  }
+}

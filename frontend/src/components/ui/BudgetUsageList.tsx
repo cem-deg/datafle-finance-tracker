@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
+import styles from "./BudgetUsageList.module.css";
 
 interface BudgetUsageItem {
   budget_id: number;
@@ -26,28 +27,28 @@ export default function BudgetUsageList({
   renderMeta,
 }: BudgetUsageListProps) {
   return (
-    <div className="progress-list">
+    <div className={`${styles.list} progress-list`}>
       {items.map((item) => (
-        <div key={item.budget_id} className="progress-card">
-          <div className="progress-card-header">
-            <div className="progress-card-label">
+        <div key={item.budget_id} className={`${styles.card} progress-card`}>
+          <div className={styles.header}>
+            <div className={styles.label}>
               {renderIcon ? renderIcon(item) : null}
               <strong>{item.category_name}</strong>
             </div>
-            <span className={`progress-card-percent ${item.is_over_budget ? "is-danger" : ""}`}>
+            <span className={`${styles.percent} ${item.is_over_budget ? styles.danger : ""}`.trim()}>
               {item.usage_percent}%
             </span>
           </div>
-          <div className="progress-track">
+          <div className={styles.track}>
             <div
-              className="progress-fill"
+              className={styles.fill}
               style={{
                 width: `${Math.min(item.usage_percent, 100)}%`,
                 background: item.is_over_budget ? "var(--accent-danger)" : item.category_color,
               }}
             />
           </div>
-          <div className="progress-card-meta">{renderMeta(item)}</div>
+          <div className={styles.meta}>{renderMeta(item)}</div>
         </div>
       ))}
     </div>

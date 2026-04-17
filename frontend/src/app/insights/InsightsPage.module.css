@@ -1,0 +1,265 @@
+.insightCard {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  white-space: pre-wrap;
+  line-height: 1.8;
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+.insightCard strong,
+.insightCard b {
+  color: var(--text-primary);
+}
+
+.insightModeToggle {
+  display: flex;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-full);
+  padding: 4px;
+  gap: 4px;
+  width: fit-content;
+}
+
+.insightModeBtn {
+  padding: 8px 20px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  transition: all var(--transition-base);
+}
+
+.insightModeBtnActive {
+  background: var(--gradient-accent);
+  color: white;
+}
+
+.insightsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.healthScoreCard {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--card-padding);
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  transition: all var(--transition-base);
+}
+
+.healthScoreCard:hover {
+  border-color: var(--glass-border-hover);
+  box-shadow: var(--shadow-glow);
+}
+
+.scoreRing {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+}
+
+.scoreRing svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ringBg {
+  fill: none;
+  stroke: var(--bg-surface);
+  stroke-width: 8;
+}
+
+.ringFill {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s ease;
+}
+
+.scoreText {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.scoreValue {
+  font-size: var(--font-2xl);
+  font-weight: 800;
+}
+
+.scoreLabel {
+  font-size: var(--font-2xs);
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: var(--line-snug);
+}
+
+.healthDetails h3 {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  margin-bottom: var(--space-xs);
+  line-height: var(--line-snug);
+}
+
+.healthDetails p {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  line-height: var(--line-relaxed);
+}
+
+.alertStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.smartAlert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--card-padding-compact);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+}
+
+.smartAlert:hover {
+  border-color: var(--glass-border-hover);
+}
+
+.alertIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: var(--font-md);
+}
+
+.alertContent {
+  flex: 1;
+}
+
+.alertTitle {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  margin-bottom: var(--space-2xs);
+  line-height: var(--line-snug);
+}
+
+.alertDesc {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  line-height: var(--line-relaxed);
+}
+
+.savingsItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-sm);
+}
+
+.savingsBarWrap {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.savingsBar {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 1s ease;
+}
+
+.savingsMetric {
+  font-size: var(--font-xs);
+  color: var(--accent-success);
+}
+
+.mutedCopy {
+  font-size: var(--font-sm);
+  color: var(--text-tertiary);
+}
+
+.labelStack {
+  min-width: 80px;
+}
+
+.labelStack strong {
+  display: block;
+  font-size: var(--font-xs);
+  font-weight: 600;
+}
+
+.labelStack span {
+  display: block;
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+}
+
+.insightSurface {
+  position: relative;
+  overflow: hidden;
+}
+
+.insightSurfaceAccent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.insightCardShell {
+  background: var(--bg-elevated);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+@media (max-width: 768px) {
+  .insightsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .healthScoreCard {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .insightModeToggle {
+    width: 100%;
+  }
+
+  .insightModeBtn {
+    flex: 1;
+    text-align: center;
+  }
+}

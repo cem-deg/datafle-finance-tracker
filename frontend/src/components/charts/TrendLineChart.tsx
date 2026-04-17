@@ -8,6 +8,7 @@ import {
 import { formatDateShort } from "@/utils/formatters";
 import { useCurrency } from "@/context/CurrencyContext";
 import type { DailyTrend } from "@/types";
+import styles from "./ChartPrimitives.module.css";
 
 interface Props {
   data: DailyTrend[];
@@ -32,9 +33,9 @@ function CustomTooltip({
   const formatted = convertAndFormat ? convertAndFormat(value, baseCurrency) : `${value.toLocaleString()}`;
   
   return (
-    <div className="chart-tooltip">
-      <p className="chart-tooltip-label">{label}</p>
-      <p className="chart-tooltip-value">{formatted}</p>
+    <div className={styles.tooltip}>
+      <p className={styles.tooltipLabel}>{label}</p>
+      <p className={styles.tooltipValue}>{formatted}</p>
     </div>
   );
 }
@@ -56,7 +57,7 @@ function TrendLineChart({ data, baseCurrency }: Props) {
         <h3 className="card-title">Spending Trend</h3>
         <span className="badge badge-primary">Last 30 days</span>
       </div>
-      <div className="chart-container">
+      <div className={styles.container}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData}>
             <defs>

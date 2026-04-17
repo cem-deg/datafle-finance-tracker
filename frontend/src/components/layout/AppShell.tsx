@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import Sidebar from "./Sidebar";
 import MobileNav from "./MobileNav";
+import styles from "./AppShell.module.css";
 
 export default function AppShell({
   children,
@@ -28,7 +29,7 @@ export default function AppShell({
 
   if (isLoading) {
     return (
-      <div className="auth-page">
+      <div className={styles.loadingShell}>
         <div className="text-center">
           <div className="skeleton mx-auto mb-md" style={{ width: 60, height: 60, borderRadius: "50%" }} />
           <div className="skeleton skeleton-text mx-auto" style={{ width: 120 }} />
@@ -40,9 +41,9 @@ export default function AppShell({
   if (!user) return null;
 
   return (
-    <div className={`app-layout ${className}`.trim()}>
+    <div className={`${styles.appLayout} ${className}`.trim()}>
       <Sidebar />
-      <main className="main-content">{children}</main>
+      <main className={styles.mainContent}>{children}</main>
       <MobileNav />
     </div>
   );

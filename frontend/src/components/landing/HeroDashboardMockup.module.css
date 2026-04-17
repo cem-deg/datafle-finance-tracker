@@ -116,7 +116,7 @@
   margin-top: 0.18rem;
   font-size: 0.67rem;
   line-height: 1.28;
-  color: rgba(20, 32, 51, 0.56);
+  color: var(--landing-text-muted);
 }
 
 .heroDashboardBody {

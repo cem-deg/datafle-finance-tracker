@@ -7,6 +7,7 @@ import {
 import { getMonthName } from "@/utils/formatters";
 import { useCurrency } from "@/context/CurrencyContext";
 import type { MonthlyTotal } from "@/types";
+import styles from "./ChartPrimitives.module.css";
 
 interface Props {
   data: MonthlyTotal[];
@@ -33,9 +34,9 @@ function CustomTooltip({
   const formatted = convertAndFormat ? convertAndFormat(value, baseCurrency) : `${value.toLocaleString()}`;
   
   return (
-    <div className="chart-tooltip">
-      <p className="chart-tooltip-label">{label}</p>
-      <p className="chart-tooltip-value">{formatted}</p>
+    <div className={styles.tooltip}>
+      <p className={styles.tooltipLabel}>{label}</p>
+      <p className={styles.tooltipValue}>{formatted}</p>
     </div>
   );
 }
@@ -82,7 +83,7 @@ function MonthlyBarChart({
           {periodLabel ? <p className="card-subtitle">{periodLabel}</p> : null}
         </div>
       </div>
-      <div ref={containerRef} className="chart-container chart-container-dynamic">
+      <div ref={containerRef} className={`${styles.container} ${styles.containerDynamic}`}>
         {chartSize.width > 0 && chartSize.height > 0 ? (
           <BarChart width={chartSize.width} height={chartSize.height} data={chartData} barSize={24}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />

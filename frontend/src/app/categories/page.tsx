@@ -70,6 +70,7 @@ import { useFlashMessage } from "@/hooks/useFlashMessage";
 import { useCategories } from "@/hooks/useData";
 import { categoryApi } from "@/services/api";
 import { CATEGORY_COLORS, CATEGORY_ICON_GROUPS } from "@/utils/constants";
+import styles from "./CategoriesPage.module.css";
 
 const ICON_MAP: Record<string, ReactNode> = {
   utensils: <Utensils size={18} />,
@@ -249,11 +250,11 @@ export default function CategoriesPage() {
         errorMessages={[error]}
       />
 
-      <div className="category-grid animate-in animate-in-delay-1">
+      <div className={`${styles.categoryGrid} animate-in animate-in-delay-1`}>
         {loading ? (
           <LoadingList count={8} height={68} />
         ) : error ? (
-          <div className="category-grid-full">
+          <div className={styles.categoryGridFull}>
             <EmptyState
               title="Could not load categories"
               description="Try refreshing the page or checking the backend connection."
@@ -263,7 +264,7 @@ export default function CategoriesPage() {
             />
           </div>
         ) : categories.length === 0 ? (
-          <div className="category-grid-full">
+          <div className={styles.categoryGridFull}>
             <EmptyState
               title="No categories yet"
               description="Create categories to organize your expenses."
@@ -274,12 +275,12 @@ export default function CategoriesPage() {
           </div>
         ) : (
           categories.map((category) => (
-            <div key={category.id} className="category-item">
-              <div className="category-color" style={{ background: category.color }}>
+            <div key={category.id} className={styles.categoryItem}>
+              <div className={styles.categoryColor} style={{ background: category.color }}>
                 {ICON_MAP[category.icon] || <Circle size={18} />}
               </div>
-              <span className="category-name">{category.name}</span>
-              <div className="category-actions">
+              <span className={styles.categoryName}>{category.name}</span>
+              <div className={styles.categoryActions}>
                 <button
                   className="btn btn-ghost btn-icon btn-sm"
                   onClick={() => openEdit(category)}
@@ -335,12 +336,12 @@ export default function CategoriesPage() {
               label="Color"
               help="Use a distinct color so charts and lists stay easy to read."
             >
-              <div className="color-picker">
+              <div className={styles.colorPicker}>
                 {CATEGORY_COLORS.map((color) => (
                   <button
                     key={color}
                     type="button"
-                    className={`color-swatch ${form.color === color ? "selected" : ""}`}
+                    className={`${styles.colorSwatch} ${form.color === color ? styles.colorSwatchSelected : ""}`.trim()}
                     style={{ background: color }}
                     onClick={() => updateForm("color", color)}
                     aria-label={`Choose ${color} as the category color`}
@@ -364,7 +365,7 @@ export default function CategoriesPage() {
                   aria-label="Search category icons"
                 />
               </div>
-              <div className="picker-panel">
+              <div className={styles.pickerPanel}>
                 {filteredGroups.length === 0 ? (
                   <EmptyState
                     title="No icons found"
@@ -374,9 +375,9 @@ export default function CategoriesPage() {
                   />
                 ) : (
                   filteredGroups.map((group) => (
-                    <div key={group.label} className="icon-group">
-                      <div className="icon-group-title">{group.label}</div>
-                      <div className="icon-group-grid">
+                    <div key={group.label} className={styles.iconGroup}>
+                      <div className={styles.iconGroupTitle}>{group.label}</div>
+                      <div className={styles.iconGroupGrid}>
                         {group.icons.map((icon) => (
                           <button
                             key={icon}
@@ -385,7 +386,7 @@ export default function CategoriesPage() {
                             title={icon}
                             aria-label={`Use ${icon} icon`}
                             aria-pressed={form.icon === icon}
-                            className={`icon-option ${form.icon === icon ? "selected" : ""}`}
+                            className={`${styles.iconOption} ${form.icon === icon ? styles.iconOptionSelected : ""}`.trim()}
                             style={
                               form.icon === icon
                                 ? {

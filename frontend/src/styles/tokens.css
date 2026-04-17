@@ -7,49 +7,49 @@
 /* ─── CSS Custom Properties (Design Tokens) ─────────────────── */
 :root {
   /* Semantic palette */
-  --rgb-background: 11 18 32;
-  --rgb-surface: 18 27 45;
-  --rgb-surface-elevated: 24 36 58;
-  --rgb-surface-hover: 31 46 72;
-  --rgb-border: 74 93 123;
-  --rgb-primary: 76 110 245;
-  --rgb-primary-hover: 61 90 214;
+  --rgb-background: 13 14 18;
+  --rgb-surface: 20 21 26;
+  --rgb-surface-elevated: 26 27 32;
+  --rgb-surface-hover: 30 32 39;
+  --rgb-border: 64 68 80;
+  --rgb-primary: 107 115 208;
+  --rgb-primary-hover: 92 100 190;
   --rgb-secondary: 47 143 131;
   --rgb-success: 47 158 111;
   --rgb-warning: 191 136 37;
   --rgb-danger: 205 92 92;
   --rgb-info: 59 130 246;
-  --rgb-muted: 108 124 147;
+  --rgb-muted: 110 116 128;
 
-  --color-background: #0b1220;
-  --color-surface: #121b2d;
-  --color-surface-elevated: #18243a;
-  --color-surface-hover: #1f2e48;
-  --color-card: rgba(18, 27, 45, 0.82);
-  --color-card-hover: rgba(24, 36, 58, 0.9);
-  --color-border: #2a3b51;
-  --color-border-strong: #40536f;
-  --color-primary: #4c6ef5;
-  --color-primary-hover: #3d5ad6;
+  --color-background: #0d0e12;
+  --color-surface: #14151a;
+  --color-surface-elevated: #1a1b20;
+  --color-surface-hover: #1e2027;
+  --color-card: rgba(20, 21, 27, 0.82);
+  --color-card-hover: rgba(24, 26, 32, 0.9);
+  --color-border: #2a2d36;
+  --color-border-strong: #3e424f;
+  --color-primary: #6b73d0;
+  --color-primary-hover: #5c64be;
   --color-secondary: #2f8f83;
   --color-text-primary: #e8eef7;
-  --color-text-secondary: #9aa8bd;
-  --color-text-muted: #6c7c93;
+  --color-text-secondary: #9aa3af;
+  --color-text-muted: #6e7480;
   --color-success: #2f9e6f;
   --color-warning: #bf8825;
   --color-danger: #cd5c5c;
   --color-info: #3b82f6;
-  --color-muted: #6c7c93;
-  --color-inverse: #0b1220;
+  --color-muted: #6e7480;
+  --color-inverse: #0d0e12;
 
-  --color-primary-soft: rgba(76, 110, 245, 0.14);
+  --color-primary-soft: rgba(107, 115, 208, 0.14);
   --color-secondary-soft: rgba(47, 143, 131, 0.14);
   --color-success-soft: rgba(47, 158, 111, 0.14);
   --color-warning-soft: rgba(191, 136, 37, 0.16);
   --color-danger-soft: rgba(205, 92, 92, 0.14);
   --color-info-soft: rgba(59, 130, 246, 0.14);
-  --color-overlay: rgba(6, 12, 22, 0.72);
-  --color-overlay-strong: rgba(6, 12, 22, 0.84);
+  --color-overlay: rgba(6, 7, 10, 0.72);
+  --color-overlay-strong: rgba(6, 7, 10, 0.84);
 
   /* Compatibility aliases */
   --bg-primary: var(--color-background);
@@ -71,9 +71,9 @@
 
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-  --gradient-accent: linear-gradient(135deg, var(--color-primary) 0%, var(--color-info) 100%);
+  --gradient-accent: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
   --gradient-danger: linear-gradient(135deg, var(--color-danger) 0%, color-mix(in srgb, var(--color-danger) 72%, #7f1d1d) 100%);
-  --gradient-surface: linear-gradient(135deg, rgba(76, 110, 245, 0.08) 0%, rgba(47, 143, 131, 0.05) 100%);
+  --gradient-surface: linear-gradient(135deg, rgba(107, 115, 208, 0.08) 0%, rgba(47, 143, 131, 0.05) 100%);
 
   /* Text */
   --text-primary: var(--color-text-primary);
@@ -84,12 +84,12 @@
   /* Surfaces */
   --glass-bg: var(--color-card);
   --glass-bg-hover: var(--color-card-hover);
-  --glass-border: rgba(64, 83, 111, 0.6);
-  --glass-border-hover: rgba(105, 126, 158, 0.72);
+  --glass-border: rgba(78, 82, 96, 0.55);
+  --glass-border-hover: rgba(110, 116, 130, 0.65);
 
   /* Semantic surface tokens — dark defaults */
-  --surface-card: rgba(22, 24, 33, 0.72);
-  --surface-card-elevated: rgba(26, 28, 38, 0.84);
+  --surface-card: rgba(22, 23, 28, 0.72);
+  --surface-card-elevated: rgba(26, 27, 32, 0.84);
 
   /* Semantic border tokens — dark defaults (white-on-dark scale) */
   --border-subtle: rgba(255, 255, 255, 0.07);
@@ -105,7 +105,7 @@
   --shadow-sm: 0 2px 8px rgba(2, 6, 16, 0.28);
   --shadow-md: 0 10px 30px rgba(2, 6, 16, 0.34);
   --shadow-lg: 0 20px 48px rgba(2, 6, 16, 0.42);
-  --shadow-glow: 0 14px 30px rgba(76, 110, 245, 0.14);
+  --shadow-glow: 0 14px 30px rgba(107, 115, 208, 0.14);
   --shadow-glow-cyan: 0 14px 30px rgba(47, 143, 131, 0.12);
 
   /* Surface elevation shadows — dark defaults */
@@ -179,4 +179,66 @@
   --transition-base: 250ms ease;
   --transition-slow: 400ms ease;
   --transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* === Landing Material Tokens =============================================
+     Frosted glass surface system for landing page and navbar.
+     These are dark-mode defaults. Light-mode overrides live in theme.css.
+     All landing components must consume these — no parallel definitions.
+     ===================================================================== */
+
+  /* Surfaces — dark defaults (transparent white glass on dark background) */
+  --landing-glass-surface:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03) 42%, rgba(255, 255, 255, 0.01) 100%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(148, 163, 184, 0.04) 52%, rgba(100, 116, 139, 0.02) 100%),
+    rgba(255, 255, 255, 0.04);
+  --landing-glass-surface-strong:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.04) 42%, rgba(255, 255, 255, 0.02) 100%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(148, 163, 184, 0.05) 52%, rgba(100, 116, 139, 0.02) 100%),
+    rgba(255, 255, 255, 0.05);
+  --landing-glass-surface-soft:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02) 42%, rgba(255, 255, 255, 0.01) 100%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(148, 163, 184, 0.03) 52%, rgba(100, 116, 139, 0.01) 100%),
+    rgba(255, 255, 255, 0.03);
+
+  /* Steel CTA surface — used for primary CTAs, same structure in both modes */
+  --landing-glass-steel:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(203, 213, 225, 0.08) 42%, rgba(148, 163, 184, 0.04) 100%),
+    linear-gradient(180deg, rgba(88, 104, 126, 0.82), rgba(57, 72, 92, 0.84)),
+    rgba(71, 85, 105, 0.72);
+
+  /* Borders — dark defaults (aliased to existing border scale) */
+  --landing-glass-border: var(--border-default);
+  --landing-glass-border-soft: var(--border-subtle);
+
+  /* Shadows — dark defaults (include top-highlight via semantic token) */
+  --landing-glass-shadow:
+    0 20px 48px rgba(0, 0, 0, 0.32),
+    0 8px 20px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 var(--highlight-top);
+  --landing-glass-shadow-soft:
+    0 14px 32px rgba(0, 0, 0, 0.24),
+    0 6px 14px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 var(--highlight-top);
+  --landing-glass-shadow-strong:
+    0 28px 64px rgba(0, 0, 0, 0.38),
+    0 12px 28px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 var(--highlight-top);
+
+  /* Text — dark defaults (light text on dark landing background) */
+  --landing-text-strong: rgba(248, 250, 252, 0.96);
+  --landing-text: rgba(226, 232, 240, 0.90);
+  --landing-text-soft: rgba(226, 232, 240, 0.82);
+  --landing-text-muted: rgba(203, 213, 225, 0.68);
+
+  /* === Auth Material Tokens ================================================
+     Surface and shadow tokens for the auth frame and form panel.
+     Dark-mode defaults. Light-mode overrides live in theme.css.
+     Visual panel backgrounds are intentionally auth-only dark art direction
+     and are not tokenized here.
+     ===================================================================== */
+
+  --surface-auth: rgba(11, 18, 31, 0.94);
+  --shadow-auth:
+    0 28px 80px rgba(2, 6, 16, 0.42),
+    inset 0 1px 0 var(--highlight-top);
 }

@@ -1,5 +1,7 @@
 "use client";
 
+import styles from "./PaginationControls.module.css";
+
 interface PaginationControlsProps {
   page: number;
   totalPages: number;
@@ -18,9 +20,9 @@ export default function PaginationControls({
   const pages = Array.from({ length: Math.min(totalPages, 7) }, (_, index) => index + 1);
 
   return (
-    <div className="pagination">
+    <div className={styles.pagination}>
       <button
-        className="pagination-btn"
+        className={styles.paginationBtn}
         disabled={page <= 1}
         onClick={() => onPageChange(page - 1)}
         aria-label="Previous page"
@@ -30,7 +32,7 @@ export default function PaginationControls({
       {pages.map((value) => (
         <button
           key={value}
-          className={`pagination-btn ${page === value ? "active" : ""}`}
+          className={`${styles.paginationBtn} ${page === value ? styles.active : ""}`.trim()}
           onClick={() => onPageChange(value)}
           aria-current={page === value ? "page" : undefined}
         >
@@ -38,7 +40,7 @@ export default function PaginationControls({
         </button>
       ))}
       <button
-        className="pagination-btn"
+        className={styles.paginationBtn}
         disabled={page >= totalPages}
         onClick={() => onPageChange(page + 1)}
         aria-label="Next page"

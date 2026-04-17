@@ -137,35 +137,10 @@
   color: var(--landing-text-muted, var(--text-tertiary));
 }
 
-[data-theme="dark"] .footerTitle {
-  color: rgba(248, 250, 252, 0.96);
-}
-
-[data-theme="dark"] .footerSubtitle {
-  color: rgba(226, 232, 240, 0.82);
-}
-
-[data-theme="dark"] .footerNavLabel {
-  color: rgba(203, 213, 225, 0.64);
-}
-
-[data-theme="dark"] .footerNavLink,
-[data-theme="dark"] .footerLegalLink {
-  color: rgba(226, 232, 240, 0.8);
-}
-
 [data-theme="dark"] .footerNavLink:hover,
 [data-theme="dark"] .footerLegalLink:hover {
   color: rgba(248, 250, 252, 0.98);
   background: rgba(255, 255, 255, 0.12);
-}
-
-[data-theme="dark"] .footerCopyright {
-  color: rgba(226, 232, 240, 0.8);
-}
-
-[data-theme="dark"] .footerNote {
-  color: rgba(203, 213, 225, 0.62);
 }
 
 [data-theme="light"] .footer::before {

@@ -1,6 +1,7 @@
 "use client";
 
 import EmptyState from "@/components/ui/EmptyState";
+import styles from "./StateSurface.module.css";
 
 interface StateSurfaceProps {
   type: "loading" | "empty" | "error";
@@ -27,18 +28,20 @@ export default function StateSurface({
   className = "",
   lines = 3,
 }: StateSurfaceProps) {
-  const shellClassName = `${framed ? "card " : ""}state-surface ${className}`.trim();
+  const shellClassName = [framed ? "card" : "", styles.stateSurface, className]
+    .filter(Boolean)
+    .join(" ");
 
   if (type === "loading") {
     return (
       <div className={shellClassName} aria-busy="true" aria-live="polite">
-        <div className="state-loading">
-          <div className="skeleton skeleton-heading state-loading-heading" />
+        <div className={styles.stateLoading}>
+          <div className={`skeleton skeleton-heading ${styles.stateLoadingHeading}`} />
           {Array.from({ length: lines }).map((_, index) => (
             <div
               key={index}
-              className={`skeleton skeleton-text state-loading-line ${
-                index === lines - 1 ? "state-loading-line-short" : ""
+              className={`skeleton skeleton-text ${styles.stateLoadingLine} ${
+                index === lines - 1 ? styles.stateLoadingLineShort : ""
               }`.trim()}
             />
           ))}

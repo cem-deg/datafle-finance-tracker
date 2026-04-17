@@ -23,11 +23,8 @@
   border-radius: 999px;
   pointer-events: auto;
   overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.52), rgba(226, 232, 240, 0.2) 42%, rgba(226, 232, 240, 0.08) 100%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(191, 219, 254, 0.16) 52%, rgba(148, 163, 184, 0.1) 100%),
-    rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.46);
+  background: var(--landing-glass-surface-strong);
+  border: 1px solid var(--landing-glass-border);
   box-shadow:
     0 20px 48px rgba(15, 23, 42, 0.12),
     0 8px 24px rgba(148, 163, 184, 0.14),
@@ -99,10 +96,8 @@
   min-width: 0;
   padding: 0.38rem 0.72rem 0.38rem 0.44rem;
   border-radius: 999px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(226, 232, 240, 0.18)),
-    rgba(255, 255, 255, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.44);
+  background: var(--landing-glass-surface);
+  border: 1px solid var(--landing-glass-border);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.72) inset,
     0 10px 24px rgba(15, 23, 42, 0.08);
@@ -268,10 +263,7 @@
   font-size: 0.9rem;
   font-weight: 700;
   letter-spacing: -0.01em;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(191, 219, 254, 0.08) 42%, rgba(148, 163, 184, 0.04) 100%),
-    linear-gradient(180deg, rgba(88, 104, 126, 0.82), rgba(57, 72, 92, 0.84)),
-    rgba(71, 85, 105, 0.72);
+  background: var(--landing-glass-steel);
   box-shadow:
     0 12px 24px rgba(15, 23, 42, 0.12),
     0 1px 0 rgba(255, 255, 255, 0.22) inset,
@@ -323,11 +315,8 @@
   padding: 1rem;
   border-radius: 32px;
   overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.56), rgba(226, 232, 240, 0.22) 42%, rgba(226, 232, 240, 0.08) 100%),
-    linear-gradient(155deg, rgba(255, 255, 255, 0.26), rgba(191, 219, 254, 0.12)),
-    rgba(255, 255, 255, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.46);
+  background: var(--landing-glass-surface-strong);
+  border: 1px solid var(--landing-glass-border);
   box-shadow:
     0 30px 56px rgba(15, 23, 42, 0.14),
     0 1px 0 rgba(255, 255, 255, 0.74) inset;
@@ -358,10 +347,8 @@
   align-items: start;
   padding: 1rem;
   border-radius: 24px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.52), rgba(226, 232, 240, 0.14)),
-    rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: var(--landing-glass-surface);
+  border: 1px solid var(--landing-glass-border-soft);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.68) inset;
 }
 
@@ -408,10 +395,8 @@
   min-height: 56px;
   padding: 0 1rem;
   border-radius: 20px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(226, 232, 240, 0.14)),
-    rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.38);
+  background: var(--landing-glass-surface-soft);
+  border: 1px solid var(--landing-glass-border-soft);
   color: rgba(15, 23, 42, 0.9);
   font-size: 1rem;
   font-weight: 600;
@@ -447,10 +432,8 @@
   gap: 0.5rem;
   padding: 0 1rem;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.38);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(226, 232, 240, 0.14)),
-    rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--landing-glass-border-soft);
+  background: var(--landing-glass-surface-soft);
   color: rgba(15, 23, 42, 0.88);
   font-size: 0.9rem;
   font-weight: 600;
@@ -494,11 +477,8 @@
 }
 
 [data-theme="dark"] .navbar {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03) 42%, rgba(255, 255, 255, 0.01) 100%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(148, 163, 184, 0.04) 52%, rgba(100, 116, 139, 0.02) 100%),
-    rgba(255, 255, 255, 0.04);
-  border-color: var(--border-default);
+  background: var(--landing-glass-surface-strong);
+  border-color: var(--landing-glass-border);
   box-shadow:
     0 24px 56px rgba(0, 0, 0, 0.32),
     0 1px 0 rgba(255, 255, 255, 0.1) inset,
@@ -517,21 +497,16 @@
 }
 
 [data-theme="dark"] .mobilePanel {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03) 42%, rgba(255, 255, 255, 0.01) 100%),
-    linear-gradient(155deg, rgba(255, 255, 255, 0.06), rgba(148, 163, 184, 0.04)),
-    rgba(255, 255, 255, 0.04);
-  border-color: var(--border-default);
+  background: var(--landing-glass-surface-strong);
+  border-color: var(--landing-glass-border);
   box-shadow:
     0 30px 60px rgba(0, 0, 0, 0.36),
     0 1px 0 rgba(255, 255, 255, 0.1) inset;
 }
 
 [data-theme="dark"] .logo {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04)),
-    rgba(255, 255, 255, 0.04);
-  border-color: var(--border-default);
+  background: var(--landing-glass-surface);
+  border-color: var(--landing-glass-border);
 }
 
 [data-theme="dark"] .logoCopy strong {
@@ -583,10 +558,8 @@
 }
 
 [data-theme="dark"] .mobileBrand {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
-    rgba(255, 255, 255, 0.04);
-  border-color: var(--border-default);
+  background: var(--landing-glass-surface);
+  border-color: var(--landing-glass-border);
 }
 
 [data-theme="dark"] .mobileBrand strong {
@@ -598,10 +571,8 @@
 }
 
 [data-theme="dark"] .mobileLink {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
-    rgba(255, 255, 255, 0.04);
-  border-color: var(--border-default);
+  background: var(--landing-glass-surface);
+  border-color: var(--landing-glass-border);
   color: rgba(203, 213, 225, 0.9);
 }
 
@@ -613,10 +584,8 @@
 
 [data-theme="dark"] .mobileThemeButton,
 [data-theme="dark"] .mobileSignIn {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
-    rgba(255, 255, 255, 0.04);
-  border-color: var(--border-default);
+  background: var(--landing-glass-surface);
+  border-color: var(--landing-glass-border);
   color: rgba(203, 213, 225, 0.88);
 }
 

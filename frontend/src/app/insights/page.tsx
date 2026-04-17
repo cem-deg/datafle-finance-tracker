@@ -30,6 +30,7 @@ import {
 } from "@/hooks/useData";
 import { useCurrency } from "@/context/CurrencyContext";
 import type { InsightResponse } from "@/types";
+import styles from "./InsightsPage.module.css";
 
 function SpendingHealthScore({ score, label }: { score: number; label: string }) {
   const radius = 42;
@@ -43,12 +44,12 @@ function SpendingHealthScore({ score, label }: { score: number; label: string })
         : "var(--color-danger)";
 
   return (
-    <div className="health-score-card">
-      <div className="score-ring">
+    <div className={styles.healthScoreCard}>
+      <div className={styles.scoreRing}>
         <svg viewBox="0 0 100 100">
-          <circle className="ring-bg" cx="50" cy="50" r={radius} />
+          <circle className={styles.ringBg} cx="50" cy="50" r={radius} />
           <circle
-            className="ring-fill"
+            className={styles.ringFill}
             cx="50"
             cy="50"
             r={radius}
@@ -57,14 +58,14 @@ function SpendingHealthScore({ score, label }: { score: number; label: string })
             strokeDashoffset={offset}
           />
         </svg>
-        <div className="score-text">
-          <span className="score-value" style={{ color }}>
+        <div className={styles.scoreText}>
+          <span className={styles.scoreValue} style={{ color }}>
             {score}
           </span>
-          <span className="score-label">Score</span>
+          <span className={styles.scoreLabel}>Score</span>
         </div>
       </div>
-      <div className="health-details">
+      <div className={styles.healthDetails}>
         <h3>Financial Health</h3>
         <p>{label}</p>
       </div>
@@ -238,9 +239,9 @@ export default function InsightsPage() {
         title="Smart Insights"
         description="Personalized financial analysis and recommendations"
         actions={
-          <div className="insight-mode-toggle">
+          <div className={styles.insightModeToggle}>
             <button
-              className={`insight-mode-btn ${mode === "rule" ? "active" : ""}`}
+              className={`${styles.insightModeBtn} ${mode === "rule" ? styles.insightModeBtnActive : ""}`.trim()}
               onClick={() => handleModeChange("rule")}
               id="mode-rule"
               type="button"
@@ -250,7 +251,7 @@ export default function InsightsPage() {
               Rule-based
             </button>
             <button
-              className={`insight-mode-btn ${mode === "ai" ? "active" : ""}`}
+              className={`${styles.insightModeBtn} ${mode === "ai" ? styles.insightModeBtnActive : ""}`.trim()}
               onClick={() => handleModeChange("ai")}
               id="mode-ai"
               type="button"
@@ -265,7 +266,7 @@ export default function InsightsPage() {
 
       <PageFeedback errorMessages={pageErrors} />
 
-      <div className="insights-grid animate-in animate-in-delay-1">
+      <div className={`${styles.insightsGrid} animate-in animate-in-delay-1`}>
         <SpendingHealthScore score={healthScore} label={healthLabel} />
 
         <PanelCard>
@@ -276,24 +277,24 @@ export default function InsightsPage() {
             description="Reduce top categories by 10%"
           />
           {savingsOpportunities.length === 0 ? (
-            <p className="muted-copy">Add expenses to see savings opportunities</p>
+            <p className={styles.mutedCopy}>Add expenses to see savings opportunities</p>
           ) : (
             savingsOpportunities.map((opportunity) => (
-              <div key={opportunity.name} className="savings-item">
-                <div className="label-stack">
+              <div key={opportunity.name} className={styles.savingsItem}>
+                <div className={styles.labelStack}>
                   <strong>{opportunity.name}</strong>
                   <span>{opportunity.percentage}%</span>
                 </div>
-                <div className="savings-bar-wrap">
+                <div className={styles.savingsBarWrap}>
                   <div
-                    className="savings-bar"
+                    className={styles.savingsBar}
                     style={{
                       width: `${opportunity.percentage}%`,
                       background: opportunity.color,
                     }}
                   />
                 </div>
-                <div className="progress-card-percent amount-positive">
+                <div className={styles.savingsMetric}>
                   <ArrowDown size={12} />{" "}
                   {convertAndFormat(opportunity.potential, categoryDistributionBaseCurrency)}
                 </div>
@@ -305,11 +306,11 @@ export default function InsightsPage() {
 
       <div className="animate-in animate-in-delay-2 section-heading-tight">
         <h3 className="section-heading">Smart Alerts</h3>
-        <div className="progress-list">
+        <div className={styles.alertStack}>
           {alerts.length === 0 ? (
-            <div className="smart-alert">
+            <div className={styles.smartAlert}>
               <div
-                className="alert-icon"
+                className={styles.alertIcon}
                 style={{
                   background: "var(--color-info-soft)",
                   color: "var(--color-info)",
@@ -317,22 +318,22 @@ export default function InsightsPage() {
               >
                 <Lightbulb size={18} />
               </div>
-              <div className="alert-content">
-                <div className="alert-title">No alerts yet</div>
-                <div className="alert-desc">
+              <div className={styles.alertContent}>
+                <div className={styles.alertTitle}>No alerts yet</div>
+                <div className={styles.alertDesc}>
                   Add more expenses to get personalized alerts and recommendations.
                 </div>
               </div>
             </div>
           ) : (
             alerts.map((alert, index) => (
-              <div key={index} className="smart-alert">
-                <div className="alert-icon" style={{ background: alert.bg, color: alert.color }}>
+              <div key={index} className={styles.smartAlert}>
+                <div className={styles.alertIcon} style={{ background: alert.bg, color: alert.color }}>
                   {alert.icon}
                 </div>
-                <div className="alert-content">
-                  <div className="alert-title">{alert.title}</div>
-                  <div className="alert-desc">{alert.desc}</div>
+                <div className={styles.alertContent}>
+                  <div className={styles.alertTitle}>{alert.title}</div>
+                  <div className={styles.alertDesc}>{alert.desc}</div>
                 </div>
               </div>
             ))
@@ -358,9 +359,9 @@ export default function InsightsPage() {
             compact
           />
         ) : (
-          <PanelCard className="insight-surface">
+          <PanelCard className={styles.insightSurface}>
             <div
-              className="insight-surface-accent"
+              className={styles.insightSurfaceAccent}
               style={{
                 background: mode === "ai" ? "var(--gradient-primary)" : "var(--gradient-accent)",
               }}
@@ -377,7 +378,7 @@ export default function InsightsPage() {
               }
             />
             {insight?.insight ? (
-              <div className="insight-card insight-card-shell">{insight.insight}</div>
+              <div className={`${styles.insightCard} ${styles.insightCardShell}`}>{insight.insight}</div>
             ) : (
               <StateSurface
                 type="empty"

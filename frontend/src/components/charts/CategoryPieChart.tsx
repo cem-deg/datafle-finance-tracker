@@ -7,6 +7,8 @@ import {
 import { useCurrency } from "@/context/CurrencyContext";
 import { CATEGORY_COLORS } from "@/utils/constants";
 import type { CategoryDistribution, Category } from "@/types";
+import primitiveStyles from "./ChartPrimitives.module.css";
+import styles from "./CategoryPieChart.module.css";
 
 interface Props {
   data: CategoryDistribution[];
@@ -32,8 +34,8 @@ function CustomTooltip({
   const formatted = convertAndFormat ? convertAndFormat(item.value, baseCurrency) : `${item.value.toLocaleString()}`;
   
   return (
-    <div className="chart-tooltip">
-      <p className="chart-tooltip-value" style={{ marginBottom: 4 }}>{item.name}</p>
+    <div className={primitiveStyles.tooltip}>
+      <p className={primitiveStyles.tooltipValue} style={{ marginBottom: 4 }}>{item.name}</p>
       <p>{formatted} ({item.payload.percentage}%)</p>
     </div>
   );
@@ -59,8 +61,8 @@ function CategoryPieChart({ data, categories, baseCurrency }: Props) {
       <div className="card-header">
         <h3 className="card-title">Category Distribution</h3>
       </div>
-      <div className="chart-container chart-layout">
-        <div className="chart-main">
+      <div className={`${primitiveStyles.container} ${styles.layout}`}>
+        <div className={styles.main}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -81,12 +83,12 @@ function CategoryPieChart({ data, categories, baseCurrency }: Props) {
             </PieChart>
           </ResponsiveContainer>
         </div>
-        <div className="chart-sidebar">
+        <div className={styles.sidebar}>
           {chartData.slice(0, 6).map((entry, i) => (
-            <div key={i} className="chart-legend-item">
-              <div className="chart-legend-dot" style={{ background: entry.color }} />
-              <span className="chart-legend-label">{entry.name}</span>
-              <span className="chart-legend-value">{entry.percentage}%</span>
+            <div key={i} className={styles.legendItem}>
+              <div className={styles.legendDot} style={{ background: entry.color }} />
+              <span className={styles.legendLabel}>{entry.name}</span>
+              <span className={styles.legendValue}>{entry.percentage}%</span>
             </div>
           ))}
         </div>

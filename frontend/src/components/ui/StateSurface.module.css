@@ -1,0 +1,28 @@
+.stateSurface {
+  display: flex;
+  align-items: stretch;
+}
+
+.stateLoading {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-xl);
+  min-height: 220px;
+  justify-content: center;
+}
+
+.stateLoadingHeading {
+  width: min(240px, 70%);
+  margin-bottom: var(--space-xs);
+}
+
+.stateLoadingLine {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.stateLoadingLineShort {
+  width: 72%;
+}
