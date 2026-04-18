@@ -1,4 +1,20 @@
-.dashboardRoot {}
+/* -- 0. Dashboard accent calibration --------------------------------
+   Override the primary accent family within the dashboard surface context.
+   CSS custom properties cascade into all child components (sidebar active
+   state, section eyebrows, empty-state icons, stat-card glows, badges)
+   without touching landing, auth, or any other page. */
+.dashboardRoot {
+  --color-primary: #5c6090;
+  --color-primary-hover: #4e5280;
+  --color-primary-soft: rgba(92, 96, 144, 0.09);
+  --rgb-primary: 92 96 144;
+  --shadow-glow: 0 14px 28px rgba(92, 96, 144, 0.09);
+}
+
+:global([data-theme="light"]) .dashboardRoot {
+  --color-primary-soft: rgba(74, 82, 168, 0.08);
+  --shadow-glow: 0 12px 24px rgba(74, 82, 168, 0.07);
+}
 
 /* ===================================================================
    Dashboard - Owned Style Layer

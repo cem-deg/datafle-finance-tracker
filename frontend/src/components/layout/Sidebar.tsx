@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -10,9 +10,10 @@ import { NAV_ITEMS, APP_NAME } from "@/utils/constants";
 import {
   LayoutDashboard, Wallet, BarChart3, Lightbulb, Tags,
   LogOut, TrendingUp, Sun, Moon, Settings, ChevronDown,
-  Calendar, Globe, X,
+  Calendar, Globe,
   Banknote, Target,
 } from "lucide-react";
+import ModalShell from "@/components/ui/ModalShell";
 import styles from "./Sidebar.module.css";
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -25,6 +26,27 @@ const iconMap: Record<string, React.ReactNode> = {
   tags: <Tags size={20} />,
 };
 
+const currencyMarks: Record<string, string> = {
+  USD: "$",
+  EUR: "€",
+  TRY: "₺",
+  GBP: "£",
+  JPY: "¥",
+  KRW: "₩",
+  CAD: "C$",
+  AUD: "A$",
+  CHF: "Fr",
+  INR: "₹",
+  BRL: "R$",
+  MXN: "M$",
+  SEK: "Skr",
+  NOK: "Nkr",
+  PLN: "zł",
+  AED: "دإ",
+  SAR: "SR",
+  RUB: "₽",
+};
+
 export default function Sidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
@@ -32,27 +54,11 @@ export default function Sidebar() {
   const { currency, setCurrency } = useCurrency();
   const [profileExpanded, setProfileExpanded] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const settingsTitleId = useId();
 
   const initial = user?.name?.charAt(0)?.toUpperCase() || "U";
   const memberSince = user?.created_at
     ? new Date(user.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })
     : "";
-
-  useEffect(() => {
-    if (!showSettings) {
-      return;
-    }
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setShowSettings(false);
-      }
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [showSettings]);
 
   return (
     <>
@@ -144,62 +150,53 @@ export default function Sidebar() {
 
       {/* Settings Modal */}
       {showSettings && (
-        <div className="modal-overlay modal-overlay-elevated" onClick={() => setShowSettings(false)}>
-          <div
-            className="modal"
-            onClick={(e) => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby={settingsTitleId}
-            tabIndex={-1}
-          >
-            <div className={styles.settingsHeader}>
-              <h2 className="modal-title" id={settingsTitleId}>Settings</h2>
-              <button className="btn btn-ghost btn-icon" onClick={() => setShowSettings(false)} type="button" aria-label="Close settings"><X size={20} /></button>
-            </div>
-
-            <div className={styles.settingsSection}>
-              <h3>Currency</h3>
-              <p className={styles.settingsHelp}>
-                Select your preferred currency for displaying amounts
-              </p>
-              <div className={styles.currencyGrid}>
-                {SUPPORTED_CURRENCIES.map((c) => (
-                  <button
-                    key={c.code}
-                    type="button"
-                    className={`${styles.currencyOption} ${currency.code === c.code ? styles.currencyOptionSelected : ""}`.trim()}
-                    onClick={() => setCurrency(c.code)}
-                    aria-pressed={currency.code === c.code}
-                  >
+        <ModalShell title="Settings" onClose={() => setShowSettings(false)}>
+          <div className={styles.settingsSection}>
+            <h3>Currency</h3>
+            <p className={styles.settingsHelp}>
+              Select your preferred currency for displaying amounts
+            </p>
+            <div className={styles.currencyGrid}>
+              {SUPPORTED_CURRENCIES.map((c) => (
+                <button
+                  key={c.code}
+                  type="button"
+                  className={`${styles.currencyOption} ${currency.code === c.code ? styles.currencyOptionSelected : ""}`.trim()}
+                  onClick={() => setCurrency(c.code)}
+                  aria-pressed={currency.code === c.code}
+                >
+                  <span className={styles.currencyMark} aria-hidden="true">
+                    {currencyMarks[c.code] ?? c.symbol}
+                  </span>
+                  <span className={styles.currencyMeta}>
+                    <span className={styles.currencyCode}>{c.code}</span>
                     <span className={styles.currencyFlag}>{c.flag}</span>
-                    <span>{c.code}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className={styles.settingsSection}>
-              <h3>Theme</h3>
-              <div className={styles.settingsThemeRow}>
-                <button
-                  className={`btn btn-equal ${theme === "dark" ? "btn-primary" : "btn-secondary"}`}
-                  onClick={() => { if (theme !== "dark") toggleTheme(); }}
-                  type="button"
-                >
-                  <Moon size={16} /> Dark
+                  </span>
                 </button>
-                <button
-                  className={`btn btn-equal ${theme === "light" ? "btn-primary" : "btn-secondary"}`}
-                  onClick={() => { if (theme !== "light") toggleTheme(); }}
-                  type="button"
-                >
-                  <Sun size={16} /> Light
-                </button>
-              </div>
+              ))}
             </div>
           </div>
-        </div>
+
+          <div className={styles.settingsSection}>
+            <h3>Theme</h3>
+            <div className={styles.settingsThemeRow}>
+              <button
+                className={`btn btn-equal ${theme === "dark" ? "btn-primary" : "btn-secondary"}`}
+                onClick={() => { if (theme !== "dark") toggleTheme(); }}
+                type="button"
+              >
+                <Moon size={16} /> Dark
+              </button>
+              <button
+                className={`btn btn-equal ${theme === "light" ? "btn-primary" : "btn-secondary"}`}
+                onClick={() => { if (theme !== "light") toggleTheme(); }}
+                type="button"
+              >
+                <Sun size={16} /> Light
+              </button>
+            </div>
+          </div>
+        </ModalShell>
       )}
     </>
   );
